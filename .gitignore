@@ -1,0 +1,6 @@
+*.*-workspace
+*.*-project
+__pycache__
+test.py
+cookies.txt
+.DS_Store
