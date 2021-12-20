@@ -26,6 +26,12 @@ class Video(DictFromAttribute):
         self.client, self.url, self.data = client, url, data
         super().__init__(self.data)
 
+    def get_download_link(self):
+        ...
+
+    def _heartbeat(self):
+        ...
+
 
 class Client(BaseClient):
     def get_video(self, url: str, headers: Headers = VIDEO) -> Union[Video, NoReturn]:
@@ -50,8 +56,9 @@ class Client(BaseClient):
             url = url.replace("sp", "www")
 
         data = BeautifulSoup(
-            request(self, "method", url, headers=headers, cookies=self.cookies).text,
-            "html.parser"
+            self.client.request(
+                "get", url, headers=headers, cookies=self.cookies
+            ).text, "html.parser"
         ).find(
             "div", {"id": "js-initial-watch-data"}
         ).get("data-api-data")
