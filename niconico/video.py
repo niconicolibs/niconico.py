@@ -10,7 +10,6 @@ from .base import DictFromAttribute, BaseClient
 from .exceptions import ExtractFailed
 from .headers import Headers, VIDEO
 from ._json import loads, dumps
-from .utils import request
 
 from .types.video import EasyComment, Tag, Video as VideoType
 
