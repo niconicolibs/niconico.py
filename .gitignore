@@ -3,4 +3,5 @@
 __pycache__
 test.py
 cookies.txt
-.DS_Store
+.*
+samples

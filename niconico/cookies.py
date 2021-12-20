@@ -1,5 +1,7 @@
 # niconico.py - Cookies
 
+from typing import Optional
+
 from http.cookies import SimpleCookie
 
 from datetime import datetime, timedelta
@@ -45,9 +47,9 @@ class Cookies(SimpleCookie):
         return cookies
 
     @classmethod
-    def guest(cls):
+    def guest(cls, nicosid: Optional[str] = None):
         cookies = cls()
-        cookies["nicosid"] = str(time())
+        cookies["nicosid"] = nicosid or str(time())
         for key, value in (
             ("domain", ".nicovideo.jp"), ("path", "/"),
             ("expires", (datetime.now() + timedelta(days=365)).strftime(FORMAT))
