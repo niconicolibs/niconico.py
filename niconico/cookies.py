@@ -14,15 +14,11 @@ FORMAT = "%a, %d-%b-%Y %X"
 class Cookies(SimpleCookie):
     @classmethod
     def from_file(cls, path: str):
-        """Create a cookie class from the stored cookies created by Netscape's cookie file format.
+        """Netscapeのクッキーファイルフォーマットに準拠したテキストファイルからクッキーが格納されたクラスを作成します。
 
         Parameters
         ----------
         path : str
-
-        Returns
-        -------
-        Cookies
 
         Raises
         ------
@@ -48,6 +44,11 @@ class Cookies(SimpleCookie):
 
     @classmethod
     def guest(cls, nicosid: Optional[str] = None):
+        """ニコニコのゲストアカウントのクッキーを生成します。  
+
+        Notes
+        -----
+        これはニコニコにアクセスして作成するクッキーではなく開発者がクッキーを見て予想して作った再現物です。"""
         cookies = cls()
         cookies["nicosid"] = nicosid or str(time())
         for key, value in (
