@@ -1,11 +1,9 @@
 # niconico.py - Base
 
-from typing import TYPE_CHECKING, Union, Optional
-
-from .cookies import Cookies
+from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
-    from .client import NicoNico
+    from .niconico import NicoNico
 
 
 class DictFromAttribute:
@@ -39,9 +37,30 @@ class DictFromAttribute:
 
 
 class BaseClient:
+    """クライアントクラスのベースクラスです。  
+    ここでいうベースクラスはニコニコの各サービスのために用意するクライアントに使われるもので、 :class:`niconico.niconico.NicoNico` では使われません。
+
+    Parameters
+    ----------
+    cookies : Cookies, optional
+        リクエストを行う際に使用するクッキーです。
+        指定しない場合は :func:`niconico.cookies.Cookies.guest` を実行して返ってきたものが使われます。"""
 
     if TYPE_CHECKING:
-        client: NicoNico
+        niconico: NicoNico
 
-    def __init__(self, cookies: Optional[Cookies] = None):
-        self.cookies = cookies
+    def log(self, type_: str, content: str, *args, **kwargs):
+        """クラスの名前を使ってログ出力を行います。
+        :attr:`niconico.niconico.NicoNico.logger` が使用されます。
+        普通これは開発者が使います。
+
+        Parameters
+        ----------
+        type_ : str
+        content : str
+        *args
+        **kwargs"""
+        return getattr(self.niconico.logger, type_)(content, *args, **kwargs)
+
+    def __init__(self, niconico: NicoNico):
+        self.niconico = niconico
