@@ -1,5 +1,7 @@
 # niconico.py - Base
 
+from __future__ import annotations
+
 from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
@@ -15,7 +17,7 @@ class DictFromAttribute:
     ):
         self.data = data
         self.__dfa_class__ = dfa_class or [
-            cls for cls in self.__mro__ if hasattr(cls, "_dfa")
+            cls for cls in self.__class__.__mro__ if hasattr(cls, "_dfa")
         ][0]
 
     @classmethod
