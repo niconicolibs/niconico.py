@@ -188,14 +188,14 @@ class Video(DictFromAttribute):
 
         # ファイルサイズを取得する。
         size = int(
-            self.niconico.request(
+            self.client.niconico.request(
                 "head", self._download_link, headers=headers, params=(params := (
                     (
                         "ht2_nicovideo",
-                        self.result_data["content_auth"]["content_auth_info"]["value"]
+                        self.session["content_auth"]["content_auth_info"]["value"]
                     ),
                 ))
-            ).headers.get("content-length")
+            ).headers["content-length"]
         )
 
         self.log("info", "Downloading...")
@@ -257,9 +257,7 @@ class Video(DictFromAttribute):
     def _make_session_data(self, mode: VideoDownloadMode):
         # セッション用のデータを作る。
         # TODO: このセッションデータの画質設定等を解析してできればもっと細かく設定できるようにする。
-        print(self.data)
-        movie = self.data["media"]["delivery"]
-        session = movie["session"]
+        session = self.data["media"]["delivery"]["movie"]["session"]
         data: dict[Any, Any] = {}
 
         data["content_type"] = "movie"
@@ -285,7 +283,6 @@ class Video(DictFromAttribute):
         }
         data["recipe_id"] = session["recipeId"]
         data["priority"] = session["priority"]
-        assert mode is VideoDownloadMode, "動画取得方法の指定方法が違います。"
         parameters = {
             VideoDownloadMode.http_output_download_parameters.name: {
                 "use_well_known_port": "yes" if session["urls"][0]["isWellKnownPort"] else "no",
@@ -318,7 +315,7 @@ class Video(DictFromAttribute):
         data["client_info"] = {
             "player_id": session["playerId"]
         }
-        del session, movie
+        del session
 
         return {"session": data}
 
