@@ -29,6 +29,7 @@ class NicoNico:
         引数は ``requests.request`` と同じです。"""
         kwargs["cookies"] = self.cookies
         response = requests.request(method, url, *args, **kwargs)
+        response.raise_for_status()
         if self.cookies is None:
             self.cookies = Cookies.guest(response.cookies["nicosid"])
         return response

@@ -67,11 +67,15 @@ class Video(DictFromAttribute):
     def __init__(self, client: Client, url: str, data: dict):
         self.client, self.url, self.data = client, url, data
         self.thread = Thread(target=self._heartbeat)
-        self.is_heartbeat_running = False
+        self._heartbeat_running = Event()
         super().__init__(self.data)
 
     def __str__(self) -> str:
         return f"<Video Title={self.data['video']['title']} Heartbeat={self.is_heartbeat_running}>"
+
+    @property
+    def is_heartbeat_running(self) -> bool:
+        return self._heartbeat_running.is_set()
 
     def get_download_link(self):
         """ダウンロードリンクを取得します。
@@ -90,26 +94,32 @@ class Video(DictFromAttribute):
         -----
         ハートビートは定期的にニコニコ動画と通信を行うもので別スレッドで動かされます。
         動画使用後には :meth:`niconico.video.Video.close` を実行してスレッドを停止させてください。"""
-        self.is_heartbeat_running = True
         self.thread.start()
         self.client.log("info", "Started heartbeat")
 
     def close(self):
         "ハートビートを停止します。"
         self.client.log("info", "Closing heartbeat")
-        self.is_heartbeat_running = False
+        self._heartbeat_running.clear()
         self.thread.join()
+
+    def _make_url(self, session_id: str) -> str:
+        # Heartbeat用のURLを作る。
+        return f"{BASES['heartbeat']}/{session_id}?_format=json&_method=PUT"
 
     def _heartbeat(self):
         # ハートビート
-        self.log("info", "Send the initial heartbeat data")
-        self.client.niconico.request(
+        self.log("info", "Send the initial heartbeat data to get session id")
+        # セッションIDを取得する。
+        self.session = self.client.niconico.request(
             "POST", f"{BASES['heartbeat']}?_format=json",
             headers=HEADERS["heartbeat"], json=self._make_session_data(
                 VideoDownloadMode.http_output_download_parameters
             )
-        )
-        self.client.niconico.request("POST", "")
+        ).json()["data"]["session"]
+        self.log("info", "Session ID: %s" % self.session["id"])
+        self._heartbeat_running.set()
+        ...
 
     def _make_session_data(self, mode: VideoDownloadMode):
         # セッション用のデータを作る。
