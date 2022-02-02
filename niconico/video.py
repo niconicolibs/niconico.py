@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Union, Any
+from typing import TYPE_CHECKING, Callable, Union, Optional, Any
 
 from threading import Thread, Event
 from time import time, sleep
@@ -96,6 +96,7 @@ class Video(DictFromAttribute):
         self.client, self.url, self.data = client, url, data
         self.thread = Thread(target=self._heartbeat)
         self._heartbeat_running = Event()
+        self._download_log: Optional[Callable[[Any], None]] = None
         super().__init__(self.data)
 
     def __str__(self) -> str:
@@ -150,7 +151,8 @@ class Video(DictFromAttribute):
     def _assert_heartbeat(self):
         assert self.is_heartbeat_running, "ハートベートが動いていません。"
 
-    def get_download_link(self) -> str:
+    @property
+    def download_link(self) -> str:
         """動画のダウンロードリンクを取得します。
 
         Notes
@@ -162,8 +164,7 @@ class Video(DictFromAttribute):
         ------
         AssertionError : ハートビートが動いていない際に発生します。"""
         self._assert_heartbeat()
-        self._download_link = self.session["content_uri"]
-        return self._download_link
+        return self.session["content_uri"]
 
     def download(self, path: str, load_chunk_size: int = 1024) -> None:
         """動画をダウンロードします。
@@ -189,7 +190,7 @@ class Video(DictFromAttribute):
         # ファイルサイズを取得する。
         size = int(
             self.client.niconico.request(
-                "head", self._download_link, headers=headers, params=(params := (
+                "head", self.download_link, headers=headers, params=(params := (
                     (
                         "ht2_nicovideo",
                         self.session["content_auth"]["content_auth_info"]["value"]
@@ -200,7 +201,7 @@ class Video(DictFromAttribute):
 
         self.log("info", "Downloading...")
         r = self.client.niconico.request(
-            "GET", self.get_download_link(), headers=headers, params=params, stream=True
+            "GET", self.download_link, headers=headers, params=params, stream=True
         )
 
         now_size = 0
@@ -209,7 +210,10 @@ class Video(DictFromAttribute):
                 if chunk:
                     now_size += len(chunk)
                     f.write(chunk)
-                    self.log("debug", f"Downloaded: {int(now_size/size*100)}% ({now_size}/{size})")
+                    if self._download_log is not None:
+                        self._download_log(
+                            f"Downloaded: {int(now_size/size*100)}% ({now_size}/{size})"
+                        )
 
         self.log("info", "Done")
 
@@ -235,7 +239,7 @@ class Video(DictFromAttribute):
             headers=HEADERS["heartbeat_first"]
         )
         # ここからは定期的に「生きているよ」のメッセージを送ります。
-        after = self._get_interval(before)
+        after = self._get_interval(time(), {"session": self.session})
         while self._heartbeat_running.is_set():
             now = time()
             if now < after:
@@ -257,24 +261,17 @@ class Video(DictFromAttribute):
     def _make_session_data(self, mode: VideoDownloadMode):
         # セッション用のデータを作る。
         # TODO: このセッションデータの画質設定等を解析してできればもっと細かく設定できるようにする。
-        session = self.data["media"]["delivery"]["movie"]["session"]
+        session = self.data["media"]["delivery"]["movie"]["session"].copy()
         data: dict[Any, Any] = {}
 
         data["content_type"] = "movie"
         data["content_src_id_sets"] = [{"content_src_ids": []}]
-        lv, la = len(session["videos"]), len(session["audios"])
-        for _ in range(lv if lv >= la else la):
-            src_id_to_mux = {
-                "src_id_to_mux": {
-                    "video_src_ids": session["videos"].copy(),
-                    "audio_src_ids": session["audios"].copy()
-                }
+        data["content_src_id_sets"][0]["content_src_ids"].append({
+            "src_id_to_mux": {
+                "video_src_ids": session["videos"],
+                "audio_src_ids": session["audios"]
             }
-            data["content_src_id_sets"][0]["content_src_ids"].append(src_id_to_mux)
-            for k in ("videos", "audios"):
-                if len(session[k]) != 1:
-                    session[k].pop(0)
-        del src_id_to_mux
+        })
         data["timing_constraint"] = "unlimited"
         data["keep_method"] = {
             "heartbeat": {

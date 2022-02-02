@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Type, Optional
 
 if TYPE_CHECKING:
     from .niconico import NicoNico
@@ -10,22 +10,19 @@ if TYPE_CHECKING:
 
 class DictFromAttribute:
 
-    _dfa = True
+    __dfa_class__: Type[DictFromAttribute]
 
     def __init__(
         self, data: dict, dfa_class: Optional["DictFromAttribute"] = None
     ):
         self.data = data
-        self.__dfa_class__ = dfa_class or [
-            cls for cls in self.__class__.__mro__ if hasattr(cls, "_dfa")
-        ][0]
 
     @classmethod
     def _from_data(cls, data):
         if isinstance(data, dict):
-            return cls(data)
+            return cls.__dfa_class__(data)
         elif isinstance(data, list):
-            return [cls._from_data(item) for item in data]
+            return [cls.__dfa_class__._from_data(item) for item in data]
         else:
             return data
 
@@ -36,6 +33,7 @@ class DictFromAttribute:
             raise AttributeError(
                 f"class '{self.__class__.__name__}' has no attributre '{key}'"
             )
+DictFromAttribute.__dfa_class__ = DictFromAttribute
 
 
 class BaseClient:

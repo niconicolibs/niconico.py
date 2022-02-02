@@ -43,12 +43,12 @@ class Cookies(SimpleCookie):
         return cookies
 
     @classmethod
-    def guest(cls, nicosid: Optional[str] = None):
-        """ニコニコのゲストアカウントのクッキーを生成します。  
+    def nicovideo_guest(cls, nicosid: Optional[str] = None):
+        """ニコニコ動画のゲストアカウントのクッキーを生成します。  
 
         Notes
         -----
-        これはニコニコにアクセスして作成するクッキーではなく開発者がクッキーを見て予想して作った再現物です。"""
+        これはニコニコ動画にアクセスして作成するクッキーではなく、開発者がクッキーを見て予想して作った再現物です。"""
         cookies = cls()
         cookies["nicosid"] = nicosid or str(time())
         for key, value in (
