@@ -128,7 +128,7 @@ class Video(DictFromAttribute):
         -----
         ハートビートは定期的にニコニコ動画と通信を行うもので別スレッドで動かされます。
         動画使用後には :meth:`niconico.video.Video.close` を実行してハートビートを停止させてください。
-        また、`with`構文を使用すればこの関数と :meth:`niconico.video.Video.close` を省略することができます。"""
+        また、 ``with`` 構文を使用すればこの関数と :meth:`niconico.video.Video.close` を省略することができます。"""
         self.thread.start()
         self._heartbeat_running.wait()
         self.client.log("info", "Started heartbeat")
