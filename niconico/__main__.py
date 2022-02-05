@@ -29,7 +29,7 @@ def set_stdout_logger(name=None):
     logger.addHandler(stderr_handler)
 
 
-if __name__ == "__main__":
+def main():
     HELP = """# ニコニコスクレイピングツール
 ニコニコから様々なデータを取り出すためのツールです。
 ニコニコ動画から動画をダウンロードしたりすることができます。

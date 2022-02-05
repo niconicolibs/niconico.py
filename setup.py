@@ -15,7 +15,7 @@ else:
     long_description = DESCRIPTION
 
 
-with open(f"{NAME}/__init__.py", "r") as f:
+with open(f"{NAME[:-3]}/__init__.py", "r") as f:
     text = f.read()
     version = text.split('__version__ = "')[1].split('"')[0]
     author = text.split('__author__ = "')[1].split('"')[0]
@@ -29,15 +29,19 @@ setup(
     long_description_content_type="text/markdown",
     url=f'https://github.com/tasuren/{NAME}',
     project_urls={
-        "Documentation": f"https://{NAME}.readthedocs.io/"
+        "Documentation": f"https://{NAME.replace('.', '-')}.readthedocs.io/"
+    },
+    entry_points={
+        "console_scripts": [
+            "niconico = niconico.__main__:main"
+        ]
     },
     author=author,
     author_email='tasuren@aol.com',
     license='MIT',
     keywords='video download niconico ニコニコ動画',
-    packages=["niconico"],
-    install_requires=[],
-    extras_requires={},
+    packages=["niconico", "niconico.abc"],
+    install_requires=["requests", "bs4"],
     python_requires='>=3.8.0',
     classifiers=[
         'Programming Language :: Python :: 3.8',

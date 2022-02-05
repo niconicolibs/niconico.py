@@ -1,5 +1,9 @@
 # niconico.py
 
+from .exceptions import ExtractFailed
 from .niconico import NicoNico
 from .cookies import Cookies
-from .video import Video
+
+
+__author__ = "tasuren"
+__version__ = "1.0.0"
