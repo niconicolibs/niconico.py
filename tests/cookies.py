@@ -1,5 +1,5 @@
-# Test
 
+import path_magic
 from niconico import Cookies
 
 

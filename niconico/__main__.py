@@ -5,21 +5,26 @@ import logging
 
 from json import dump
 
-from niconico import NicoNico, Cookies
+try:
+    from niconico import NicoNico, Cookies
+except ImportError:
+    from sys import path as spath
+    spath.insert(0, __file__[:-20])
+    from niconico import NicoNico, Cookies
 
 
-def setStdoutLogger(name=None):
+def set_stdout_logger(name=None):
     "標準出力をするように指定された名前のLoggerを設定する。"
     # FROM: https://techblog.sasashima.works/archives/229
     stdout_handler = logging.StreamHandler(stream=stdout)
-    stderr_handler.setFormatter("[%(levelname)s] %(message)s")
-    stdout_handler.setLevel(logging.DEBUG)
+    stdout_handler.setFormatter(fmt:=logging.Formatter("[%(levelname)s] %(message)s"))
+    stdout_handler.setLevel(logging.INFO)
     stdout_handler.addFilter(lambda record: record.levelno <= logging.INFO)
     stderr_handler = logging.StreamHandler(stream=stderr)
-    stderr_handler.setFormatter("[%(levelname)s] %(message)s")
+    stderr_handler.setFormatter(fmt)
     stderr_handler.setLevel(logging.WARNING)
     logger = logging.getLogger(name)
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
     logger.addHandler(stdout_handler)
     logger.addHandler(stderr_handler)
 
@@ -50,6 +55,7 @@ Pythonのニコニコの非公式スクレイピング用のライブラリで�
 このツールを使用してから起きること全てを受け入れてください。"""
     args = argv[2:] if argv[0].startswith("py") else argv[1:]
     text, logger = " ".join(args), logging.getLogger("niconico.py")
+    set_stdout_logger("niconico.py")
 
     cookies = None
     for i, arg in enumerate(args):
@@ -71,8 +77,12 @@ Pythonのニコニコの非公式スクレイピング用のライブラリで�
             else:
                 logger.info("Writing json...")
                 with open(f"{video.video.id}.json", "w") as f:
-                    dump(video.data, f, indent=2)
+                    dump(video.data, f, ensure_ascii=False, indent=2)
+                logger.info("Done")
 
             exit()
+    else:
+        print(HELP)
+        exit()
 
     print("使用方法が違います。\n`niconico help`で使用方法を確認することができます。")
