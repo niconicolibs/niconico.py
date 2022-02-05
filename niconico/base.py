@@ -2,33 +2,36 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Type, Optional
+from typing import TYPE_CHECKING, Generic, TypeVar, Type, Optional
 
 if TYPE_CHECKING:
     from .niconico import NicoNico
 
 
-class DictFromAttribute:
+SuperT = TypeVar("SuperT")
+class DictFromAttribute(Generic[SuperT]):
+    "辞書を属性からアクセスできるようにするものです。"
 
     __dfa_class__: Type[DictFromAttribute]
 
     def __init__(
-        self, data: dict, dfa_class: Optional["DictFromAttribute"] = None
+        self, data: dict, super_: SuperT, *,
+        dfa_class: Optional["DictFromAttribute"] = None
     ):
-        self.data = data
+        self.__data__, self.super_ = data, super_
 
     @classmethod
-    def _from_data(cls, data):
+    def _from_data(cls, data, super_: SuperT):
         if isinstance(data, dict):
-            return cls.__dfa_class__(data)
+            return cls.__dfa_class__(data, super_)
         elif isinstance(data, list):
-            return [cls.__dfa_class__._from_data(item) for item in data]
+            return [cls.__dfa_class__._from_data(item, super_) for item in data]
         else:
             return data
 
     def __getattr__(self, key: str):
-        if key in self.data:
-            return self._from_data(self.data[key])
+        if key in self.__data__:
+            return self._from_data(self.__data__[key], self.super_)
         else:
             raise AttributeError(
                 f"class '{self.__class__.__name__}' has no attributre '{key}'"
@@ -64,3 +67,6 @@ class BaseClient:
 
     def __init__(self, niconico: NicoNico):
         self.niconico = niconico
+
+
+Headers = "dict[str, str]"

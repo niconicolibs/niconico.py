@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Callable, Union, Optional, Any
+from typing import TYPE_CHECKING, Callable, Iterator, Union, Optional, Any
 
 from threading import Thread, Event
 from time import time, sleep
@@ -13,8 +13,12 @@ from json import loads
 from .base import DictFromAttribute, BaseClient
 from .exceptions import ExtractFailed
 from .enums import VideoDownloadMode
+from .utils import parse_link
 
-from .types.video import EasyComment, Tag, Video as VideoType
+from .abc.video import (
+    EasyComment, Tag, AbcVideo as AbcAbcVideo, Video as AbcVideo,
+    MyListItemVideo as AbcMyListItemVideo, MyList as AbcMyList
+)
 
 if TYPE_CHECKING:
     from .niconico import Response
@@ -37,6 +41,19 @@ HEADERS = {
         'sec-ch-ua-mobile': '?0',
         'sec-ch-ua-platform': '"macOS"',
         'Accept-Language': 'ja,en;q=0.9,en-GB;q=0.8,en-US;q=0.7',
+    },
+    "mylist": {
+        'Accept': '*/*',
+        'Accept-Language': 'ja',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Host': 'nvapi.nicovideo.jp',
+        'Origin': 'https://www.nicovideo.jp',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.2 Safari/605.1.15',
+        'Connection': 'keep-alive',
+        'Referer': 'https://www.nicovideo.jp/',
+        'X-Frontend-Id': '6',
+        'X-Niconico-Language': 'ja-jp',
+        'X-Frontend-Version': '0',
     },
     "heartbeat": {
         "Host": "api.dmc.nico",
@@ -84,20 +101,21 @@ class Video(DictFromAttribute):
         動画クライアントクラスのインスタンスです。
     url : str
         取得する動画のURLです。
-    data : dict
-        動画の辞書形式のデータです。"""
+    __data__ : dict
+        動画の辞書形式のデータです。  
+        属性からこのデータにアクセスすることができます。"""
 
     if TYPE_CHECKING:
         easyComment: EasyComment
         tag: Tag
-        video: VideoType
+        video: AbcVideo
 
     def __init__(self, client: Client, url: str, data: dict):
-        self.client, self.url, self.data = client, url, data
+        self.client, self.url, self.__data__ = client, url, data
         self.thread = Thread(target=self._heartbeat)
         self._heartbeat_running = Event()
         self._download_log: Optional[Callable[[Any], None]] = None
-        super().__init__(self.data)
+        super().__init__(self.data, self)
 
     def __str__(self) -> str:
         return f"<Video Title={self.data['video']['title']} Heartbeat={self.is_heartbeat_running}>"
@@ -131,11 +149,11 @@ class Video(DictFromAttribute):
         また、 ``with`` 構文を使用すればこの関数と :meth:`niconico.video.Video.close` を省略することができます。"""
         self.thread.start()
         self._heartbeat_running.wait()
-        self.client.log("info", "Started heartbeat")
+        self.client.log("info", "ハートビートを開始しました。")
 
     def close(self):
         "ハートビートを停止します。"
-        self.client.log("info", "Closing heartbeat")
+        self.client.log("info", "ハートビートを停止させました。")
         self._heartbeat_running.clear()
         self.thread.join()
 
@@ -199,7 +217,7 @@ class Video(DictFromAttribute):
             ).headers["content-length"]
         )
 
-        self.log("info", "Downloading...")
+        self.log("info", "ダウンロード中...")
         r = self.client.niconico.request(
             "GET", self.download_link, headers=headers, params=params, stream=True
         )
@@ -212,10 +230,10 @@ class Video(DictFromAttribute):
                     f.write(chunk)
                     if self._download_log is not None:
                         self._download_log(
-                            f"Downloaded: {int(now_size/size*100)}% ({now_size}/{size})"
+                            f"ダウンロード済み: {int(now_size/size*100)}% ({now_size}/{size})"
                         )
 
-        self.log("info", "Done")
+        self.log("info", "完了")
 
     def _make_url(self, session_id: str) -> str:
         # Heartbeat用のURLを作る。
@@ -223,7 +241,7 @@ class Video(DictFromAttribute):
 
     def _heartbeat(self):
         # ハートビート
-        self.log("info", "Send the initial heartbeat data to get session id")
+        self.log("info", "セッションIDを取得中...")
         # セッションIDを取得する。
         self.session = self.client.niconico.request(
             "POST", f"{BASES['heartbeat']}?_format=json",
@@ -231,7 +249,7 @@ class Video(DictFromAttribute):
                 VideoDownloadMode.http_output_download_parameters
             )
         ).json()["data"]["session"]
-        self.log("info", "Session ID: %s" % self.session["id"])
+        self.log("info", "セッションID: %s" % self.session["id"])
         self._heartbeat_running.set()
         # 事前にしておかなければならないリクエストをしておく。
         self.client.niconico.request(
@@ -251,8 +269,8 @@ class Video(DictFromAttribute):
                 "POST", self._make_url(self.session["id"]),
                 json=data, headers=HEADERS["heartbeat"]
             ).json()["data"]["session"]
-            self.log("info", "Sent heartbeat")
-            self.log("debug", f"Data: {self.session}")
+            self.log("info", "ハートビートを送信しました。")
+            self.log("debug", f"レスポンス: {self.session}")
             after = self._get_interval(now, data)
 
     def _get_interval(self, now: float, data: dict) -> float:
@@ -326,13 +344,10 @@ class Client(BaseClient):
 
         Parameters
         ----------
-        headers : Headers, default VIDEO
+        url : str
+            動画のURLです。
+        headers : Headers, default HEADERS["normal"]
             リクエストをする際に使用するヘッダーです。
-
-        Returns
-        -------
-        data : dict
-            動画のデータです。
 
         Raises
         ------
@@ -340,21 +355,46 @@ class Client(BaseClient):
         # 短縮やスマホ用のURLであれば元に戻す。
         if "nico.ms" in url:
             url = url.replace("nico.ms/", "www.nicovideo.jp/watch/")
-        if "sp" in url:
-            url = url.replace("sp", "www")
+        url = parse_link(url)
 
         # 動画情報を取得する。
         data = BeautifulSoup(
-            self.niconico.request(
-                "get", url, headers=headers, cookies=self.niconico.cookies
-            ).text, "html.parser"
+            self.niconico.request("GET", url, headers=headers).text, "html.parser"
         ).find(
             "div", {"id": "js-initial-watch-data"}
         ).get("data-api-data")
         video = Video(self, url, data)
 
         if data:
-            video.data = loads(data)
+            video.__data__ = loads(data)
             return video
         else:
             raise ExtractFailed("ニコニコ動画から情報を取得するのに失敗しました。")
+
+    def get_mylist(self, url: str, headers: dict[str, str] = HEADERS["mylist"]) -> Iterator[AbcMyList]:
+        """マイリストのデータを取得します。
+
+        Parameters
+        ----------
+        url : str
+            マイリストのURLです。
+        headers : """
+        url = parse_link(url)
+        mylist = False
+        for code in url.split("/"):
+            if code == "mylist":
+                mylist = True
+            elif mylist:
+                self.log("info", "取得中...")
+                before, page = None, 0
+                while before is None or before.hasNext:
+                    page += 1
+                    data = self.niconico.request(
+                        "GET", f"https://nvapi.nicovideo.jp/v2/mylists/{code}",
+                        headers=headers, params=(("pageSize", 100), ("page", page))
+                    ).json()
+                    self.log("info", "マイリストの%sページ目のデータを取得しました。" % page)
+                    yield (before := AbcMyList(data["data"]["mylist"], self))
+                break
+        else:
+            raise ValueError("URLが適切ではありません。")
