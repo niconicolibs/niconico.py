@@ -1,0 +1,22 @@
+# Netscape HTTP Cookie File
+# http://curl.haxx.se/rfc/cookie_spec.html
+# This is a generated file!  Do not edit.
+
+.nicovideo.jp	TRUE	/	FALSE	1950352056	nicosid	1634992056.1318363483
+.nicovideo.jp	TRUE	/	FALSE	1671435817	_ss_pp_id	ccbadf2cda256f833131637419415149
+dic.nicovideo.jp	FALSE	/	FALSE	1640043815	maincss	%2Fnd2.css
+dic.nicovideo.jp	FALSE	/	TRUE	1655451817	__uuiduz	2d325d0d-dfc0-49ed-a703-245b2f989cad
+.nicovideo.jp	TRUE	/	FALSE	1641213545	user_session	user_session_86146818_0189e400e21d3b00d885e568566dd0d2251cbc483378aa981b108e20d2496f08
+.nicovideo.jp	TRUE	/	TRUE	1641213545	user_session_secure	ODYxNDY4MTg6NFFIVXouWUVXMVBNVjlxU3ZSbVVSd3VUQ2ZhTUJVemVPMVRVT3dNeGhUcQ
+.nicovideo.jp	TRUE	/	FALSE	1641898763	nico_gc	srch_s%3Dn%26srch_o%3Dd
+dic.nicovideo.jp	FALSE	/	FALSE	1641714218	sess	Y9S5LaMnwYNpLzUFFMI09eVfivqRKcNZG9iCHQsBsfhX_a6Ze_xdsHW9BAZXiYdsfrirX8FSXbvaI2sf959kgw
+dic.nicovideo.jp	FALSE	/	FALSE	1641714218	uname	tasuren
+dic.nicovideo.jp	FALSE	/	FALSE	1641714218	uprem	n
+dic.nicovideo.jp	FALSE	/	FALSE	1641714218	uid	86146818
+.nicovideo.jp	TRUE	/	FALSE	1725799802	common-header-oshirase-open-date	2021-12-13T12:50:02.810Z
+seiga.nicovideo.jp	FALSE	/	FALSE	1642318410	__ah_i	a%3A1%3A%7Bi%3A10865584%3Bi%3A1639726410%3B%7D
+dic.nicovideo.jp	FALSE	/	FALSE	1641714218	login	y
+news.nicovideo.jp	FALSE	/	FALSE	2271051761	ubid	33f182af-6d14-41d1-9438-83dbbd499cc7
+news.nicovideo.jp	FALSE	/	FALSE	0	_newnews_session	SEllRjVnMktnQjlSYmxSd2dVZzh4OEUwdk1yUGRqbXlxbG1BdnYxL0lQL0dId05XMGgwS3pPMmJEaTZSSkdwY0tVK2xtYXo5N2w5M2wwblNNckFLa1QwWHY0bzd1Yzh0S3BrdVN1MWZrM3Z1RHp5ZFVua0cwWWFvdXBjRE5ZdFZtNlQ1TWcxVWQvajl2K3JOTTJKbDdBPT0tLTFqWXVuclVTN0V6QUJaRFlITzREZnc9PQ%3D%3D--f06030e213b31fe4579461a865a61fa8a5e57e94
+news.nicovideo.jp	FALSE	/	TRUE	1655451762	__uuiduz	2d325d0d-dfc0-49ed-a703-245b2f989cad
+.nicovideo.jp	TRUE	/	FALSE	1702971817	_td	a84349da-2c24-49c0-af9e-3bfbcca3f1f9

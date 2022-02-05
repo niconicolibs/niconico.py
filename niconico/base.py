@@ -10,15 +10,20 @@ if TYPE_CHECKING:
 
 SuperT = TypeVar("SuperT")
 class DictFromAttribute(Generic[SuperT]):
-    "辞書を属性からアクセスできるようにするものです。"
+    """辞書を属性からアクセスできるようにするものです。  
+    属性からアクセスされた際に返すものもこのクラスのインスタンスです。
+
+    Parameters
+    ----------
+    data : dict
+        属性でアクセスされた際に返すべき値がある辞書です。
+    super_data : SuperT
+        属性からアクセスされた際に返すインスタンスに渡すものです。"""
 
     __dfa_class__: Type[DictFromAttribute]
 
-    def __init__(
-        self, data: dict, super_: SuperT, *,
-        dfa_class: Optional["DictFromAttribute"] = None
-    ):
-        self.__data__, self.super_ = data, super_
+    def __init__(self, data: dict, super_data: SuperT):
+        self.__data__, self.__super__ = data, super_data
 
     @classmethod
     def _from_data(cls, data, super_: SuperT):
@@ -31,7 +36,7 @@ class DictFromAttribute(Generic[SuperT]):
 
     def __getattr__(self, key: str):
         if key in self.__data__:
-            return self._from_data(self.__data__[key], self.super_)
+            return self._from_data(self.__data__[key], self.__super__)
         else:
             raise AttributeError(
                 f"class '{self.__class__.__name__}' has no attributre '{key}'"
@@ -67,6 +72,3 @@ class BaseClient:
 
     def __init__(self, niconico: NicoNico):
         self.niconico = niconico
-
-
-Headers = "dict[str, str]"

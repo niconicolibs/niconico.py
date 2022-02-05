@@ -16,7 +16,7 @@ from .enums import VideoDownloadMode
 from .utils import parse_link
 
 from .abc.video import (
-    EasyComment, Tag, AbcVideo as AbcAbcVideo, Video as AbcVideo,
+    EasyComment, Tag, VideoOwner, AbcVideo as AbcAbcVideo, Video as AbcVideo,
     MyListItemVideo as AbcMyListItemVideo, MyList as AbcMyList
 )
 
@@ -101,24 +101,33 @@ class Video(DictFromAttribute):
         動画クライアントクラスのインスタンスです。
     url : str
         取得する動画のURLです。
-    __data__ : dict
+    data : dict
         動画の辞書形式のデータです。  
         属性からこのデータにアクセスすることができます。"""
 
-    if TYPE_CHECKING:
-        easyComment: EasyComment
-        tag: Tag
-        video: AbcVideo
+    easyComment: EasyComment
+    "簡易コメントデータです。"
+    tag: Tag
+    "動画についているタグです。"
+    video: AbcVideo
+    "動画のデータです。"
+    owner: Optional[VideoOwner]
+    "動画の投稿者です。"
+    thread: Optional[Thread] = None
+    "ハートビートを動かすスレッドです。"
+    url: str
+    "動画のURLです。"
+    client: Client
+    "動画取得用のクライアントのインスタンスです。"
 
     def __init__(self, client: Client, url: str, data: dict):
         self.client, self.url, self.__data__ = client, url, data
-        self.thread = Thread(target=self._heartbeat)
         self._heartbeat_running = Event()
         self._download_log: Optional[Callable[[Any], None]] = None
-        super().__init__(self.data, self)
+        super().__init__(self.__data__, self)
 
     def __str__(self) -> str:
-        return f"<Video Title={self.data['video']['title']} Heartbeat={self.is_heartbeat_running}>"
+        return f"<Video Title={self.__data__['video']['title']} Heartbeat={self.is_heartbeat_running}>"
 
     def log(self, type_: str, content: str, *args, **kwargs):
         """:meth:`niconico.base.BaseClient.log` を使用してログ出力をします。
@@ -137,6 +146,7 @@ class Video(DictFromAttribute):
 
     @property
     def is_heartbeat_running(self) -> bool:
+        "ハートビートが動いているかです。"
         return self._heartbeat_running.is_set()
 
     def connect(self):
@@ -147,6 +157,7 @@ class Video(DictFromAttribute):
         ハートビートは定期的にニコニコ動画と通信を行うもので別スレッドで動かされます。
         動画使用後には :meth:`niconico.video.Video.close` を実行してハートビートを停止させてください。
         また、 ``with`` 構文を使用すればこの関数と :meth:`niconico.video.Video.close` を省略することができます。"""
+        self.thread = Thread(target=self._heartbeat)
         self.thread.start()
         self._heartbeat_running.wait()
         self.client.log("info", "ハートビートを開始しました。")
@@ -274,12 +285,13 @@ class Video(DictFromAttribute):
             after = self._get_interval(now, data)
 
     def _get_interval(self, now: float, data: dict) -> float:
+        # ハートビートのインターバルを取得します。
         return now + data["session"]["keep_method"]["heartbeat"]["lifetime"] / 1000 - 3
 
     def _make_session_data(self, mode: VideoDownloadMode):
         # セッション用のデータを作る。
         # TODO: このセッションデータの画質設定等を解析してできればもっと細かく設定できるようにする。
-        session = self.data["media"]["delivery"]["movie"]["session"].copy()
+        session = self.__data__["media"]["delivery"]["movie"]["session"].copy()
         data: dict[Any, Any] = {}
 
         data["content_type"] = "movie"
@@ -339,15 +351,13 @@ class Client(BaseClient):
     """ニコニコ動画用のクライアントです。
     普通 :class:`niconico.niconico.NicoNico` から使います。"""
 
-    def get_video(self, url: str, headers: dict[str, str] = HEADERS["normal"]) -> Video:
+    def get_video(self, url: str) -> Video:
         """ニコニコ動画から指定された動画を取得します。
 
         Parameters
         ----------
         url : str
-            動画のURLです。
-        headers : Headers, default HEADERS["normal"]
-            リクエストをする際に使用するヘッダーです。
+            動画のURLです。。
 
         Raises
         ------
@@ -359,7 +369,7 @@ class Client(BaseClient):
 
         # 動画情報を取得する。
         data = BeautifulSoup(
-            self.niconico.request("GET", url, headers=headers).text, "html.parser"
+            self.niconico.request("GET", url, headers=HEADERS["normal"]).text, "html.parser"
         ).find(
             "div", {"id": "js-initial-watch-data"}
         ).get("data-api-data")
@@ -371,14 +381,19 @@ class Client(BaseClient):
         else:
             raise ExtractFailed("ニコニコ動画から情報を取得するのに失敗しました。")
 
-    def get_mylist(self, url: str, headers: dict[str, str] = HEADERS["mylist"]) -> Iterator[AbcMyList]:
+    def get_mylist(self, url: str) -> Iterator[AbcMyList]:
         """マイリストのデータを取得します。
 
         Parameters
         ----------
         url : str
             マイリストのURLです。
-        headers : """
+
+        Notes
+        -----
+        ニコニコ動画のマイリストは複数ページにわたる場合があります。  
+        なので100ページずつ取得していきます。  
+        よって返される各マイリストには百ページ分動画の情報が入っています。"""
         url = parse_link(url)
         mylist = False
         for code in url.split("/"):
@@ -391,7 +406,7 @@ class Client(BaseClient):
                     page += 1
                     data = self.niconico.request(
                         "GET", f"https://nvapi.nicovideo.jp/v2/mylists/{code}",
-                        headers=headers, params=(("pageSize", 100), ("page", page))
+                        headers=HEADERS["mylist"], params=(("pageSize", 100), ("page", page))
                     ).json()
                     self.log("info", "マイリストの%sページ目のデータを取得しました。" % page)
                     yield (before := AbcMyList(data["data"]["mylist"], self))
