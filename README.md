@@ -1,3 +1,4 @@
+[![PyPI](https://img.shields.io/pypi/v/niconico.py)](https://pypi.org/project/niconico.py/) ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/niconico.py) ![PyPI - Downloads](https://img.shields.io/pypi/dm/niconico.py) ![PyPI - License](https://img.shields.io/pypi/l/niconico.py) [![Documentation Status](https://readthedocs.org/projects/niconico-py/badge/?version=latest)](https://niconico-py.readthedocs.io/ja/latest/?badge=latest) [![Discord](https://img.shields.io/discord/777430548951728149?label=chat&logo=discord)](https://discord.gg/kfMwZUyGFG) [![Buy Me a Coffee](https://img.shields.io/badge/-tasuren-E9EEF3?label=Buy%20Me%20a%20Coffee&logo=buymeacoffee)](https://www.buymeacoffee.com/tasuren)
 # niconico.py
 niconico.pyはニコニコにあるコンテンツを取得するためのライブラリです。  
 これを使うことでニコニコ動画の動画のダウンロードができます。  
