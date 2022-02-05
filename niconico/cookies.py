@@ -43,8 +43,8 @@ class Cookies(SimpleCookie):
         return cookies
 
     @classmethod
-    def nicovideo_guest(cls, nicosid: Optional[str] = None):
-        """ニコニコ動画のゲストアカウントのクッキーを生成します。  
+    def guest(cls, nicosid: Optional[str] = None):
+        """ニコニコのゲストアカウントのクッキーを生成します。  
 
         Notes
         -----
