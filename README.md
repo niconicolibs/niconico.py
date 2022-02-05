@@ -24,7 +24,7 @@ with client.video.get_video("https://www.nicovideo.jp/watch/sm37658498") as vide
 ```
 #### マイリスト
 ```python
-from niconico import NicoNico, Cookies
+from niconico import NicoNico
 
 URL = "https://www.nicovideo.jp/user/85641805/mylist/63403141"
 
