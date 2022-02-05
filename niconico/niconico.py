@@ -12,17 +12,34 @@ from .video import Client as VideoClient
 from .cookies import Cookies
 
 
+__all__ = ("adjust_cookies", "NicoNico", "logger")
 Response = requests.Response
 logger = getLogger("niconico.py")
+"``logging`` の ``Logger`` です。"
 
 
 def adjust_cookies(cookies: Cookies) -> dict[str, str]:
-    "Cookiesを辞書に変換します。"
+    """Cookiesを辞書に変換します。
+
+    Parameters
+    ----------
+    cookies : Cookies
+        辞書に変換するクッキーです。"""
     return {key: morsel.value for key, morsel in cookies.items()}
 
 
 class NicoNico:
-    """ニコニコにアクセスするために使うクラスです。"""
+    """ニコニコにアクセスするために使うクラスです。
+
+    Parameters
+    ----------
+    cookies : Cookies, optional
+        リクエストの際に使用するクッキーです。"""
+
+    video: VideoClient
+    "ニコニコ動画用のクライアントクラスのインスタンスです。"
+    cookies: Optional[Cookies]
+    "リクエスト時に使用するクッキーです。"
 
     def __init__(self, cookies: Optional[Cookies] = None):
         self.video = VideoClient(self)
@@ -31,7 +48,11 @@ class NicoNico:
 
     def request(self, method: str, url: str, *args, **kwargs) -> requests.Response:
         """``requests.request`` を使用して設定されているクッキーでリクエストを行います。
-        引数は ``requests.request`` と同じです。"""
+        引数は ``requests.request`` と同じです。
+
+        Notes
+        -----
+        引数 ``cookies`` に :class:`niconico.cookies.Cookies` を渡した場合は自動で辞書に変換されます。"""
         save_default = True
 
         # クッキーの調整をする。

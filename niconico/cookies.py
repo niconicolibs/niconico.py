@@ -8,17 +8,21 @@ from datetime import datetime, timedelta
 from time import time
 
 
+__all__ = ("Cookies",)
 FORMAT = "%a, %d-%b-%Y %X"
 
 
 class Cookies(SimpleCookie):
     @classmethod
     def from_file(cls, path: str):
-        """Netscapeのクッキーファイルフォーマットに準拠したテキストファイルからクッキーが格納されたクラスを作成します。
+        """Netscapeのクッキーファイルフォーマットに準拠したテキストファイルからクッキーが格納されたクラスを作成します。  
+        なので、ChromeやEdgeで使用可能な `Get cookies.txt <https://chrome.google.com/webstore/detail/get-cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid>`_ のような拡張機能を使って作ったクッキーのテキストファイルを読み込むことができます。
+        もし自分のアカウントでニコニコ動画のコンテンツを取得したい場合はこれを使用しましょう。
 
         Parameters
         ----------
         path : str
+            クッキーのファイルのパスです。
 
         Raises
         ------

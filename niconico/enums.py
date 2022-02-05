@@ -3,6 +3,9 @@
 from enum import Enum
 
 
+__all__ = ("VideoDownloadMode",)
+
+
 class VideoDownloadMode(Enum):
     "ニコニコ動画のダウンロードのモードの列挙型です。"
 

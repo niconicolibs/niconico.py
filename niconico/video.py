@@ -15,15 +15,13 @@ from .exceptions import ExtractFailed
 from .enums import VideoDownloadMode
 from .utils import parse_link
 
-from .abc.video import (
-    EasyComment, Tag, VideoOwner, AbcVideo as AbcAbcVideo, Video as AbcVideo,
-    MyListItemVideo as AbcMyListItemVideo, MyList as AbcMyList
-)
+from .abc.video import EasyComment, Tag, VideoOwner, Video as AbcVideo, MyList as AbcMyList
 
 if TYPE_CHECKING:
     from .niconico import Response
 
 
+__all__ = ("HEADERS", "Video", "Client")
 BASES = {
     "heartbeat": "https://api.dmc.nico/api/sessions"
 }
@@ -88,6 +86,7 @@ HEADERS = {
         "Accept-Language": "ja,en;q=0.9,en-GB;q=0.8,en-US;q=0.7"
     }
 }
+"リクエストに使用されるヘッダーが入っている定数です。"
 
 
 class Video(DictFromAttribute):
