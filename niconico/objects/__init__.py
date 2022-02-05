@@ -1,4 +1,4 @@
-# niconico.py - Types
+# niconico.py - Objects
 
 from .dictionary import *
 from .video import *
