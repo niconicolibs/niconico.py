@@ -89,7 +89,7 @@ Pythonのニコニコの非公式スクレイピング用のライブラリで�
                 with video as video:
                     video.download(f"{video.video.id}.mp4")
             else:
-                print(dumps(video))
+                print(dumps(video.__data__))
         elif args[0] == "mylist" and length == 2:
             # ニコニコ動画 - マイリスト
             print(dumps(list(

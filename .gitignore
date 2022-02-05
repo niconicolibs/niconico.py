@@ -1,7 +1,8 @@
 *.*-workspace
 *.*-project
+
 __pycache__
-test.py
-cookies.txt
-.*
-samples
+.DS_Store
+
+.mypy_cache
+.vscode

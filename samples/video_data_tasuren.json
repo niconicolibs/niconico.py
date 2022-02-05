@@ -1,0 +1,858 @@
+{
+	"ads": null,
+	"category": null,
+	"channel": null,
+	"client": {
+		"nicosid": "1634992056.1318363483",
+		"watchId": "sm37658498",
+		"watchTrackId": "HpgMlri7Jm_1639990374413"
+	},
+	"comment": {
+		"server": {
+			"url": "https://nvcomment.nicovideo.jp/legacy/api/"
+		},
+		"keys": {
+			"userKey": "1639992174.~1~l2E9TsE6fkDEtETUeXE33tFq7-LMJYnAH9ydwQsk55s"
+		},
+		"layers": [
+			{
+				"index": 0,
+				"isTranslucent": false,
+				"threadIds": [
+					{
+						"id": 1602464225,
+						"fork": 1
+					}
+				]
+			},
+			{
+				"index": 1,
+				"isTranslucent": false,
+				"threadIds": [
+					{
+						"id": 1602464225,
+						"fork": 0
+					},
+					{
+						"id": 1602464225,
+						"fork": 2
+					}
+				]
+			}
+		],
+		"threads": [
+			{
+				"id": 1602464225,
+				"fork": 1,
+				"isActive": false,
+				"isDefaultPostTarget": false,
+				"isEasyCommentPostTarget": false,
+				"isLeafRequired": false,
+				"isOwnerThread": true,
+				"isThreadkeyRequired": false,
+				"threadkey": null,
+				"is184Forced": false,
+				"hasNicoscript": true,
+				"label": "owner",
+				"postkeyStatus": 0,
+				"server": "https://nvcomment.nicovideo.jp/legacy"
+			},
+			{
+				"id": 1602464225,
+				"fork": 0,
+				"isActive": true,
+				"isDefaultPostTarget": true,
+				"isEasyCommentPostTarget": false,
+				"isLeafRequired": true,
+				"isOwnerThread": false,
+				"isThreadkeyRequired": false,
+				"threadkey": null,
+				"is184Forced": false,
+				"hasNicoscript": false,
+				"label": "default",
+				"postkeyStatus": 0,
+				"server": "https://nvcomment.nicovideo.jp/legacy"
+			},
+			{
+				"id": 1602464225,
+				"fork": 2,
+				"isActive": true,
+				"isDefaultPostTarget": false,
+				"isEasyCommentPostTarget": true,
+				"isLeafRequired": true,
+				"isOwnerThread": false,
+				"isThreadkeyRequired": false,
+				"threadkey": null,
+				"is184Forced": false,
+				"hasNicoscript": false,
+				"label": "easy",
+				"postkeyStatus": 0,
+				"server": "https://nvcomment.nicovideo.jp/legacy"
+			}
+		],
+		"ng": {
+			"ngScore": {
+				"isDisabled": false
+			},
+			"channel": [],
+			"owner": [],
+			"viewer": {
+				"revision": 1,
+				"count": 0,
+				"items": [],
+				"ngScoreDefaultLevel": "high"
+			}
+		},
+		"isAttentionRequired": false,
+		"nvComment": {
+			"threadKey": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJqdGkiOiI2MWMwNDQ2NjcyZTQ2IiwiZXhwIjoxNjM5OTkwNTc4LCJ0eXAiOiJUaHJlYWQtS2V5IiwidGlkcyI6WyIxNjAyNDY0MjI1Il0sImYxODRzIjpbXSwidWlkIjoiODYxNDY4MTgifQ.bPkv1YoyTIyQS-dPnAqzpJ-h4n8zK2VKFPiYe_kgpu_blsBzVL4KMICe8PwS9F8WtLUIGKZgsFhDPL7XMSsBUQ",
+			"server": "https://nvcomment.nicovideo.jp",
+			"params": {
+				"targets": [
+					{
+						"id": "1602464225",
+						"fork": "owner"
+					},
+					{
+						"id": "1602464225",
+						"fork": "main"
+					},
+					{
+						"id": "1602464225",
+						"fork": "easy"
+					}
+				],
+				"language": "ja-jp"
+			}
+		}
+	},
+	"community": null,
+	"easyComment": {
+		"phrases": [
+			{
+				"text": "うぽつ",
+				"nicodic": {
+					"title": "うぽつ",
+					"viewTitle": "うぽつ",
+					"summary": "うぽつとはうｐ乙のことでうｐ(アップロード)乙(お疲れ様です)という意味。語源はうｐと乙をローマ字で打つと「うぽつ」（up otu→u po tu）になることから。\n類義語にうぱりがある。\n関連項目\n",
+					"link": "https://dic.nicovideo.jp/a/%E3%81%86%E3%81%BD%E3%81%A4"
+				}
+			},
+			{
+				"text": "www",
+				"nicodic": {
+					"title": "www",
+					"viewTitle": "www",
+					"summary": "wwwとは\n World Wide Web（ワールドワイドウェブ）\n ASIAN KUNG-FU GENERATIONの4thフルアルバム『ワールド ワールド ワールド』の省略表記\n QuinRose",
+					"link": "https://dic.nicovideo.jp/a/www"
+				}
+			},
+			{
+				"text": "すき",
+				"nicodic": {
+					"title": "すき",
+					"viewTitle": "すき",
+					"summary": "もしかして? → 好き\nひょっとして? → 鋤\n概要\n隙ありっ! これで全部だと思うたか!?\n関連静画\n関連項目\n すすきの\n 自動リンクされていない記事の一覧",
+					"link": "https://dic.nicovideo.jp/a/%E3%81%99%E3%81%8D"
+				}
+			},
+			{
+				"text": "ここすき",
+				"nicodic": {
+					"title": "ここすき",
+					"viewTitle": "ここすき",
+					"summary": "発祥\nアイマスMAD「もっとすいみんぶそく」が発祥である\n普及\nニコニコ動画での公式アニメ配信以降、他のアニメのOPで「ここすき」というコメントが度々見受けられていたが、\n「花咲くいろは」のOPでの弾",
+					"link": "https://dic.nicovideo.jp/a/%E3%81%93%E3%81%93%E3%81%99%E3%81%8D"
+				}
+			},
+			{
+				"text": "！？",
+				"nicodic": {
+					"title": "!?",
+					"viewTitle": "！？",
+					"summary": "概要!?\n!?とは\"強烈\"かつ\"理解不能\"な驚きを示す約物（記号）である…!?\n専門用語では「感嘆符疑問符」という名前である。投げやりじゃねえか!?\n略すると「感嘆修辞疑問符」という長ったらしい上によ",
+					"link": "https://dic.nicovideo.jp/a/%21%3F"
+				}
+			},
+			{
+				"text": "おつ",
+				"nicodic": {
+					"title": "おつ",
+					"viewTitle": "おつ",
+					"summary": "乙とは、以下のことを表す。\n 乙（おつ、きのと） - 十干の第2位。五行は木、陰陽は陰。草花を象徴し、協調・社交・和合を意味する。\n 乙（おつ） - 甲で始まる順位の第2位。「乙種」「甲乙つけがたい」",
+					"link": "https://dic.nicovideo.jp/a/%E3%81%8A%E3%81%A4"
+				}
+			},
+			{
+				"text": "88888888",
+				"nicodic": {
+					"title": "88888888",
+					"viewTitle": "88888888",
+					"summary": "8は整数のひとつ。7の次、9の前。\n概要\n 酸素(O)の原子番号。\n 横に倒すと∞になってしまうので注意。8からずいぶん離れてしまう。\n 「八」は末広がりの形をしているため、縁起の良い数とされる。\n ",
+					"link": "https://dic.nicovideo.jp/a/88888888"
+				}
+			}
+		]
+	},
+	"external": {
+		"commons": {
+			"hasContentTree": true
+		},
+		"ichiba": {
+			"isEnabled": true
+		}
+	},
+	"genre": {
+		"key": "other",
+		"label": "その他",
+		"isImmoral": false,
+		"isDisabled": false,
+		"isNotSet": false
+	},
+	"marquee": {
+		"isDisabled": false,
+		"tagRelatedLead": null
+	},
+	"media": {
+		"delivery": {
+			"recipeId": "nicovideo-sm37658498",
+			"encryption": null,
+			"movie": {
+				"contentId": "out1",
+				"audios": [
+					{
+						"id": "archive_aac_192kbps",
+						"isAvailable": true,
+						"metadata": {
+							"bitrate": 192000,
+							"samplingRate": 48000,
+							"loudness": {
+								"integratedLoudness": -4.7,
+								"truePeak": 0.5
+							},
+							"levelIndex": 1,
+							"loudnessCollection": [
+								{
+									"type": "video",
+									"value": 0.3054921113215513
+								},
+								{
+									"type": "pureAdPreroll",
+									"value": 0.7079457843841379
+								},
+								{
+									"type": "houseAdPreroll",
+									"value": 0.7079457843841379
+								},
+								{
+									"type": "networkAdPreroll",
+									"value": 0.7079457843841379
+								},
+								{
+									"type": "pureAdMidroll",
+									"value": 0.7079457843841379
+								},
+								{
+									"type": "houseAdMidroll",
+									"value": 0.7079457843841379
+								},
+								{
+									"type": "networkAdMidroll",
+									"value": 0.7079457843841379
+								},
+								{
+									"type": "pureAdPostroll",
+									"value": 0.7079457843841379
+								},
+								{
+									"type": "houseAdPostroll",
+									"value": 0.7079457843841379
+								},
+								{
+									"type": "networkAdPostroll",
+									"value": 0.7079457843841379
+								},
+								{
+									"type": "nicoadVideoIntroduce",
+									"value": 0.8912509381337456
+								},
+								{
+									"type": "nicoadBillboard",
+									"value": 1
+								},
+								{
+									"type": "marquee",
+									"value": 1
+								}
+							]
+						}
+					},
+					{
+						"id": "archive_aac_64kbps",
+						"isAvailable": true,
+						"metadata": {
+							"bitrate": 64000,
+							"samplingRate": 48000,
+							"loudness": {
+								"integratedLoudness": -4.7,
+								"truePeak": 0.5
+							},
+							"levelIndex": 0,
+							"loudnessCollection": [
+								{
+									"type": "video",
+									"value": 0.3054921113215513
+								},
+								{
+									"type": "pureAdPreroll",
+									"value": 0.7079457843841379
+								},
+								{
+									"type": "houseAdPreroll",
+									"value": 0.7079457843841379
+								},
+								{
+									"type": "networkAdPreroll",
+									"value": 0.7079457843841379
+								},
+								{
+									"type": "pureAdMidroll",
+									"value": 0.7079457843841379
+								},
+								{
+									"type": "houseAdMidroll",
+									"value": 0.7079457843841379
+								},
+								{
+									"type": "networkAdMidroll",
+									"value": 0.7079457843841379
+								},
+								{
+									"type": "pureAdPostroll",
+									"value": 0.7079457843841379
+								},
+								{
+									"type": "houseAdPostroll",
+									"value": 0.7079457843841379
+								},
+								{
+									"type": "networkAdPostroll",
+									"value": 0.7079457843841379
+								},
+								{
+									"type": "nicoadVideoIntroduce",
+									"value": 0.8912509381337456
+								},
+								{
+									"type": "nicoadBillboard",
+									"value": 1
+								},
+								{
+									"type": "marquee",
+									"value": 1
+								}
+							]
+						}
+					}
+				],
+				"videos": [
+					{
+						"id": "archive_h264_1080p",
+						"isAvailable": true,
+						"metadata": {
+							"label": "1080p",
+							"bitrate": 4000000,
+							"resolution": {
+								"width": 1920,
+								"height": 1080
+							},
+							"levelIndex": 4,
+							"recommendedHighestAudioLevelIndex": 1
+						}
+					},
+					{
+						"id": "archive_h264_720p",
+						"isAvailable": true,
+						"metadata": {
+							"label": "720p",
+							"bitrate": 2000000,
+							"resolution": {
+								"width": 1280,
+								"height": 720
+							},
+							"levelIndex": 3,
+							"recommendedHighestAudioLevelIndex": 1
+						}
+					},
+					{
+						"id": "archive_h264_480p",
+						"isAvailable": true,
+						"metadata": {
+							"label": "480p",
+							"bitrate": 1600000,
+							"resolution": {
+								"width": 854,
+								"height": 480
+							},
+							"levelIndex": 2,
+							"recommendedHighestAudioLevelIndex": 1
+						}
+					},
+					{
+						"id": "archive_h264_360p",
+						"isAvailable": true,
+						"metadata": {
+							"label": "360p",
+							"bitrate": 600000,
+							"resolution": {
+								"width": 640,
+								"height": 360
+							},
+							"levelIndex": 1,
+							"recommendedHighestAudioLevelIndex": 1
+						}
+					},
+					{
+						"id": "archive_h264_360p_low",
+						"isAvailable": true,
+						"metadata": {
+							"label": "低画質",
+							"bitrate": 300000,
+							"resolution": {
+								"width": 640,
+								"height": 360
+							},
+							"levelIndex": 0,
+							"recommendedHighestAudioLevelIndex": 1
+						}
+					}
+				],
+				"session": {
+					"recipeId": "nicovideo-sm37658498",
+					"playerId": "nicovideo-6-HpgMlri7Jm_1639990374413",
+					"videos": [
+						"archive_h264_1080p",
+						"archive_h264_720p",
+						"archive_h264_480p",
+						"archive_h264_360p",
+						"archive_h264_360p_low"
+					],
+					"audios": [
+						"archive_aac_192kbps",
+						"archive_aac_64kbps"
+					],
+					"movies": [],
+					"protocols": [
+						"http",
+						"hls"
+					],
+					"authTypes": {
+						"http": "ht2",
+						"hls": "ht2"
+					},
+					"serviceUserId": "86146818",
+					"token": "{\"service_id\":\"nicovideo\",\"player_id\":\"nicovideo-6-HpgMlri7Jm_1639990374413\",\"recipe_id\":\"nicovideo-sm37658498\",\"service_user_id\":\"86146818\",\"protocols\":[{\"name\":\"http\",\"auth_type\":\"ht2\"},{\"name\":\"hls\",\"auth_type\":\"ht2\"}],\"videos\":[\"archive_h264_1080p\",\"archive_h264_360p\",\"archive_h264_360p_low\",\"archive_h264_480p\",\"archive_h264_720p\"],\"audios\":[\"archive_aac_192kbps\",\"archive_aac_64kbps\"],\"movies\":[],\"created_time\":1639990374000,\"expire_time\":1640076774000,\"content_ids\":[\"out1\"],\"heartbeat_lifetime\":120000,\"content_key_timeout\":600000,\"priority\":0.40000000000000002220446049250313080847263336181640625,\"transfer_presets\":[]}",
+					"signature": "1feff3711a41567d0d28748beae69f7dcb31c9583d56ad99d6f27011c9117d2a",
+					"contentId": "out1",
+					"heartbeatLifetime": 120000,
+					"contentKeyTimeout": 600000,
+					"priority": 0.4,
+					"transferPresets": [],
+					"urls": [
+						{
+							"url": "https://api.dmc.nico/api/sessions",
+							"isWellKnownPort": true,
+							"isSsl": true
+						}
+					]
+				}
+			},
+			"storyboard": null,
+			"trackingId": "us8e6rs3e74frc4lodxw6zrdwht/872/jjr13pk5owcho7euzfivse4wloaa3h/e5w3g1dxutu1sj/yjmiqv3tasfk6+/f2x29p894t3oy4="
+		},
+		"deliveryLegacy": null
+	},
+	"okReason": "PURELY",
+	"owner": null,
+	"payment": {
+		"video": {
+			"isPpv": false,
+			"isAdmission": false,
+			"isPremium": false,
+			"watchableUserType": "all",
+			"commentableUserType": "all"
+		},
+		"preview": {
+			"ppv": {
+				"isEnabled": false
+			},
+			"admission": {
+				"isEnabled": false
+			},
+			"premium": {
+				"isEnabled": false
+			}
+		}
+	},
+	"pcWatchPage": {
+		"tagRelatedBanner": null,
+		"videoEnd": {
+			"bannerIn": null,
+			"overlay": null
+		},
+		"showOwnerMenu": false,
+		"showOwnerThreadCoEditingLink": false,
+		"showMymemoryEditingLink": false
+	},
+	"player": {
+		"initialPlayback": null,
+		"comment": {
+			"isDefaultInvisible": false
+		},
+		"layerMode": 0
+	},
+	"ppv": null,
+	"ranking": {
+		"genre": {
+			"rank": 2,
+			"genre": "その他",
+			"dateTime": "2020-10-13T18:00:00+09:00"
+		},
+		"popularTag": [
+			{
+				"tag": "クッキー☆",
+				"regularizedTag": "クッキー☆",
+				"rank": 1,
+				"genre": "その他",
+				"dateTime": "2020-10-13T00:00:00+09:00"
+			},
+			{
+				"tag": "例のアレ",
+				"regularizedTag": "例ノアレ",
+				"rank": 2,
+				"genre": "その他",
+				"dateTime": "2020-10-13T18:00:00+09:00"
+			}
+		]
+	},
+	"series": {
+		"id": 17476,
+		"title": "音MAD",
+		"description": "",
+		"thumbnailUrl": "https://dcdn.cdn.nimg.jp/nicovideo/series/tmb/0/60076983/17476.1578809432",
+		"video": {
+			"prev": {
+				"type": "essential",
+				"id": "sm37522262",
+				"title": "ナナシノテエマ☆",
+				"registeredAt": "2020-09-15T20:00:00+09:00",
+				"count": {
+					"view": 17570,
+					"comment": 86,
+					"mylist": 85,
+					"like": 105
+				},
+				"thumbnail": {
+					"url": "https://nicovideo.cdn.nimg.jp/thumbnails/37522262/37522262.94972992",
+					"middleUrl": "https://nicovideo.cdn.nimg.jp/thumbnails/37522262/37522262.94972992.M",
+					"largeUrl": "https://nicovideo.cdn.nimg.jp/thumbnails/37522262/37522262.94972992.L",
+					"listingUrl": "https://nicovideo.cdn.nimg.jp/thumbnails/37522262/37522262.94972992.M",
+					"nHdUrl": "https://img.cdn.nimg.jp/s/nicovideo/thumbnails/37522262/37522262.94972992.original/r640x360l?key=58046986a76ed1fe1a57385015d6a272d31d6904b6c101241ec8734be0de2010"
+				},
+				"duration": 87,
+				"shortDescription": "蛻晄兜遞ｿ縺ｧす。",
+				"latestCommentSummary": "使命を感じ3DSから 続編作る前提のエンディングで不人気になり続編開発中止というかなしみ UDK笛使える ええやん！ よかった ここすき 完璧すぎる 文字化けしてるはずなのに読める読める・・・（投コメ） 投稿者で草 ゆっくりやボイロ以外の実況動画苦手...",
+				"isChannelVideo": false,
+				"isPaymentRequired": false,
+				"playbackPosition": null,
+				"owner": {
+					"ownerType": "hidden",
+					"id": null,
+					"name": null,
+					"iconUrl": null
+				},
+				"requireSensitiveMasking": false,
+				"videoLive": null,
+				"9d091f87": false,
+				"acf68865": false
+			},
+			"next": {
+				"type": "essential",
+				"id": "sm38044101",
+				"title": "プロトタイプ宣言☆｜MGR",
+				"registeredAt": "2020-12-30T20:10:00+09:00",
+				"count": {
+					"view": 4708,
+					"comment": 29,
+					"mylist": 37,
+					"like": 109
+				},
+				"thumbnail": {
+					"url": "https://nicovideo.cdn.nimg.jp/thumbnails/38044101/38044101.78940077",
+					"middleUrl": "https://nicovideo.cdn.nimg.jp/thumbnails/38044101/38044101.78940077.M",
+					"largeUrl": "https://nicovideo.cdn.nimg.jp/thumbnails/38044101/38044101.78940077.L",
+					"listingUrl": "https://nicovideo.cdn.nimg.jp/thumbnails/38044101/38044101.78940077.M",
+					"nHdUrl": "https://img.cdn.nimg.jp/s/nicovideo/thumbnails/38044101/38044101.78940077.original/r640x360l?key=a185558553a272999f3cd729dd6fc8fdf266860ea6ee59dd5497a68226282c73"
+				},
+				"duration": 78,
+				"shortDescription": "・◡・",
+				"latestCommentSummary": "♥ ええぞ MADの方が歌上手いMGR姉貴好きだよ すき これスルメ曲 良いねぇ! ・◡・ ええやん 短い動画見やすいから好きだよ あーいいわいいわいいわ ほんとMGRすき あーねんまつ 今日ずっと聞いてる ボカロより聞きとりやすいって技術力どうなっ...",
+				"isChannelVideo": false,
+				"isPaymentRequired": false,
+				"playbackPosition": null,
+				"owner": {
+					"ownerType": "hidden",
+					"id": null,
+					"name": null,
+					"iconUrl": null
+				},
+				"requireSensitiveMasking": false,
+				"videoLive": null,
+				"9d091f87": false,
+				"acf68865": false
+			},
+			"first": {
+				"type": "essential",
+				"id": "sm29822358",
+				"title": "サヨナラ＊ビブン",
+				"registeredAt": "2016-10-12T18:16:09+09:00",
+				"count": {
+					"view": 12938,
+					"comment": 94,
+					"mylist": 69,
+					"like": 4
+				},
+				"thumbnail": {
+					"url": "https://nicovideo.cdn.nimg.jp/thumbnails/29822358/29822358",
+					"middleUrl": "https://nicovideo.cdn.nimg.jp/thumbnails/29822358/29822358.M",
+					"largeUrl": "https://nicovideo.cdn.nimg.jp/thumbnails/29822358/29822358.L",
+					"listingUrl": "https://nicovideo.cdn.nimg.jp/thumbnails/29822358/29822358.M",
+					"nHdUrl": "https://img.cdn.nimg.jp/s/nicovideo/thumbnails/29822358/29822358.original/r640x360l?key=160b3c68f9a4c54cdd460a3d6fcd5d5a40689ffc6a374a8ba7c9f4db549c8994"
+				},
+				"duration": 122,
+				"shortDescription": "受験生頑張って；；",
+				"latestCommentSummary": "「ヴアァァ」 草 うるせぇww タイトルwwwww wwwwwwwwwwwwwwwwwwwwww 軽めに言って頭おかしい(誉め言葉) ビルボードで草 ジョジョw もっと伸びてもいい w ないない草 無いの使い方うまいwww 原曲の雰囲気を微塵も感じさ...",
+				"isChannelVideo": false,
+				"isPaymentRequired": false,
+				"playbackPosition": null,
+				"owner": {
+					"ownerType": "hidden",
+					"id": null,
+					"name": null,
+					"iconUrl": null
+				},
+				"requireSensitiveMasking": false,
+				"videoLive": null,
+				"9d091f87": false,
+				"acf68865": false
+			}
+		}
+	},
+	"smartphone": null,
+	"system": {
+		"serverTime": "2021-12-20T17:52:54+09:00",
+		"isPeakTime": false
+	},
+	"tag": {
+		"items": [
+			{
+				"name": "例のアレ",
+				"isCategory": false,
+				"isCategoryCandidate": false,
+				"isNicodicArticleExists": true,
+				"isLocked": true
+			},
+			{
+				"name": "クッキー☆",
+				"isCategory": false,
+				"isCategoryCandidate": false,
+				"isNicodicArticleExists": true,
+				"isLocked": true
+			},
+			{
+				"name": "音MAD",
+				"isCategory": false,
+				"isCategoryCandidate": false,
+				"isNicodicArticleExists": true,
+				"isLocked": true
+			},
+			{
+				"name": "クッキー☆音MADリンク",
+				"isCategory": false,
+				"isCategoryCandidate": false,
+				"isNicodicArticleExists": true,
+				"isLocked": true
+			},
+			{
+				"name": "NYN姉貴",
+				"isCategory": false,
+				"isCategoryCandidate": false,
+				"isNicodicArticleExists": true,
+				"isLocked": true
+			},
+			{
+				"name": "ICG姉貴",
+				"isCategory": false,
+				"isCategoryCandidate": false,
+				"isNicodicArticleExists": true,
+				"isLocked": true
+			},
+			{
+				"name": "RRM姉貴",
+				"isCategory": false,
+				"isCategoryCandidate": false,
+				"isNicodicArticleExists": true,
+				"isLocked": true
+			},
+			{
+				"name": "小さな恋のうた",
+				"isCategory": false,
+				"isCategoryCandidate": false,
+				"isNicodicArticleExists": true,
+				"isLocked": true
+			},
+			{
+				"name": "めいさく",
+				"isCategory": false,
+				"isCategoryCandidate": false,
+				"isNicodicArticleExists": true,
+				"isLocked": false
+			},
+			{
+				"name": "乳酸菌兄貴",
+				"isCategory": false,
+				"isCategoryCandidate": false,
+				"isNicodicArticleExists": false,
+				"isLocked": false
+			},
+			{
+				"name": "一転攻勢",
+				"isCategory": false,
+				"isCategoryCandidate": false,
+				"isNicodicArticleExists": true,
+				"isLocked": false
+			}
+		],
+		"hasR18Tag": false,
+		"isPublishedNicoscript": false,
+		"edit": {
+			"isEditable": true,
+			"uneditableReason": null,
+			"editKey": "1:1639990374:1602464225:39d1e718de5334bf8afe05bc271313931fbe38819354691ce8c49472a36e443f"
+		},
+		"viewer": {
+			"isEditable": true,
+			"uneditableReason": null,
+			"editKey": "1:1639990374:1602464225:39d1e718de5334bf8afe05bc271313931fbe38819354691ce8c49472a36e443f"
+		}
+	},
+	"video": {
+		"id": "sm37658498",
+		"title": "小さな恋のうた☆",
+		"description": "<span style=\"color: #ff69b4; font-size: 15px;\"><strong>──お前もしかして、あいつのことが好きなのか？</strong></span><br><br>Music : 小さな恋のうた (Synth Rock Cover)<br><a href=\"https://nico.ms/sm31011192\" target=\"_blank\" rel=\"noopener nofollow\">https://nico.ms/sm31011192</a><br>原曲 : MONGOL800 / 小さな恋のうた<br><a href=\"https://youtu.be/u8EkSB9zSpE\" target=\"_blank\" rel=\"noopener nofollow\">https://youtu.be/u8EkSB9zSpE</a><br /><br>▽マイリスト<br><a href=\"https://www.nicovideo.jp/mylist/65591471\" target=\"_blank\" rel=\"noopener\">mylist/65591471</a>",
+		"count": {
+			"view": 236628,
+			"comment": 4130,
+			"mylist": 1929,
+			"like": 2105
+		},
+		"duration": 136,
+		"thumbnail": {
+			"url": "https://nicovideo.cdn.nimg.jp/thumbnails/37658498/37658498.42622355",
+			"middleUrl": "https://nicovideo.cdn.nimg.jp/thumbnails/37658498/37658498.42622355.M",
+			"largeUrl": "https://nicovideo.cdn.nimg.jp/thumbnails/37658498/37658498.42622355.L",
+			"player": "https://img.cdn.nimg.jp/s/nicovideo/thumbnails/37658498/37658498.42622355.original/a960x540l?key=b2a25be152c0de4ff48abbf389b6df4483136a9bfad2a2b2d5396cf242674967",
+			"ogp": "https://img.cdn.nimg.jp/s/nicovideo/thumbnails/37658498/37658498.42622355.original/r1280x720l?key=3da801fa5a4c006774f214d295b66f9f673bd82e49f4c9095951fcbb8f10aa6f"
+		},
+		"rating": {
+			"isAdult": false
+		},
+		"registeredAt": "2020-10-12T20:10:00+09:00",
+		"isPrivate": false,
+		"isDeleted": false,
+		"isNoBanner": false,
+		"isAuthenticationRequired": false,
+		"isEmbedPlayerAllowed": true,
+		"isGiftAllowed": true,
+		"viewer": {
+			"isOwner": false,
+			"like": {
+				"isLiked": true,
+				"count": null
+			}
+		},
+		"watchableUserTypeForPayment": "all",
+		"commentableUserTypeForPayment": "all",
+		"9d091f87": false
+	},
+	"videoAds": {
+		"additionalParams": {
+			"videoId": "sm37658498",
+			"videoDuration": 136,
+			"isAdultRatingNG": false,
+			"isAuthenticationRequired": false,
+			"isR18": false,
+			"nicosid": "1634992056.1318363483",
+			"lang": "ja-jp",
+			"watchTrackId": "HpgMlri7Jm_1639990374413",
+			"genre": "other",
+			"gender": "1",
+			"age": 16
+		},
+		"items": [
+			{
+				"type": "preroll",
+				"timingMs": null,
+				"additionalParams": {
+					"linearType": "preroll",
+					"adIdx": 0,
+					"skipType": 1,
+					"skippableType": 1,
+					"pod": 1
+				}
+			},
+			{
+				"type": "postroll",
+				"timingMs": null,
+				"additionalParams": {
+					"linearType": "postroll",
+					"adIdx": 0,
+					"skipType": 1,
+					"skippableType": 1,
+					"pod": 2
+				}
+			}
+		],
+		"reason": "non_premium_user_ads"
+	},
+	"videoLive": null,
+	"viewer": {
+		"id": 86146818,
+		"nickname": "tasuren",
+		"isPremium": false,
+		"existence": {
+			"age": 16,
+			"prefecture": "千葉県",
+			"sex": "male"
+		}
+	},
+	"waku": {
+		"information": null,
+		"bgImages": [],
+		"addContents": null,
+		"addVideo": null,
+		"tagRelatedBanner": {
+			"title": "ニコニコポイントがコンビニで買えるようになりました。",
+			"imageUrl": "https://secure-dcdn.cdn.nimg.jp/nicocc/wakutkool/v2/nicovideo-watch-tag-banner/161145_559d3598.png",
+			"description": "詳しくはこちらをチェック！",
+			"isEvent": false,
+			"linkUrl": "https://blog.nicovideo.jp/niconews/160973.html?from=tag_linkage",
+			"isNewWindow": false
+		},
+		"tagRelatedMarquee": {
+			"title": "ニコニコポイントがコンビニで買えるようになりました！",
+			"linkUrl": "https://blog.nicovideo.jp/niconews/160973.html?from=tag_marquee_linkage",
+			"isNewWindow": false
+		}
+	}
+}
