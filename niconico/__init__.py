@@ -6,4 +6,4 @@ from .cookies import Cookies
 
 
 __author__ = "tasuren"
-__version__ = "1.0.0"
+__version__ = "1.0.1"
