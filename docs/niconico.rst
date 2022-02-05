@@ -7,7 +7,7 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   niconico.abc
+   niconico.objects
 
 Submodules
 ----------

@@ -107,3 +107,7 @@ Pythonのニコニコの非公式スクレイピング用のライブラリで�
         exit()
 
     print(WRONG_WAY)
+
+
+if __name__ == "__main__":
+    main()

@@ -15,7 +15,7 @@ from .exceptions import ExtractFailed
 from .enums import VideoDownloadMode
 from .utils import parse_link
 
-from .abc.video import EasyComment, Tag, VideoOwner, Video as AbcVideo, MyList as AbcMyList
+from .objects.video import EasyComment, Tag, VideoOwner, Video as AbcVideo, MyList as AbcMyList
 
 if TYPE_CHECKING:
     from .niconico import Response
