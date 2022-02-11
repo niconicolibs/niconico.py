@@ -246,6 +246,10 @@ class MyListItemVideo(AbcVideo):
 class MyListItem(DictFromAttribute["VideoClient"]):
     "マイリストのアイテムです。"
 
+    __extends__ = {
+        "video": MyListItemVideo
+    }
+
     itemId: int
     "アイテムIDです。"
     watchId: str
@@ -262,6 +266,10 @@ class MyListItem(DictFromAttribute["VideoClient"]):
 
 class MyList(DictFromAttribute["VideoClient"]):
     "一ページ単位でのマイリストです。"
+
+    __extends__ = {
+        "items": MyListItem
+    }
 
     id: str
     "マイリストのIDです。"
