@@ -41,6 +41,10 @@ setup(
     license='MIT',
     keywords='video download niconico ニコニコ動画',
     packages=["niconico", "niconico.objects"],
+    package_data={
+        "niconico": ("py.typed",),
+        "niconico.objects": ("py.typed",)
+    },
     install_requires=["requests", "bs4"],
     python_requires='>=3.8.0',
     classifiers=[
