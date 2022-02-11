@@ -36,9 +36,6 @@ for mylist in client.video.get_mylist(URL):
 `niconico help`で使用方法を確認可能です。  
 注意：コマンドの使用方法は後日変更される予定です。
 
-## Documentation
-ドキュメンテーションのテーマに[pydata-sphinx-theme](https://github.com/pydata/pydata-sphinx-theme/blob/master/LICENSE)を使用しています。
-
 ## Contributing
 リポジトリ内の`contributing.md`をご覧ください。
 
