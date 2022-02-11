@@ -104,6 +104,8 @@ class Video(DictFromAttribute):
         動画の辞書形式のデータです。  
         属性からこのデータにアクセスすることができます。"""
 
+    __dfa_class__ = DictFromAttribute
+
     easyComment: EasyComment
     "簡易コメントデータです。"
     tag: Tag

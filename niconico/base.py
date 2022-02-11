@@ -42,23 +42,30 @@ class DictFromAttribute(Generic[SuperT]):
     def __init__(self, data: dict, super_: SuperT):
         self.__data__, self.__super__ = data, super_
 
+    @staticmethod
+    def _get_extends(cls) -> dict[str, Type[DictFromAttribute]]:
+        return getattr(cls, "__extends__", {})
+
     @classmethod
-    def _from_data(cls, data, super_: SuperT):
+    def _from_data(cls, data, super_: SuperT, key: str):
+        cls = cls._get_extends(cls).get(key, cls)
         if isinstance(data, dict):
-            return cls.__dfa_class__(data, super_)
+            try:
+                return cls(data, super_)
+            except TypeError:
+                return cls.__dfa_class__(data, super_)
         elif isinstance(data, list):
-            return [cls.__dfa_class__._from_data(item, super_) for item in data]
+            return [cls._from_data(item, super_, key) for item in data]
         else:
             return data
 
     def __getattr__(self, key: str):
         if key in self.__data__:
-            return self._from_data(self.__data__[key], self.__super__)
+            return self._from_data(self.__data__[key], self.__super__, key)
         else:
             raise AttributeError(
                 f"class '{self.__class__.__name__}' has no attributre '{key}'"
             )
-DictFromAttribute.__dfa_class__ = DictFromAttribute
 
 
 class BaseClient:
