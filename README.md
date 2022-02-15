@@ -46,10 +46,6 @@ for mylist in client.video.get_mylist(URL):
 * [ ] 非同期版 (できれば)
 * [ ] etc
 
-## Documentation
-ドキュメンテーションは[こちら](https://niconico-py.readthedocs.io/ja/latest/)から閲覧が可能です。  
-テーマに[pydata-sphinx-theme](https://github.com/pydata/pydata-sphinx-theme/blob/master/LICENSE)を使用しています。
-
 ## Contributing
 リポジトリ内の`contributing.md`をご覧ください。
 
