@@ -9,6 +9,7 @@ from logging import getLogger
 import requests
 
 from .video import Client as VideoClient
+from .search import SearchClient
 from .cookies import Cookies
 
 
@@ -42,9 +43,18 @@ class NicoNico:
     "リクエスト時に使用するクッキーです。"
 
     def __init__(self, cookies: Optional[Cookies] = None):
-        self.video = VideoClient(self)
+        self.__video = VideoClient(self)
+        self.__search = SearchClient(self)
         self.cookies = cookies
         self.logger = logger
+        
+    @property
+    def video(self):
+        return self.__video
+    
+    @property
+    def search(self):
+        return self.__search
 
     def request(self, method: str, url: str, *args, **kwargs) -> requests.Response:
         """``requests.request`` を使用して設定されているクッキーでリクエストを行います。
