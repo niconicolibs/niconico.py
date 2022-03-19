@@ -43,18 +43,18 @@ class NicoNico:
     "リクエスト時に使用するクッキーです。"
 
     def __init__(self, cookies: Optional[Cookies] = None):
-        self.__video = VideoClient(self)
-        self.__search = SearchClient(self)
+        self._video = VideoClient(self)
+        self._search = SearchClient(self)
         self.cookies = cookies
         self.logger = logger
         
     @property
     def video(self):
-        return self.__video
+        return self._video
     
     @property
     def search(self):
-        return self.__search
+        return self._search
 
     def request(self, method: str, url: str, *args, **kwargs) -> requests.Response:
         """``requests.request`` を使用して設定されているクッキーでリクエストを行います。
