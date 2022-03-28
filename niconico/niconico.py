@@ -9,6 +9,7 @@ from logging import getLogger
 import requests
 
 from .video import Client as VideoClient
+from .search import SearchClient
 from .cookies import Cookies
 
 
@@ -43,6 +44,7 @@ class NicoNico:
 
     def __init__(self, cookies: Optional[Cookies] = None):
         self.video = VideoClient(self)
+        self.search = SearchClient(self)
         self.cookies = cookies
         self.logger = logger
 
