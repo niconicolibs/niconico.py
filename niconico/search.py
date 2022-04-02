@@ -14,4 +14,4 @@ class SearchClient:
             "targets": ",".join(target for target in targets),
             "fields": ",".join(field for field in fields)
         }
-        return self.__client.request(self.APIURL, params=query).json()
+        return self.__client.request("GET", self.APIURL, params=query).json()
