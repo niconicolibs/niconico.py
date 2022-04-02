@@ -44,7 +44,7 @@ class NicoNico:
 
     def __init__(self, cookies: Optional[Cookies] = None):
         self.video = VideoClient(self)
-        self.search = SearchClient(self)
+        self.searchclient = SearchClient(self)
         self.cookies = cookies
         self.logger = logger
 
