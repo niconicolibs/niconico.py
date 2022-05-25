@@ -1,16 +1,14 @@
-
 from sys import stdout, stderr, path
 import logging
-
 
 path.insert(0, __file__[:-20])
 
 
 def setStdoutLogger(name=None):
-    "標準出力をするように指定された名前のLoggerを設定する。"
+    """標準出力をするように指定された名前のLoggerを設定する。"""
     # FROM: https://techblog.sasashima.works/archives/229
     stdout_handler = logging.StreamHandler(stream=stdout)
-    stdout_handler.setFormatter(fmt:=logging.Formatter("[%(levelname)s] %(message)s"))
+    stdout_handler.setFormatter(fmt := logging.Formatter("[%(levelname)s] %(message)s"))
     stdout_handler.setLevel(logging.DEBUG)
     stdout_handler.addFilter(lambda record: record.levelno <= logging.INFO)
     stderr_handler = logging.StreamHandler(stream=stderr)

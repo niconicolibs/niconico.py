@@ -20,7 +20,7 @@ __all__ = (
 
 # easyComment
 class NicoDic(DictFromAttribute):
-    "ニコニコ大百科での簡易データです。"
+    """ニコニコ大百科での簡易データです。"""
 
     title: str
     viewTitle: str
@@ -29,7 +29,7 @@ class NicoDic(DictFromAttribute):
 
 
 class Phrase(DictFromAttribute):
-    "言葉です。"
+    """言葉です。"""
 
     text: str
     "言葉です。"
@@ -38,7 +38,7 @@ class Phrase(DictFromAttribute):
 
 
 class EasyComment(DictFromAttribute):
-    "簡易コメントリストです。"
+    """簡易コメントリストです。"""
 
     phrases: List[Phrase]
     "簡易コメントリストのデータです。"
@@ -46,7 +46,7 @@ class EasyComment(DictFromAttribute):
 
 # tag
 class TagEdit(DictFromAttribute):
-    "タグを編集可能かどうかのデータです。"
+    """タグを編集可能かどうかのデータです。"""
 
     isEditable: bool
     "編集可能かどうかです。"
@@ -57,7 +57,7 @@ class TagEdit(DictFromAttribute):
 
 
 class TagItem(DictFromAttribute):
-    "タグの内容です。"
+    """タグの内容です。"""
 
     name: str
     "タグの名前"
@@ -72,7 +72,7 @@ class TagItem(DictFromAttribute):
 
 
 class Tag(DictFromAttribute):
-    "タグデータです。"
+    """タグデータです。"""
 
     items: List[TagItem]
     "ついているタグのリストです。"
@@ -88,7 +88,7 @@ class Tag(DictFromAttribute):
 
 # video
 class Counter(DictFromAttribute):
-    "動画の閲覧数等のカウンターです。"
+    """動画の閲覧数等のカウンターです。"""
 
     view: int
     "閲覧数"
@@ -101,7 +101,7 @@ class Counter(DictFromAttribute):
 
 
 class Thumbnail(DictFromAttribute):
-    "サムネイルです。"
+    """サムネイルです。"""
 
     url: str
     "サムネイルの画像のURLです。"
@@ -116,14 +116,14 @@ class Thumbnail(DictFromAttribute):
 
 
 class Rating(DictFromAttribute):
-    "動画の評価です。"
+    """動画の評価です。"""
 
     isAdult: bool
     "大人向けかどうかです。"
 
 
 class ViewerLike(DictFromAttribute):
-    "クライアントの動画へやった「好き」のデータです。"
+    """クライアントの動画へやった「好き」のデータです。"""
 
     isLiked: bool
     "「好き」を押したかどうかです。"
@@ -132,7 +132,7 @@ class ViewerLike(DictFromAttribute):
 
 
 class Viewer(DictFromAttribute):
-    "動画でのクライアントの内容です。"
+    """動画でのクライアントの内容です。"""
 
     isOwner: bool
     "動画投稿者かどうかです。"
@@ -141,7 +141,7 @@ class Viewer(DictFromAttribute):
 
 
 class AbcOwner(DictFromAttribute):
-    "動画投稿者の基底クラスです。"
+    """動画投稿者の基底クラスです。"""
 
     id: str
     "投稿者のIDです。"
@@ -152,7 +152,7 @@ class AbcOwner(DictFromAttribute):
 
 
 class AbcVideo(DictFromAttribute["VideoClient"]):
-    "動画データの基底クラスです。"
+    """動画データの基底クラスです。"""
 
     id: str
     "動画IDです。"
@@ -171,7 +171,7 @@ class AbcVideo(DictFromAttribute["VideoClient"]):
 
 
 class VideoOwner(AbcOwner):
-    "動画の投稿者のデータです。"
+    """動画の投稿者のデータです。"""
 
     isVideosPublic: bool
     "アップロードした動画が公開されているかどうかです。"
@@ -180,7 +180,7 @@ class VideoOwner(AbcOwner):
 
 
 class Video(AbcVideo):
-    "動画データです。"
+    """動画データです。"""
 
     rating: Rating
     "動画のレートです。"
@@ -198,23 +198,23 @@ class Video(AbcVideo):
     "ギフトが有効かどうかです。"
     viewer: Viewer
     "クライアントのデータです。"
-    watchableUserTypeForPayment: str # TODO: ここに入る文字列は決まっている、なのでLiteralにしたい。
+    watchableUserTypeForPayment: str  # TODO: ここに入る文字列は決まっている、なのでLiteralにしたい。
     "不明"
-    commentableUserTypeForPayment: str # TODO: 上記と同じ。
+    commentableUserTypeForPayment: str  # TODO: 上記と同じ。
     "不明"
 
 
 class MyListOwner(AbcOwner):
-    "マイリストのオーナーのデータです。"
+    """マイリストのオーナーのデータです。"""
 
     ownerType: str
     "不明"
 
 
 class MyListItemVideo(AbcVideo):
-    "マイリストのアイテムの動画です。"
+    """マイリストのアイテムの動画です。"""
 
-    type: str # TODO: ここに入る文字列は恐らく決まっている...? Literalにしたい。
+    type: str  # TODO: ここに入る文字列は恐らく決まっている...? Literalにしたい。
     "不明"
     shortDescription: str
     "短くした動画の説明です。"
@@ -224,27 +224,27 @@ class MyListItemVideo(AbcVideo):
     "不明"
     isPaymentRequired: bool
     "不明"
-    playbackPosition: Any # 何なのか調べる。
+    playbackPosition: Any  # 何なのか調べる。
     "不明"
     owner: MyListOwner
     "マイリストの作成者のデータです。"
     requireSensitiveMasking: bool
     "センシティブなもので一度隠す必要があるかどうかです。"
-    videoLive: Any # TODO: なんなのか調べる。
+    videoLive: Any  # TODO: なんなのか調べる。
     "不明"
 
     def get_video(self) -> RealVideo:
-        ":class:`niconico.video.Video` のインスタンスを作ります。"
+        """:class:`niconico.video.Video` のインスタンスを作ります。"""
         return self.__super__.get_video(self.url)
 
     @property
     def url(self) -> str:
-        "この動画のURLです。"
+        """この動画のURLです。"""
         return f"https://www.nicovideo.jp/watch/{self.id}"
 
 
 class MyListItem(DictFromAttribute["VideoClient"]):
-    "マイリストのアイテムです。"
+    """マイリストのアイテムです。"""
 
     __extends__ = {
         "video": MyListItemVideo
@@ -258,14 +258,14 @@ class MyListItem(DictFromAttribute["VideoClient"]):
     "アイテムの説明です。"
     addedAt: str
     "マイリストに追加された時間です。"
-    status: str # TODO: ここに入っているのは決まっていると思うのでLiteralにしたい。
+    status: str  # TODO: ここに入っているのは決まっていると思うのでLiteralにしたい。
     "公開されているなら`public`が入ります。"
     video: MyListItemVideo
     "動画情報のクラスです。"
 
 
 class MyList(DictFromAttribute["VideoClient"]):
-    "一ページ単位でのマイリストです。"
+    """一ページ単位でのマイリストです。"""
 
     __extends__ = {
         "items": MyListItem

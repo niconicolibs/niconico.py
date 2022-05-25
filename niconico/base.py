@@ -7,11 +7,11 @@ from typing import TYPE_CHECKING, Generic, TypeVar, Type, Optional
 if TYPE_CHECKING:
     from .niconico import NicoNico
 
-
 __all__ = ("DictFromAttribute", "BaseClient")
 
-
 SuperT = TypeVar("SuperT")
+
+
 class DictFromAttribute(Generic[SuperT]):
     """辞書を属性からアクセスできるようにするものです。
     属性からアクセスされた際に返すものもこのクラスのインスタンスです。
@@ -64,7 +64,7 @@ class DictFromAttribute(Generic[SuperT]):
             return self._from_data(self.__data__[key], self.__super__, key)
         else:
             raise AttributeError(
-                f"class '{self.__class__.__name__}' has no attributre '{key}'"
+                f"class '{self.__class__.__name__}' has no attribute '{key}'"
             )
 
 

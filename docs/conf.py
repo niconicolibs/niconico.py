@@ -12,8 +12,8 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../'))
 
+sys.path.insert(0, os.path.abspath('../'))
 
 # -- Project information -----------------------------------------------------
 
@@ -24,7 +24,6 @@ author = 'tasuren'
 # The full version, including alpha/beta/rc tags
 with open("../niconico/__init__.py", "r") as f:
     release = version = f.read().split('__version__ = "')[1].split('"')[0]
-
 
 # -- General configuration ---------------------------------------------------
 
@@ -51,7 +50,6 @@ language = 'ja'
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
-
 
 # -- Options for HTML output -------------------------------------------------
 

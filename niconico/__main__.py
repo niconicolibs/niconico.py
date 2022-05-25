@@ -9,6 +9,7 @@ try:
     from niconico import NicoNico, Cookies
 except ImportError:
     from sys import path as spath
+
     spath.insert(0, __file__[:-20])
     from niconico import NicoNico, Cookies
 
@@ -17,7 +18,7 @@ def set_stdout_logger(name=None):
     "標準出力をするように指定された名前のLoggerを設定する。"
     # FROM: https://techblog.sasashima.works/archives/229
     stdout_handler = logging.StreamHandler(stream=stdout)
-    stdout_handler.setFormatter(fmt:=logging.Formatter("[%(levelname)s] %(message)s"))
+    stdout_handler.setFormatter(fmt := logging.Formatter("[%(levelname)s] %(message)s"))
     stdout_handler.setLevel(logging.INFO)
     stdout_handler.addFilter(lambda record: record.levelno <= logging.INFO)
     stderr_handler = logging.StreamHandler(stream=stderr)
@@ -62,14 +63,14 @@ Pythonのニコニコの非公式スクレイピング用のライブラリで�
     WRONG_WAY = "使用方法が違います。\n`niconico help`で使用方法を確認することができます。"
     args = argv[2:] if argv[0].startswith("py") else argv[1:]
     text, logger = " ".join(args), logging.getLogger("niconico.py")
-    stl = lambda : set_stdout_logger("niconico.py")
+    stl = lambda: set_stdout_logger("niconico.py")
 
     cookies, indent = None, 0
     for i, arg in enumerate(args):
         if arg == "--cookies":
             # クッキーが指定されていればパスを取り出す。
-            cookies = Cookies.from_file(args[i+1])
-            del args[i], args[i+1]
+            cookies = Cookies.from_file(args[i + 1])
+            del args[i], args[i + 1]
         if arg == "--indent":
             indent = 2
             del args[i]
