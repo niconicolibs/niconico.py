@@ -1,6 +1,5 @@
 # niconico.py - Cookies
 
-from optparse import Option
 from typing import Optional
 
 from http.cookies import SimpleCookie
