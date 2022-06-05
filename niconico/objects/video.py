@@ -204,6 +204,41 @@ class Video(AbcVideo):
     "不明"
 
 
+class CommentServer(DictFromAttribute):
+    "コメントサーバーに関するデータです。"
+
+    url: str
+    "コメントサーバーのURLです。"
+
+
+class NvCommentID(DictFromAttribute):
+    "コメントデータ取得に関するデータです。"
+
+    id: str
+    fork: str
+
+
+class NvCommentParams(DictFromAttribute):
+    "コメントデータ取得に関するデータです。"
+
+    targets: List[NvCommentID]
+    language: str
+
+class NvComment(DictFromAttribute):
+    "コメントデータ取得に関するデータです。"
+
+    threadKey: str
+    server: str
+    params: NvCommentParams
+
+
+class Comment(DictFromAttribute):
+    "コメントに関するデータです。"
+
+    server: CommentServer
+    nvComment: NvComment
+
+
 class MyListOwner(AbcOwner):
     "マイリストのオーナーのデータです。"
 

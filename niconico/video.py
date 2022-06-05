@@ -1,6 +1,7 @@
 # niconico.py - Video
 
 from __future__ import annotations
+from concurrent.futures import thread
 
 from typing import TYPE_CHECKING, Callable, Iterator, Union, Optional, Any
 
@@ -10,12 +11,14 @@ from time import time, sleep
 from bs4 import BeautifulSoup
 from json import loads
 
+from niconico.objects.comment import Comments, MovieChat
+
 from .base import DictFromAttribute, BaseClient
 from .exceptions import ExtractFailed
 from .enums import VideoDownloadMode
 from .utils import parse_link
 
-from .objects.video import EasyComment, Tag, VideoOwner, Video as AbcVideo, MyList as AbcMyList
+from .objects.video import Comment, EasyComment, Tag, VideoOwner, Video as AbcVideo, MyList as AbcMyList
 
 if TYPE_CHECKING:
     from .niconico import Response
@@ -120,6 +123,8 @@ class Video(DictFromAttribute):
     "動画のURLです。"
     client: Client
     "動画取得用のクライアントのインスタンスです。"
+    comment: Comment
+    "コメントのデータです。"
 
     def __init__(self, client: Client, url: str, data: dict):
         self.client, self.url, self.__data__ = client, url, data
@@ -346,6 +351,53 @@ class Video(DictFromAttribute):
         del session
 
         return {"session": data}
+    
+    def get_comments(self, fork: str, num: Optional[int] = 1000):
+        """動画のコメントを取得します。
+
+        Parameters
+        ----------
+        fork : str
+            コメントの種類です。"owner","easy","main"が指定可能です。
+        num : int, default 1000
+            1度に取得する数です。1000が最大です。
+        """
+
+        fork_id = "0"
+        if fork == "main":
+            fork_id = "0"
+        elif fork == "owner":
+            fork_id = "1"
+        elif fork == "easy":
+            fork_id = "2"
+        r = self.client.niconico.request(
+            "GET", self.comment.nvComment.server+"/legacy/api.json/thread", headers=HEADERS["normal"],
+            params={
+                "fork": fork_id,
+                "nicoru": "3",
+                "scores": "1",
+                "res_from": "-"+str(num),
+                "thread": next(
+                    x for x in self.comment.nvComment.params.targets if x.fork == fork).id,
+                "version": "20090904",
+                "with_global": "1"
+            }
+        ).json()
+
+        comments = Comments()
+        comments.fork = fork
+        for obj in r:
+            if "thread" in obj:
+                comments.thread = obj["thread"].get("thread")
+                comments.ticket = obj["thread"].get("ticket")
+                comments.last_res = obj["thread"].get("last_res")
+            if "leaf" in obj:
+                comments.count = obj["leaf"].get("count")
+            if "global_num_res" in obj:
+                comments.num_res = obj["global_num_res"].get("num_res")
+            if "chat" in obj:
+                comments.items.append(MovieChat(obj["chat"]))
+        return comments
 
 
 class Client(BaseClient):
