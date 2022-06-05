@@ -122,5 +122,5 @@ class NicoNico:
             title = title_ptn.search(res.text)
             if title:
                 if "2段階認証" in title.group(1):
-                    raise LoginFailureException("二段階認証には対応していません。")
-        raise LoginFailureException("ログインに失敗しました。")
+                    raise LoginFailureException("Two-step verification is not supported.")
+        raise LoginFailureException("Login failed.")
