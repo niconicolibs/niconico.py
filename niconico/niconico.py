@@ -12,6 +12,8 @@ import re
 from .video import Client as VideoClient
 from .cookies import Cookies
 
+from .objects.niconico import LoginFailureException
+
 
 __all__ = ("adjust_cookies", "NicoNico", "logger")
 Response = requests.Response
@@ -27,11 +29,6 @@ def adjust_cookies(cookies: Cookies) -> dict[str, str]:
     cookies : Cookies
         辞書に変換するクッキーです。"""
     return {key: morsel.value for key, morsel in cookies.items()}
-
-
-class LoginFailureException(Exception):
-    """ログインの失敗を知らせる例外クラスです。"""
-    pass
 
 
 class NicoNico:
