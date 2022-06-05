@@ -5,9 +5,9 @@ from __future__ import annotations
 from typing import Optional
 
 from logging import getLogger
+import re
 
 import requests
-import re
 
 from .video import Client as VideoClient
 from .search import SearchClient
