@@ -7,6 +7,7 @@ from typing import Optional
 from logging import getLogger
 
 import requests
+import re
 
 from .video import Client as VideoClient
 from .cookies import Cookies
@@ -26,6 +27,11 @@ def adjust_cookies(cookies: Cookies) -> dict[str, str]:
     cookies : Cookies
         辞書に変換するクッキーです。"""
     return {key: morsel.value for key, morsel in cookies.items()}
+
+
+class LoginFailureException(Exception):
+    """ログインの失敗を知らせる例外クラスです。"""
+    pass
 
 
 class NicoNico:
@@ -83,3 +89,38 @@ class NicoNico:
             self.cookies = Cookies(response.cookies.get_dict())
         response.raise_for_status()
         return response
+
+    def login(self, mail: str, password: str) -> NicoNico:
+        """メールアドレスとパスワードを用いてログインを行います。
+        二段階認証が有効になっているアカウントではログインすることができません。
+        クッキーの中身を直接置き換える方法で認証をしてください。
+
+        Parameters
+        ----------
+        mail : str
+            ログインする際のメールアドレスもしくは電話番号です。
+        password : str
+            ログインする際のパスワードです。
+
+        Raises
+        ------
+        LoginFailureException"""
+        session = requests.session()
+        
+        res = session.post(
+            "https://secure.nicovideo.jp/secure/login?site=niconico",
+            params={
+                "mail": mail,
+                "password": password
+            })
+        
+        if res.headers.get("x-niconico-authflag") == ('1' or '3'):
+            self.cookies = Cookies.from_string(session.cookies.get("user_session"))
+            return self
+        else:
+            title_ptn = re.compile('<title>(.*?)</title>')
+            title = title_ptn.search(res.text)
+            if title:
+                if "2段階認証" in title.group(1):
+                    raise LoginFailureException("二段階認証には対応していません。")
+        raise LoginFailureException("ログインに失敗しました。")
