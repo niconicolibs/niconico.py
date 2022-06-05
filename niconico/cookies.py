@@ -13,6 +13,17 @@ FORMAT = "%a, %d-%b-%Y %X"
 
 
 class Cookies(SimpleCookie):
+    @staticmethod
+    def _make_cookie_tuple(name: str, cookie: str, domain: Optional[str] = ".nicovideo.jp"):
+        cookies = Cookies()
+        cookies[name] = cookie
+        for key, value in (
+            ("domain", domain), ("path", "/"),
+            ("expires", (datetime.now() + timedelta(days=365)).strftime(FORMAT))
+        ):
+            cookies[name][key] = value
+        return cookies
+
     @classmethod
     def from_file(cls, path: str):
         """Netscapeのクッキーファイルフォーマットに準拠したテキストファイルからクッキーが格納されたクラスを作成します。  
@@ -45,6 +56,16 @@ class Cookies(SimpleCookie):
                         if key == "expires" else item[index]
                     )
         return cookies
+    
+    @classmethod
+    def from_string(cls, user_session: str):
+        """ニコニコ動画上での認証済みのクッキーの値を直接指定しクラスを作成します。
+
+        Parameters
+        ----------
+        user_session : str
+            ユーザーセッションです。"""
+        return cls._make_cookie_tuple("user_session", user_session)
 
     @classmethod
     def guest(cls, nicosid: Optional[str] = None):
@@ -53,11 +74,4 @@ class Cookies(SimpleCookie):
         Notes
         -----
         これはニコニコ動画にアクセスして作成するクッキーではなく、開発者がクッキーを見て予想して作った再現物です。"""
-        cookies = cls()
-        cookies["nicosid"] = nicosid or str(time())
-        for key, value in (
-            ("domain", ".nicovideo.jp"), ("path", "/"),
-            ("expires", (datetime.now() + timedelta(days=365)).strftime(FORMAT))
-        ):
-            cookies["nicosid"][key] = value
-        return cookies
+        return cls._make_cookie_tuple("nicosid", nicosid or str(time()))
