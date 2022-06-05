@@ -1,5 +1,6 @@
 # niconico.py - Cookies
 
+from optparse import Option
 from typing import Optional
 
 from http.cookies import SimpleCookie
@@ -44,6 +45,23 @@ class Cookies(SimpleCookie):
                         datetime.fromtimestamp(float(item[index])).strftime(FORMAT)
                         if key == "expires" else item[index]
                     )
+        return cookies
+    
+    @classmethod
+    def from_string(cls, user_session: str):
+        """ニコニコ動画上での認証済みのクッキーの値を直接指定しクラスを作成します。
+
+        Parameters
+        ----------
+        user_session : str
+            ユーザーセッションです。"""
+        cookies = cls()
+        cookies["user_session"] = user_session
+        for key, value in (
+            ("domain", ".nicovideo.jp"), ("path", "/"),
+            ("expires", (datetime.now() + timedelta(days=365)).strftime(FORMAT))
+        ):
+            cookies["user_session"][key] = value
         return cookies
 
     @classmethod
