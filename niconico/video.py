@@ -11,14 +11,13 @@ from time import time, sleep
 from bs4 import BeautifulSoup
 from json import loads
 
-from niconico.objects.comment import Comments, MovieChat
-
 from .base import DictFromAttribute, BaseClient
 from .exceptions import ExtractFailed
 from .enums import VideoDownloadMode
 from .utils import parse_link
 
 from .objects.video import Comment, EasyComment, Tag, VideoOwner, Video as AbcVideo, MyList as AbcMyList
+from .objects.comment import Comments, MovieChat
 
 if TYPE_CHECKING:
     from .niconico import Response
