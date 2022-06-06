@@ -351,7 +351,7 @@ class Video(DictFromAttribute):
 
         return {"session": data}
     
-    def get_comments(self, fork: str, num: Optional[int] = 1000, when: Optional(int) = None):
+    def get_comments(self, fork: str, num: Optional[int] = 1000, when: Optional(int) = None) -> Comments:
         """動画のコメントを取得します。
 
         Parameters
@@ -413,7 +413,8 @@ class Client(BaseClient):
         Parameters
         ----------
         url : str
-            動画のURLです。。
+            動画のURLです。(ex. https://www.nicovideo.jp/watch/sm9)
+            動画IDでも指定できます。(ex. sm9)
 
         Raises
         ------
@@ -422,6 +423,9 @@ class Client(BaseClient):
         if "nico.ms" in url:
             url = url.replace("nico.ms/", "www.nicovideo.jp/watch/")
         url = parse_link(url)
+
+        if "watch" not in url:
+            url = "https://www.nicovideo.jp/watch/" + url
 
         # 動画情報を取得する。
         data = BeautifulSoup(
