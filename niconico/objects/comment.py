@@ -5,7 +5,7 @@ from niconico.base import DictFromAttribute
 
 
 __all__ = (
-    "Comments", "MovieComment"
+    "Comments", "MovieChat"
 )
 
 
