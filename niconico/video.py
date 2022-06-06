@@ -350,7 +350,7 @@ class Video(DictFromAttribute):
 
         return {"session": data}
     
-    def get_comments(self, fork: str, num: Optional[int] = 1000, when: Optional(int) = None) -> Comments:
+    def get_comments(self, fork: str, num: Optional[int] = 1000, when: Optional[int] = None) -> Comments:
         """動画のコメントを取得します。
 
         Parameters
@@ -371,12 +371,12 @@ class Video(DictFromAttribute):
         elif fork == "easy":
             fork_id = "2"
         r = self.client.niconico.request(
-            "GET", self.comment.nvComment.server+"/legacy/api.json/thread", headers=HEADERS["normal"],
+            "GET", f"{self.comment.nvComment.server}/legacy/api.json/thread", headers=HEADERS["normal"],
             params={
                 "fork": fork_id,
                 "nicoru": "3",
                 "scores": "1",
-                "res_from": "-"+str(num),
+                "res_from": f"-{num}",
                 "thread": next(
                     x for x in self.comment.nvComment.params.targets if x.fork == fork).id,
                 "version": "20090904",
@@ -389,16 +389,19 @@ class Video(DictFromAttribute):
         comments.fork = fork
         for obj in r:
             if "thread" in obj:
-                comments.thread = obj["thread"].get("thread")
+                if obj["thread"]["resultcode"] == 1:
+                    raise Exception("コメントの取得に失敗しました。")
+                comments.thread = obj["thread"]["thread"]
                 comments.ticket = obj["thread"].get("ticket")
                 comments.last_res = obj["thread"].get("last_res")
-                comments.when = when or obj["thread"].get("server_time")
+                comments.when = when or obj["thread"]["server_time"]
             if "leaf" in obj:
-                comments.count = obj["leaf"].get("count")
+                comments.count = obj["leaf"]["count"]
             if "global_num_res" in obj:
-                comments.num_res = obj["global_num_res"].get("num_res")
+                comments.num_res = obj["global_num_res"]["num_res"]
             if "chat" in obj:
                 comments.chats.append(MovieChat(obj["chat"]))
+
         return comments
 
 
