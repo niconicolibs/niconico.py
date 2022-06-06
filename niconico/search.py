@@ -1,3 +1,6 @@
+# niconico.py - Search
+
+
 from typing import List
 
 class SearchClient:
