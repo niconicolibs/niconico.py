@@ -1,7 +1,6 @@
 # niconico.py - Video
 
 from __future__ import annotations
-from concurrent.futures import thread
 
 from typing import TYPE_CHECKING, Callable, Iterator, Union, Optional, Any
 
