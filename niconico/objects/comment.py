@@ -55,7 +55,7 @@ class Comments():
     "取得したものの最新のコメント番号です。"
     num_res: int
     "全サーバー合計のコメント数です。"
-    ticket: str
+    ticket: Optional[str]
     "コメント投稿をする際のチケットです。"
     chats: List[MovieChat]
     "コメントデータのリストです。"
