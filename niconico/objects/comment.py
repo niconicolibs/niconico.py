@@ -20,15 +20,15 @@ class MovieChat(DictFromAttribute):
     "コメントが投稿された場所です。"
     date: int
     "コメントが投稿された日時です。"
-    nicoru: Optional[int] = 0,
+    nicoru: int = 0
     "ニコられた数です。"
-    premium: Optional[int] = 0,
+    premium: bool = False
     "プレミアムかどうかです。"
-    anonymity: int
+    anonymity: bool
     "匿名アカウントかどうかです。"
-    date_usec: Optional[int] = 0,
+    date_usec: int = 0
     "コメントが投稿された日時のミリ秒数です。"
-    score: Optional[int] = 0,
+    score: int = 0
     "コメントのNG共有スコアの値です。"
     user_id: str
     "コメント投稿者のユーザーIDです。"
@@ -47,7 +47,7 @@ class Comments():
 
     thread: str
     "スレッドのIDです。"
-    fork: int
+    fork: str
     "コメントの種類です。"
     count: int
     "投稿されたコメント数です。"

@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, TypedDict, Literal, Optional, List, Any
 
 from ..base import DictFromAttribute
-from .__init__ import Unknown
 
 if TYPE_CHECKING:
     from ..video import Client as VideoClient, Video as RealVideo

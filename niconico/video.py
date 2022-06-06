@@ -356,13 +356,11 @@ class Video(DictFromAttribute):
         Parameters
         ----------
         fork : str
-            コメントの種類です。"owner","easy","main"が指定可能です。
+            コメントの種類です。"main","owner","easy","channel"が指定可能です。
         num : int, default 1000
             1度に取得する数です。1000が最大です。
         when: Optional[int]
-            過去ログをUNIXタイムで指定できます。何も指定しない場合は最新のコメントを取得します。
-        """
-
+            過去ログをUNIXタイムで指定できます。何も指定しない場合は最新のコメントを取得します。"""
         fork_id = "0"
         if fork == "main":
             fork_id = "0"
