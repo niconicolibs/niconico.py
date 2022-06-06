@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 __all__ = (
     "NicoDic", "Phrase", "EasyComment", "TagEdit", "TagItem", "Tag", "Counter", "Thumbnail",
     "Rating", "ViewerLike", "Viewer", "AbcOwner", "AbcVideo", "Video", "VideoOwner",
+    "CommentServer","NvCommentID","NvCommentParams","NvComment","Comment",
     "MyListOwner", "MyListItemVideo", "MyListItem", "MyList"
 )
 
