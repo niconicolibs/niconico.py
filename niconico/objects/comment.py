@@ -37,6 +37,10 @@ class MovieChat(DictFromAttribute):
     content: str
     "コメント内容です。"
 
+    def __init__(self, data: dict):
+        self.__data__ = data
+        super().__init__(self.__data__, self)
+
 
 class Comments():
     "動画のコメントデータです。"
@@ -53,9 +57,10 @@ class Comments():
     "全サーバー合計のコメント数です。"
     ticket: str
     "コメント投稿をする際のチケットです。"
-    items: List[MovieChat]
+    chats: List[MovieChat]
     "コメントデータのリストです。"
+    when: int
+    "いつ時点のコメントデータかをUNIXタイムで返します。"
 
-    def __init__(self, data: dict):
-        self.__data__ = data
-        super().__init__(self.__data__, self)
+    def __init__(self):
+        self.chats = []

@@ -352,7 +352,7 @@ class Video(DictFromAttribute):
 
         return {"session": data}
     
-    def get_comments(self, fork: str, num: Optional[int] = 1000):
+    def get_comments(self, fork: str, num: Optional[int] = 1000, when: Optional(int) = None):
         """動画のコメントを取得します。
 
         Parameters
@@ -361,6 +361,8 @@ class Video(DictFromAttribute):
             コメントの種類です。"owner","easy","main"が指定可能です。
         num : int, default 1000
             1度に取得する数です。1000が最大です。
+        when: Optional[int]
+            過去ログをUNIXタイムで指定できます。何も指定しない場合は最新のコメントを取得します。
         """
 
         fork_id = "0"
@@ -380,7 +382,8 @@ class Video(DictFromAttribute):
                 "thread": next(
                     x for x in self.comment.nvComment.params.targets if x.fork == fork).id,
                 "version": "20090904",
-                "with_global": "1"
+                "with_global": "1",
+                "when": when or ""
             }
         ).json()
 
@@ -391,12 +394,13 @@ class Video(DictFromAttribute):
                 comments.thread = obj["thread"].get("thread")
                 comments.ticket = obj["thread"].get("ticket")
                 comments.last_res = obj["thread"].get("last_res")
+                comments.when = when or obj["thread"].get("server_time")
             if "leaf" in obj:
                 comments.count = obj["leaf"].get("count")
             if "global_num_res" in obj:
                 comments.num_res = obj["global_num_res"].get("num_res")
             if "chat" in obj:
-                comments.items.append(MovieChat(obj["chat"]))
+                comments.chats.append(MovieChat(obj["chat"]))
         return comments
 
 
