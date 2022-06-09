@@ -7,6 +7,9 @@ from typing import TYPE_CHECKING, TypedDict, Literal, Optional, List, Any
 from ..base import DictFromAttribute
 from .__init__ import Unknown
 
+if TYPE_CHECKING:
+    from ..common import Client as UserClient
+
 
 __all__ = (
     "Icons", "AbcUser", "UserLevel", "UserChannel", "UserSNS", "User"
@@ -23,7 +26,7 @@ class Icons(DictFromAttribute):
     "大きいアイコン画像のURLです。"
 
 
-class AbcUser(DictFromAttribute):
+class AbcUser(DictFromAttribute["UserClient"]):
     "ニコニコのアカウントデータの基底クラスです。"
 
     id: int
