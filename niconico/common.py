@@ -5,12 +5,13 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Callable, Iterator, Union, Optional, Any
 
 from bs4 import BeautifulSoup
-from json import loads, dumps
+from json import loads
 
 from .base import DictFromAttribute, BaseClient
 from .exceptions import ExtractFailed
 
-from .objects.niconico import User as AbcUser
+from .objects.video import MyList as AbcMyList, VideoSortKey, AbcVideo
+from .objects.niconico import User as AbcUser, AbcUser as AbcAbcUser
 
 if TYPE_CHECKING:
     from .niconico import Response
@@ -52,32 +53,141 @@ class User():
         self.client = client
         self.user = AbcUser(data, client)
 
+    def get_followers(self, num: Optional[int] = 1000, page: Optional[int] = 1) -> Iterator[AbcUser]:
+        """ユーザーのフォロワーを取得します。
+
+        Parameters
+        ----------
+        num : int, default 100
+            取得する上限値です。
+        page : int, default 1
+            合計数を上限値で割ったときの何ページ目を表示するかです。
+
+        Raises
+        ------
+        ExtractFailed"""
+        
+        r = self.client.niconico.request(
+            "GET", f"https://nvapi.nicovideo.jp/v1/users/{id}/followed-by/users?pageSize={num}&page={page}", headers=HEADERS["normal"]
+        ).json()
+
+        for user in r["data"]["items"]:
+            yield AbcAbcUser(user, self)
+    
+    def get_followees(self, num: Optional[int] = 1000, page: Optional[int] = 1) -> Iterator[AbcUser]:
+        """ユーザーがフォローしているユーザーを取得します。
+
+        Parameters
+        ----------
+        num : int, default 100
+            取得する上限値です。
+        page : int, default 1
+            合計数を上限値で割ったときの何ページ目を表示するかです。
+
+        Raises
+        ------
+        ExtractFailed"""
+        
+        r = self.client.niconico.request(
+            "GET", f"https://nvapi.nicovideo.jp/v1/users/{id}/following/users?pageSize={num}&page={page}", headers=HEADERS["normal"]
+        ).json()
+
+        for user in r["data"]["items"]:
+            yield AbcAbcUser(user, self)
+    
+    def get_mylists(self) -> Iterator[AbcMyList]:
+        """ユーザーのマイリストを取得します。
+
+        Raises
+        ------
+        ExtractFailed"""
+        
+        r = self.client.niconico.request(
+            "GET", f"https://nvapi.nicovideo.jp/v1/users/{id}/mylists", headers=HEADERS["normal"]
+        ).json()
+
+        for mr in r["data"]["mylists"]:
+            yield AbcMyList(mr, self)
+    
+    def get_movies(
+            self, num: Optional[int] = 100, page: Optional[int] = 1,
+            sortKey: Optional[str] = VideoSortKey.registeredAt,
+            sortOrder: Optional[str] = "desc") -> Iterator[AbcVideo]:
+        """ユーザーのマイリストを取得します。
+
+        Parameters
+        ----------
+        num : int, default 100
+            取得する上限値です。
+        page : int, default 1
+            合計数を上限値で割ったときの何ページ目を表示するかです。
+        sortKey : str, default VideoSortKey.registeredAt
+            動画のソート方法です。VideoSortKey列挙型でも指定できます。
+        sortOrder : str, default desc
+            ソートが降順(desc)か昇順(asc)かを指定します。
+
+        Raises
+        ------
+        ExtractFailed"""
+        
+        r = self.client.niconico.request(
+            "GET", f"https://nvapi.nicovideo.jp/v1/users/{id}/videos"\
+                f"?pageSize={num}&page={page}&sortKey={sortKey}&sortOrder={sortOrder}",
+            headers=HEADERS["normal"]
+        ).json()
+
+        for v in r["data"]["items"]:
+            yield AbcVideo(v, self)
+    
+    def is_following(self, id: int) -> bool:
+        """指定したユーザーをフォローしているかを返します。
+
+        Parameters
+        ----------
+        id : int
+            ユーザーIDです。"""
+        
+        r = self.client.niconico.request(
+            "GET",
+            f"https://user-follow-api.nicovideo.jp/v1/user/followees/niconico-users/{id}.json",
+            headers=HEADERS["normal"]
+        ).json()
+
+        return r["data"]["following"]
+
 
 class Client(BaseClient):
     """ニコニコサービス全体のクライアントです。
     普通 :class:`niconico.niconico.NicoNico` から使います。"""
 
-    def get_user(self, id: int) -> User:
+    def get_user(self, id: str) -> User:
         """ニコニコのアカウント情報を取得します。
 
         Parameters
         ----------
-        id : int
+        id : str
             アカウントのIDです。
 
         Raises
         ------
         ExtractFailed"""
         
-        # 動画情報を取得する。
-        data = BeautifulSoup(
-            self.niconico.request("GET", f"https://www.nicovideo.jp/user/{id}", headers=HEADERS["normal"]).text, "html.parser"
-        ).find(
-            "div", {"id": "js-initial-userpage-data"}
-        ).get("data-initial-data")
+        r = self.niconico.request(
+            "GET", f"https://nvapi.nicovideo.jp/v1/users/{id}", headers=HEADERS["normal"]
+        ).json()
+        return User(self, r["data"]["user"])
+    
+    def get_own(self) -> User:
+        """ログインしているアカウント情報を取得します。
 
-        if data:
-            user = User(self, loads(data)["userDetails"]["userDetails"]["user"])
-            return user
-        else:
-            raise ExtractFailed("ニコニコから情報を取得するのに失敗しました。")
+        Raises
+        ------
+        ExtractFailed"""
+
+        return self.get_user("me")
+        
+
+#TODO
+"""
+user.is_followee(id)
+"""

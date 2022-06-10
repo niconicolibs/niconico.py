@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, TypedDict, Literal, Optional, List, Any
+from enum import Enum
 
 from ..base import DictFromAttribute
 from .__init__ import Unknown
@@ -333,3 +334,13 @@ class MyList(DictFromAttribute["VideoClient"]):
     "フォロワーの数です。"
     isFollowing: bool
     "フォローしているかどうかです。"
+
+
+class VideoSortKey(Enum):
+    registeredAt = "registeredAt"
+    viewCount = "viewCount"
+    lastCommentTime = "lastCommentTime",
+    commentCount = "commentCount",
+    likeCount = "likeCount",
+    mylistCount = "mylistCount",
+    duration = "duration"
