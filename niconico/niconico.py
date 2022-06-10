@@ -9,6 +9,7 @@ import re
 
 import requests
 
+from .common import Client as CommonClient
 from .video import Client as VideoClient
 from .search import SearchClient
 from .cookies import Cookies
@@ -40,12 +41,15 @@ class NicoNico:
     cookies : Cookies, optional
         リクエストの際に使用するクッキーです。"""
 
+    common: CommonClient
+    "ニコニコサービス全体のクライアントクラスのインスタンスです。"
     video: VideoClient
     "ニコニコ動画用のクライアントクラスのインスタンスです。"
     cookies: Optional[Cookies]
     "リクエスト時に使用するクッキーです。"
 
     def __init__(self, cookies: Optional[Cookies] = None):
+        self.common = CommonClient(self)
         self.video = VideoClient(self)
         self.searchclient = SearchClient(self)
         self.cookies = cookies
