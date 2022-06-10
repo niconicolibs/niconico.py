@@ -110,9 +110,10 @@ class User():
             yield AbcMyList(mr, self)
     
     def get_movies(
-            self, num: Optional[int] = 100, page: Optional[int] = 1,
-            sortKey: Optional[str] = VideoSortKey.registeredAt,
-            sortOrder: Optional[str] = "desc") -> Iterator[AbcVideo]:
+             self, num: Optional[int] = 100, page: Optional[int] = 1,
+             sortKey: Optional[str] = VideoSortKey.registeredAt,
+             sortOrder: Optional[str] = "desc"
+        ) -> Iterator[AbcVideo]:
         """ユーザーのマイリストを取得します。
 
         Parameters
@@ -147,13 +148,11 @@ class User():
         id : int
             ユーザーIDです。"""
         
-        r = self.client.niconico.request(
+        return self.client.niconico.request(
             "GET",
             f"https://user-follow-api.nicovideo.jp/v1/user/followees/niconico-users/{id}.json",
             headers=HEADERS["normal"]
-        ).json()
-
-        return r["data"]["following"]
+        ).json()["data"]["following"]
 
 
 class Client(BaseClient):
