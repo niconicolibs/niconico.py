@@ -1,4 +1,4 @@
-[![PyPI](https://img.shields.io/pypi/v/niconico.py)](https://pypi.org/project/niconico.py/) ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/niconico.py) ![PyPI - Downloads](https://img.shields.io/pypi/dm/niconico.py) ![PyPI - License](https://img.shields.io/pypi/l/niconico.py) [![Documentation Status](https://readthedocs.org/projects/niconico-py/badge/?version=latest)](https://niconico-py.readthedocs.io/ja/latest/?badge=latest) [![Discord](https://img.shields.io/discord/777430548951728149?label=chat&logo=discord)](https://discord.gg/kfMwZUyGFG) [![Buy Me a Coffee](https://img.shields.io/badge/-tasuren-E9EEF3?label=Buy%20Me%20a%20Coffee&logo=buymeacoffee)](https://www.buymeacoffee.com/tasuren)
+[![PyPI](https://img.shields.io/pypi/v/niconico.py)](https://pypi.org/project/niconico.py/) ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/niconico.py) ![PyPI - Downloads](https://img.shields.io/pypi/dm/niconico.py) ![PyPI - License](https://img.shields.io/pypi/l/niconico.py) [![Documentation Status](https://readthedocs.org/projects/niconico-py/badge/?version=latest)](https://niconico-py.readthedocs.io/ja/latest/?badge=latest)
 # niconico.py
 niconico.pyはニコニコにあるコンテンツを取得するためのライブラリです。  
 これを使うことでニコニコ動画の動画のダウンロードができます。  
@@ -6,6 +6,12 @@ niconico.pyはニコニコにあるコンテンツを取得するためのライ
 
 **Warning!**  
 現在は開発されたばかりで使用者が予期できない変更やバグがある可能性があります。
+
+## Important
+niconico.pyは元々私(tasuren)が暇な時に開発をしようと思って開発を始めましたが、思うように時間をとることができず現在は全くメンテナンスされていない状況です。  
+そこで、私はniconico.pyの所有権を、他のniconico.pyをメンテナンスしたいと思っている人に渡したいと思い当たりました。  
+なので、もしniconico.pyの所有者になって、メンテナンスをしたいという人が居れば、`tasuren@aol.com`までメールで連絡してください。  
+一番最初に来た人に渡します。
 
 ## Installation
 pipを使用してインストールすることができます。  
