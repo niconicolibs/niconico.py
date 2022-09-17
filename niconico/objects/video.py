@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, TypedDict, Literal, Optional, List, Any
 
 from ..base import DictFromAttribute
-from .__init__ import Unknown
 
 if TYPE_CHECKING:
     from ..video import Client as VideoClient, Video as RealVideo
@@ -14,6 +13,7 @@ if TYPE_CHECKING:
 __all__ = (
     "NicoDic", "Phrase", "EasyComment", "TagEdit", "TagItem", "Tag", "Counter", "Thumbnail",
     "Rating", "ViewerLike", "Viewer", "AbcOwner", "AbcVideo", "Video", "VideoOwner",
+    "CommentServer","NvCommentID","NvCommentParams","NvComment","Comment",
     "MyListOwner", "MyListItemVideo", "MyListItem", "MyList"
 )
 
@@ -202,6 +202,41 @@ class Video(AbcVideo):
     "不明"
     commentableUserTypeForPayment: str # TODO: 上記と同じ。
     "不明"
+
+
+class CommentServer(DictFromAttribute):
+    "コメントサーバーに関するデータです。"
+
+    url: str
+    "コメントサーバーのURLです。"
+
+
+class NvCommentID(DictFromAttribute):
+    "コメントデータ取得に関するデータです。"
+
+    id: str
+    fork: str
+
+
+class NvCommentParams(DictFromAttribute):
+    "コメントデータ取得に関するデータです。"
+
+    targets: List[NvCommentID]
+    language: str
+
+class NvComment(DictFromAttribute):
+    "コメントデータ取得に関するデータです。"
+
+    threadKey: str
+    server: str
+    params: NvCommentParams
+
+
+class Comment(DictFromAttribute):
+    "コメントに関するデータです。"
+
+    server: CommentServer
+    nvComment: NvComment
 
 
 class MyListOwner(AbcOwner):
