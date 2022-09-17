@@ -1,4 +1,12 @@
-[![PyPI](https://img.shields.io/pypi/v/niconico.py)](https://pypi.org/project/niconico.py/) ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/niconico.py) ![PyPI - Downloads](https://img.shields.io/pypi/dm/niconico.py) ![PyPI - License](https://img.shields.io/pypi/l/niconico.py)
+[![PyPI](https://img.shields.io/pypi/v/niconico.py)](https://pypi.org/project/niconico.py/)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/niconico.py)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/niconico.py)
+![PyPI - License](https://img.shields.io/pypi/l/niconico.py)
+
+[![Test](https://github.com/niconicolibs/niconico.py/actions/workflows/release.yml/badge.svg)](https://github.com/niconicolibs/niconico.py/actions/workflows/release.yml)
+[![Test](https://github.com/niconicolibs/niconico.py/actions/workflows/docs.yml/badge.svg)](https://github.com/niconicolibs/niconico.py/actions/workflows/docs.yml)
+[![Test](https://github.com/niconicolibs/niconico.py/actions/workflows/pypi.yml/badge.svg)](https://github.com/niconicolibs/niconico.py/actions/workflows/pypi.yml)
+
 # niconico.py(β)
 niconico.pyはニコニコにあるコンテンツを取得するためのPythonのライブラリです。  
 これを使うことでニコニコ動画の動画のダウンロードができます。  
