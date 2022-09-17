@@ -51,5 +51,5 @@ jobs:
           if (git diff --shortstat | grep '[0-9]'); then \
             git add .; \
             git commit -m "Generating docs via GitHub Actions"; \
-            git push origin HEAD:${{GITHUB_REF}}; \
+            git push origin HEAD:${{ GITHUB_REF }}; \
           fi
