@@ -1,19 +1,22 @@
-[![PyPI](https://img.shields.io/pypi/v/niconico.py)](https://pypi.org/project/niconico.py/) ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/niconico.py) ![PyPI - Downloads](https://img.shields.io/pypi/dm/niconico.py) ![PyPI - License](https://img.shields.io/pypi/l/niconico.py) [![Documentation Status](https://readthedocs.org/projects/niconico-py/badge/?version=latest)](https://niconico-py.readthedocs.io/ja/latest/?badge=latest)
-# niconico.py
-niconico.pyはニコニコにあるコンテンツを取得するためのライブラリです。  
+[![PyPI](https://img.shields.io/pypi/v/niconico.py)](https://pypi.org/project/niconico.py/) ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/niconico.py) ![PyPI - Downloads](https://img.shields.io/pypi/dm/niconico.py) ![PyPI - License](https://img.shields.io/pypi/l/niconico.py)
+# niconico.py(β)
+niconico.pyはニコニコにあるコンテンツを取得するためのPythonのライブラリです。  
 これを使うことでニコニコ動画の動画のダウンロードができます。  
 また、自分のアカウントを使用して動画情報の取得も可能です。
 
-**Warning!**  
-現在は開発されたばかりで使用者が予期できない変更やバグがある可能性があります。
+***Warning!***
+
+ベータ版のため予期できない変更やバグがある可能性があります。
 
 ## Installation
 pipを使用してインストールすることができます。  
-`pip install niconico.py`
+```bash
+pip install niconico.py
+```
 
 ## Example
 ### ニコニコ動画
-#### ダウンロード
+#### 動画ダウンロード
 ```python
 from niconico import NicoNico
 
@@ -22,7 +25,7 @@ client = NicoNico()
 with client.video.get_video("https://www.nicovideo.jp/watch/sm37658498") as video:
     video.download(f"{video.video.id}.mp4")
 ```
-#### マイリスト
+#### マイリスト取得
 ```python
 from niconico import NicoNico
 
