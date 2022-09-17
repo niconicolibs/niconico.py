@@ -58,7 +58,5 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: main
-          FOLDER: docs
+          BRANCH: docs
           COMMIT_MESSAGE: "docs: update docs via GitHub Actions"
-          CLEAN: true
