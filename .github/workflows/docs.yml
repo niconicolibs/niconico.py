@@ -39,7 +39,7 @@ jobs:
       # pdocでドキュメントを生成
       - name: Pdoc
         run: |
-          pdoc niconico --html -o tmp --force --template-dir pdoc/templates
+          pdoc --html -o tmp --force --template-dir pdoc/templates niconico
           cp -r tmp/niconico docs
           rm -rf tmp
       
