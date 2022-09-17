@@ -15,7 +15,8 @@ from .exceptions import ExtractFailed
 from .enums import VideoDownloadMode
 from .utils import parse_link
 
-from .objects.video import EasyComment, Tag, VideoOwner, Video as AbcVideo, MyList as AbcMyList
+from .objects.video import Comment, EasyComment, Tag, VideoOwner, Video as AbcVideo, MyList as AbcMyList
+from .objects.comment import Comments, MovieChat
 
 if TYPE_CHECKING:
     from .niconico import Response
@@ -120,6 +121,8 @@ class Video(DictFromAttribute):
     "動画のURLです。"
     client: Client
     "動画取得用のクライアントのインスタンスです。"
+    comment: Comment
+    "コメントのデータです。"
 
     def __init__(self, client: Client, url: str, data: dict):
         self.client, self.url, self.__data__ = client, url, data
@@ -346,6 +349,58 @@ class Video(DictFromAttribute):
         del session
 
         return {"session": data}
+    
+    def get_comments(self, fork: str, num: Optional[int] = 1000, when: Optional[int] = None) -> Comments:
+        """動画のコメントを取得します。
+
+        Parameters
+        ----------
+        fork : str
+            コメントの種類です。"main","owner","easy","channel"が指定可能です。
+        num : int, default 1000
+            1度に取得する数です。1000が最大です。
+        when: Optional[int]
+            過去ログをUNIXタイムで指定できます。何も指定しない場合は最新のコメントを取得します。"""
+        fork_id = "0"
+        if fork == "main":
+            fork_id = "0"
+        elif fork == "owner":
+            fork_id = "1"
+        elif fork == "easy":
+            fork_id = "2"
+        r = self.client.niconico.request(
+            "GET", f"{self.comment.nvComment.server}/legacy/api.json/thread", headers=HEADERS["normal"],
+            params={
+                "fork": fork_id,
+                "nicoru": "3",
+                "scores": "1",
+                "res_from": f"-{num}",
+                "thread": next(
+                    x for x in self.comment.nvComment.params.targets if x.fork == fork).id,
+                "version": "20090904",
+                "with_global": "1",
+                "when": when or ""
+            }
+        ).json()
+
+        comments = Comments()
+        comments.fork = fork
+        for obj in r:
+            if "thread" in obj:
+                if obj["thread"]["resultcode"] == 1:
+                    raise Exception("コメントの取得に失敗しました。")
+                comments.thread = obj["thread"]["thread"]
+                comments.ticket = obj["thread"].get("ticket")
+                comments.last_res = obj["thread"].get("last_res")
+                comments.when = when or obj["thread"]["server_time"]
+            if "leaf" in obj:
+                comments.count = obj["leaf"]["count"]
+            if "global_num_res" in obj:
+                comments.num_res = obj["global_num_res"]["num_res"]
+            if "chat" in obj:
+                comments.chats.append(MovieChat(obj["chat"]))
+
+        return comments
 
 
 class Client(BaseClient):
@@ -358,7 +413,8 @@ class Client(BaseClient):
         Parameters
         ----------
         url : str
-            動画のURLです。。
+            動画のURLです。(ex. https://www.nicovideo.jp/watch/sm9)
+            動画IDでも指定できます。(ex. sm9)
 
         Raises
         ------
@@ -367,6 +423,9 @@ class Client(BaseClient):
         if "nico.ms" in url:
             url = url.replace("nico.ms/", "www.nicovideo.jp/watch/")
         url = parse_link(url)
+
+        if "watch" not in url:
+            url = "https://www.nicovideo.jp/watch/" + url
 
         # 動画情報を取得する。
         data = BeautifulSoup(
