@@ -8,7 +8,7 @@ authors = [
 ]
 readme = "README.md"
 packages = [{include = "niconico"}]
-license = {file = "LICENSE"}
+license = "LICENSE"
 classifiers = [
     "Programming Language :: Python :: 3",
 ]
