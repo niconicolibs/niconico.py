@@ -27,7 +27,7 @@ setup(
     description=DESCRIPTION,
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url=f'https://github.com/tasuren/{NAME}',
+    url=f'https://github.com/niconicolibs/{NAME}',
     project_urls={
         "Documentation": f"https://{NAME.replace('.', '-')}.readthedocs.io/"
     },
