@@ -14,8 +14,6 @@
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
 <script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
-<style>.homelink{display:block;font-size:2em;font-weight:bold;color:#555;padding-bottom:.5em;border-bottom:1px solid silver}.homelink:hover{color:inherit}.homelink img{max-width:20%;max-height:5em;margin:auto;margin-bottom:.3em}</style>
-<link rel="icon" href="https://avatars.githubusercontent.com/u/113749892?s=64">
 </head>
 <body>
 <main>
@@ -34,7 +32,6 @@
 from typing import List
 
 class SearchClient:
-    &#34;スナップショットAPIを利用するためのクライアントです&#34;
     APIURL = &#34;https://api.search.nicovideo.jp/api/v2/snapshot/video/contents/search&#34;
     def __init__(self, client):
         self.__client = client
@@ -42,15 +39,6 @@ class SearchClient:
     def search(self, keyword: str, *,
                sort: str=&#34;-viewCounter&#34;, targets: List[str]=[&#34;title&#34;],
               fields: List[str]=[&#34;contentId&#34;, &#34;title&#34;, &#34;viewCounter&#34;]):
-        &#34;&#34;&#34;ニコニコ動画の動画をスナップショットAPIを利用して検索します。
-        Parameters
-        ----------
-        keyword : str
-            検索キーワード
-        sort : str
-            ソート方式
-        targets : List[str]
-        fields : List[str]&#34;&#34;&#34;
         query = {
             &#34;q&#34;: keyword,
             &#34;_sort&#34;: sort,
@@ -74,13 +62,12 @@ class SearchClient:
 <span>(</span><span>client)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>スナップショットAPIを利用するためのクライアントです</p></div>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class SearchClient:
-    &#34;スナップショットAPIを利用するためのクライアントです&#34;
     APIURL = &#34;https://api.search.nicovideo.jp/api/v2/snapshot/video/contents/search&#34;
     def __init__(self, client):
         self.__client = client
@@ -88,15 +75,6 @@ class SearchClient:
     def search(self, keyword: str, *,
                sort: str=&#34;-viewCounter&#34;, targets: List[str]=[&#34;title&#34;],
               fields: List[str]=[&#34;contentId&#34;, &#34;title&#34;, &#34;viewCounter&#34;]):
-        &#34;&#34;&#34;ニコニコ動画の動画をスナップショットAPIを利用して検索します。
-        Parameters
-        ----------
-        keyword : str
-            検索キーワード
-        sort : str
-            ソート方式
-        targets : List[str]
-        fields : List[str]&#34;&#34;&#34;
         query = {
             &#34;q&#34;: keyword,
             &#34;_sort&#34;: sort,
@@ -118,19 +96,7 @@ class SearchClient:
 <span>def <span class="ident">search</span></span>(<span>self, keyword: str, *, sort: str = '-viewCounter', targets: List[str] = ['title'], fields: List[str] = ['contentId', 'title', 'viewCounter'])</span>
 </code></dt>
 <dd>
-<div class="desc"><p>ニコニコ動画の動画をスナップショットAPIを利用して検索します。
-Parameters</p>
-<hr>
-<dl>
-<dt><strong><code>keyword</code></strong> :&ensp;<code>str</code></dt>
-<dd>検索キーワード</dd>
-<dt><strong><code>sort</code></strong> :&ensp;<code>str</code></dt>
-<dd>ソート方式</dd>
-<dt><strong><code>targets</code></strong> :&ensp;<code>List[str]</code></dt>
-<dd>&nbsp;</dd>
-<dt><strong><code>fields</code></strong> :&ensp;<code>List[str]</code></dt>
-<dd>&nbsp;</dd>
-</dl></div>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -138,15 +104,6 @@ Parameters</p>
 <pre><code class="python">def search(self, keyword: str, *,
            sort: str=&#34;-viewCounter&#34;, targets: List[str]=[&#34;title&#34;],
           fields: List[str]=[&#34;contentId&#34;, &#34;title&#34;, &#34;viewCounter&#34;]):
-    &#34;&#34;&#34;ニコニコ動画の動画をスナップショットAPIを利用して検索します。
-    Parameters
-    ----------
-    keyword : str
-        検索キーワード
-    sort : str
-        ソート方式
-    targets : List[str]
-    fields : List[str]&#34;&#34;&#34;
     query = {
         &#34;q&#34;: keyword,
         &#34;_sort&#34;: sort,
@@ -162,11 +119,6 @@ Parameters</p>
 </section>
 </article>
 <nav id="sidebar">
-<header>
-<a class="homelink" rel="home" title="docs Home" href="https://niconicolibs.github.io/niconico.py/">
-<img src="https://avatars.githubusercontent.com/u/113749892?s=512" alt=""> niconico.py
-</a>
-</header>
 <h1>Index</h1>
 <div class="toc">
 <ul></ul>
