@@ -39,10 +39,8 @@ jobs:
       # pdocでドキュメントを生成
       - name: Pdoc
         run: |
-          rm -rf docs
           pdoc --html -o tmp --force --template-dir pdoc/templates niconico
-          ls tmp/niconico
-          mv tmp/niconico docs
+          cp -r tmp/niconico docs
           rm -rf tmp
       
       # 差分をgitにpushする
