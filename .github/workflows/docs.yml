@@ -43,22 +43,13 @@ jobs:
       
       # 差分をgitにpushする
       # ref: https://zenn.dev/lollipop_onl/articles/eoz-gha-push-diffs
-      #- name: Push new docs
-      #  run: |
-      #    git remote set-url origin https://github-actions:${{secrets.GITHUB_TOKEN}}@github.com/niconicolibs/niconico.py
-      #    git config --global user.name "github-actions[bot]"
-      #    git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-      #    if (git diff --shortstat | grep '[0-9]'); then \
-      #      git add .; \
-      #      git commit -m 'Generating docs via GitHub Actions'; \
-      #      git push origin HEAD:${{ GITHUB_REF }}; \
-      #    fi
-
-      - name: Deploy on main
-        uses: JamesIves/github-pages-deploy-action@4.4.0
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: main
-          FOLDER: docs
-          COMMIT_MESSAGE: "docs: update docs via GitHub Actions"
-          CLEAN: true
+      - name: Push new docs
+        run: |
+          git remote set-url origin https://github-actions:${{secrets.GITHUB_TOKEN}}@github.com/niconicolibs/niconico.py
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if (git diff --shortstat | grep '[0-9]'); then \
+            git add .; \
+            git commit -m "Generating docs via GitHub Actions"; \
+            git push origin HEAD:${{ GITHUB_REF }}; \
+          fi
