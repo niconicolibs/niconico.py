@@ -1,4 +1,4 @@
-name: Docs
+name: Update Docs
 
 on:
   push:
@@ -18,28 +18,25 @@ jobs:
       
       # set up python
       - name: Setting up python.
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v1
         with:
           python-version: 3.8
         
       # install poetry
-      #- name: Install Poetry
-      #  run: |
-      #    curl -sSL https://install.python-poetry.org/ | python
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org/ | python
       
-      #- name: Add path for Poetry
-      #  run: echo "$HOME/.poetry/bin" >> $GITHUB_PATH
+      - name: Add path for Poetry
+        run: echo "$HOME/.poetry/bin" >> $GITHUB_PATH
       
       # install dependencies
-      #- name: Install Dependencies
-      #  run: poetry install --no-interaction --no-dev
-      
       - name: Install Dependencies
-        run: pip install pdoc3
+        run: poetry install --no-interaction --no-dev
 
       # pdocでドキュメントを生成
       - name: Pdoc
-        run: pdoc --html -o docs --force niconico
+        run: poetry run pdoc --html -o docs --force niconico
       
       # 差分をgitにpushする
       # ref: https://zenn.dev/lollipop_onl/articles/eoz-gha-push-diffs

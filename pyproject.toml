@@ -12,7 +12,6 @@ license = "LICENSE"
 classifiers = [
     "Programming Language :: Python :: 3",
 ]
-repository = "https://github.com/niconicolibs/niconico.py"
 
 [tool.poetry.dependencies]
 python = "^3.8"
