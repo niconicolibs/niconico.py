@@ -39,7 +39,7 @@ jobs:
       # pdocでドキュメントを生成
       - name: Pdoc
         run: |
-          pdoc niconico --html -o tmp --force --template-dir pdoc/templates
+          pdoc --html -o tmp --force niconico
           cp -r tmp/niconico docs
           rm -rf tmp
       
@@ -61,7 +61,7 @@ jobs:
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add docs/*
-          git commit -m "docs: update docs @ ${{ github.sha }}"
+          git commit -m "docs: update docs @${{ github.sha }}"
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:

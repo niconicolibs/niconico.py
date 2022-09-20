@@ -1,7 +1,4 @@
-"""
-niconico.py
-.. include:: ../README.md
-"""
+# niconico.py
 
 from .exceptions import ExtractFailed
 from .niconico import NicoNico
