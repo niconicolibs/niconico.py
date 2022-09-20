@@ -36,10 +36,7 @@ jobs:
 
       # pdocでドキュメントを生成
       - name: Pdoc
-        run: |
-          pdoc --html -o tmp --force niconico
-          cp -r tmp/niconico docs
-          rm -rf tmp
+        run: pdoc --html -o docs --force niconico
       
       # 差分をgitにpushする
       # ref: https://zenn.dev/lollipop_onl/articles/eoz-gha-push-diffs
@@ -54,14 +51,8 @@ jobs:
       #      git push origin HEAD:${{ GITHUB_REF }}; \
       #    fi
 
-      - name: Commit
-        run: |
-          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add docs/*
-          git commit -m "docs: update docs @${{ github.sha }}"
-      - name: Push changes
-        uses: ad-m/github-push-action@master
+      - name: Deploy on main
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.ref }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FOLDER: ~
