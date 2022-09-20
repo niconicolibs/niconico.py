@@ -1,15 +1,11 @@
-name: Upload Pypi
+name: Upload Python Package
 
 on:
-  push:
-    branches:
-      - main
   release:
-    types:
-      - created
+    types: [created]
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
