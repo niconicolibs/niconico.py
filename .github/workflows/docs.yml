@@ -35,7 +35,7 @@ jobs:
       #  run: poetry install --no-interaction --no-dev
       
       - name: Install Dependencies
-        run: pip install requests beautifulsoup4 pdoc3
+        run: pip install pdoc3
 
       # pdocでドキュメントを生成
       - name: Pdoc
