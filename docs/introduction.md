@@ -1,5 +1,4 @@
-[![PyPI](https://img.shields.io/pypi/v/niconico.py)](https://pypi.org/project/niconico.py/) ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/niconico.py) ![PyPI - Downloads](https://img.shields.io/pypi/dm/niconico.py) ![PyPI - License](https://img.shields.io/pypi/l/niconico.py) [![Documentation Status](https://readthedocs.org/projects/niconico-py/badge/?version=latest)](https://niconico-py.readthedocs.io/ja/latest/?badge=latest)
-# niconico.py
+# Introduction
 niconico.pyはニコニコにあるコンテンツを取得するためのライブラリです。  
 これを使うことでニコニコ動画の動画のダウンロードができます。  
 また、自分のアカウントを使用して動画情報の取得も可能です。
@@ -24,7 +23,7 @@ with client.video.get_video("https://www.nicovideo.jp/watch/sm37658498") as vide
 ```
 #### マイリスト
 ```python
-from niconico import NicoNico
+from niconico import NicoNico, Cookies
 
 URL = "https://www.nicovideo.jp/user/85641805/mylist/63403141"
 
@@ -36,15 +35,6 @@ for mylist in client.video.get_mylist(URL):
 ## コンソールからの使用
 `niconico help`で使用方法を確認可能です。  
 注意：コマンドの使用方法は後日変更される予定です。
-
-## ToDo
-* [x] 動画のダウンロード
-* [x] マイリストの読み込み
-* [ ] 検索
-* [ ] ニコニコ大百科
-* [ ] ニコニコ静画
-* [ ] 非同期版 (できれば)
-* [ ] etc
 
 ## Contributing
 リポジトリ内の`contributing.md`をご覧ください。
