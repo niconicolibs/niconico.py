@@ -1,12 +1,11 @@
-name: UploadPyPi
+name: Upload Python Package
 
 on:
   release:
-    types:
-      - created
+    types: [created]
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2

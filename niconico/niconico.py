@@ -13,7 +13,7 @@ from .video import Client as VideoClient
 from .search import SearchClient
 from .cookies import Cookies
 
-from .exceptions import LoginFailureException
+from .objects.niconico import LoginFailureException
 
 
 __all__ = ("adjust_cookies", "NicoNico", "logger")
