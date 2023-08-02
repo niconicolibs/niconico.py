@@ -9,13 +9,13 @@ DESCRIPTION = "ニコニコスクレイピングライブラリ"
 
 
 if exists("README.md"):
-    with open("README.md", "r") as f:
+    with open("README.md", "r", encoding="utf-8") as f:
         long_description = f.read()
 else:
     long_description = DESCRIPTION
 
 
-with open(f"{NAME[:-3]}/__init__.py", "r") as f:
+with open(f"{NAME[:-3]}/__init__.py", "r", encoding="utf-8") as f:
     text = f.read()
     version = text.split('__version__ = "')[1].split('"')[0]
     author = text.split('__author__ = "')[1].split('"')[0]
