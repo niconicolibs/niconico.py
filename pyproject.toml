@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "niconico-py"
-version = "1.2.3"
+version = "1.2.4"
 description = "ニコニコ動画や生放送等の各種サイトの非公開APIに簡単にアクセスするためのPythonライブラリ"
 authors = [
   "Negima1072 <67858442+Negima1072@users.noreply.github.com>",

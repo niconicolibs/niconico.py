@@ -8,4 +8,4 @@ from .cookies import Cookies
 
 
 __author__ = "Negima1072"
-__version__ = "1.2.3"
+__version__ = "1.2.4"
