@@ -1,7 +1,9 @@
 # niconico.py - Search
+from typing import List, TYPE_CHECKING
 
+if TYPE_CHECKING:
+    from niconico import NicoNico
 
-from typing import List
 
 class SearchClient:
     "スナップショットAPIを利用するためのクライアントです"
