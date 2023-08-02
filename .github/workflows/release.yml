@@ -13,14 +13,17 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: Branch Tag
+        id: branch_tag
+        run: echo ::set-output name=tag::${GITHUB_REF##*/}
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ GITHUB_REF##*/ }}
-          release_name: ${{ GITHUB_REF##*/ }}
+          tag_name: ${{ steps.branch_tag.outputs.tag }}
+          release_name: ${{ steps.branch_tag.outputs.tag }}
           body: "Please enter the content of the release here"
           draft: false
           prerelease: true
