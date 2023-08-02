@@ -29,9 +29,11 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python"># niconico.py - Search
+from typing import List, TYPE_CHECKING
 
+if TYPE_CHECKING:
+    from niconico import NicoNico
 
-from typing import List
 
 class SearchClient:
     &#34;スナップショットAPIを利用するためのクライアントです&#34;
