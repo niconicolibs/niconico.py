@@ -10,3 +10,5 @@ _build
 cookies.txt
 build
 *.egg-info
+
+dist
