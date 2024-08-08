@@ -8,13 +8,22 @@ import requests
 
 from niconico.base.client import BaseClient
 from niconico.objects.nvapi import MylistData, NvAPIResponse, SeriesData, TagsData, VideosData
+from niconico.video.ranking import VideoRankingClient
 
 if TYPE_CHECKING:
-    from niconico.objects.video import EssentialVideo, Mylist, Tag
+    from niconico.niconico import NicoNico
+    from niconico.objects.video import EssentialVideo, Mylist, MylistSortKey, MylistSortOrder, Tag
 
 
 class VideoClient(BaseClient):
     """A class that represents a video client."""
+
+    ranking: VideoRankingClient
+
+    def __init__(self, niconico: NicoNico) -> None:
+        """Initialize the client."""
+        super().__init__(niconico)
+        self.ranking = VideoRankingClient(niconico)
 
     def get_video(self, video_id: str) -> EssentialVideo | None:
         """Get a video by its ID.
@@ -25,7 +34,7 @@ class VideoClient(BaseClient):
         Returns:
             EssentialVideo | None: The video object if found, None otherwise.
         """
-        res = self.niconico.get("https://nvapi.nicovideo.jp/v1/videos?watchIds=" + video_id)
+        res = self.niconico.get(f"https://nvapi.nicovideo.jp/v1/videos?watchIds={video_id}")
         if res.status_code == requests.codes.ok:
             res_cls = NvAPIResponse[VideosData](**res.json())
             if res_cls.data is not None and len(res_cls.data.items) >= 1:
@@ -41,39 +50,61 @@ class VideoClient(BaseClient):
         Returns:
             list[Tag] | None: The tags of the video if found, None otherwise.
         """
-        res = self.niconico.get("https://nvapi.nicovideo.jp/v1/videos/" + video_id + "/tags")
+        res = self.niconico.get(f"https://nvapi.nicovideo.jp/v1/videos/{video_id}/tags")
         if res.status_code == requests.codes.ok:
             res_cls = NvAPIResponse[TagsData](**res.json())
             if res_cls.data is not None:
                 return res_cls.data.tags
         return None
 
-    def get_mylist(self, mylist_id: str) -> Mylist | None:
+    def get_mylist(
+        self,
+        mylist_id: str,
+        *,
+        page_size: int = 20,
+        page: int = 1,
+        sort_key: MylistSortKey | None = None,
+        sort_order: MylistSortOrder | None = None,
+    ) -> Mylist | None:
         """Get a mylist by its ID.
 
         Args:
             mylist_id (str): The ID of the mylist.
+            page_size (int): The number of videos to get per page.
+            page (int): The page number.
+            sort_key (MylistSortKey | None): The sort key.
+            sort_order (MylistSortOrder | None): The sort order.
 
         Returns:
             Mylist | None: The mylist object if found, None otherwise.
         """
-        res = self.niconico.get("https://nvapi.nicovideo.jp/v2/mylists/" + mylist_id)
+        query = {"pageSize": str(page_size), "page": str(page)}
+        if sort_key is not None:
+            query["sortKey"] = sort_key.value
+        if sort_order is not None:
+            query["sortOrder"] = sort_order.value
+        query_str = "&".join([f"{key}={value}" for key, value in query.items()])
+        res = self.niconico.get(f"https://nvapi.nicovideo.jp/v2/mylists/{mylist_id}?{query_str}")
         if res.status_code == requests.codes.ok:
             res_cls = NvAPIResponse[MylistData](**res.json())
             if res_cls.data is not None:
                 return res_cls.data.mylist
         return None
 
-    def get_series(self, series_id: str) -> SeriesData | None:
+    def get_series(self, series_id: str, *, page_size: int = 100, page: int = 1) -> SeriesData | None:
         """Get a series by its ID.
 
         Args:
             series_id (str): The ID of the series.
+            page_size (int): The number of videos to get per page.
+            page (int): The page number.
 
         Returns:
             SeriesData | None: The series object if found, None otherwise.
         """
-        res = self.niconico.get("https://nvapi.nicovideo.jp/v1/series/" + series_id)
+        query = {"pageSize": str(page_size), "page": str(page)}
+        query_str = "&".join([f"{key}={value}" for key, value in query.items()])
+        res = self.niconico.get(f"https://nvapi.nicovideo.jp/v1/series/{series_id}?{query_str}")
         if res.status_code == requests.codes.ok:
             res_cls = NvAPIResponse[SeriesData](**res.json())
             if res_cls.data is not None:

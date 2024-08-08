@@ -38,6 +38,9 @@ target-version = "py38"
     "ANN102"
 ]
 
+[tool.ruff.lint.pylint]
+max-args = 10
+
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 

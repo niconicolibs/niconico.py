@@ -6,6 +6,7 @@ from typing import Generic, TypeVar
 
 from pydantic import BaseModel, Field
 
+from niconico.objects.ranking import Genre
 from niconico.objects.video import EssentialVideo, Mylist, SeriesDetail, SeriesItem, Tag
 
 T = TypeVar("T")
@@ -71,3 +72,32 @@ class SeriesData(BaseModel):
     detail: SeriesDetail
     total_count: int = Field(..., alias="totalCount")
     items: list[SeriesItem]
+
+
+class GenresData(BaseModel):
+    """A class that represents the data of a genre response from the NvAPI.
+
+    ref: https://nvapi.nicovideo.jp/v2/genres
+    """
+
+    genres: list[Genre]
+
+
+class PopularTagsData(BaseModel):
+    """A class that represents the data of a popular tags response from the NvAPI.
+
+    ref: https://nvapi.nicovideo.jp/v1/genres/<genre_key>/popular-tags
+    """
+
+    start_at: str = Field(..., alias="startAt")
+    tags: list[str]
+
+
+class RankingData(BaseModel):
+    """A class that represents the data of a ranking response from the NvAPI.
+
+    ref: https://nvapi.nicovideo.jp/v1/ranking/genre/<genre_key>
+    """
+
+    items: list[EssentialVideo]
+    has_next: bool = Field(..., alias="hasNext")
