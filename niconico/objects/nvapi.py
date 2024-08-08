@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Generic, TypeVar
 from pydantic import BaseModel, Field
 
 if TYPE_CHECKING:
-    from niconico.objects.video import EssentialVideo, Mylist, Tag
+    from niconico.objects.video import EssentialVideo, Mylist, SeriesDetail, SeriesItem, Tag
 
 T = TypeVar("T")
 
@@ -61,3 +61,14 @@ class MylistData(BaseModel):
     """
 
     mylist: Mylist
+
+
+class SeriesData(BaseModel):
+    """A class that represents the data of a series response from the NvAPI.
+
+    ref: https://nvapi.nicovideo.jp/v2/series/<series_id>
+    """
+
+    detail: SeriesDetail
+    total_count: int = Field(..., alias="totalCount")
+    items: list[SeriesItem]

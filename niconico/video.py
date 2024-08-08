@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 import requests
 
 from niconico.base.client import BaseClient
-from niconico.objects.nvapi import MylistData, NvAPIResponse, TagsData, VideosData
+from niconico.objects.nvapi import MylistData, NvAPIResponse, SeriesData, TagsData, VideosData
 
 if TYPE_CHECKING:
     from niconico.objects.video import EssentialVideo, Mylist, Tag
@@ -62,4 +62,20 @@ class VideoClient(BaseClient):
             res_cls = NvAPIResponse[MylistData](**res.json())
             if res_cls.data is not None:
                 return res_cls.data.mylist
+        return None
+
+    def get_series(self, series_id: str) -> SeriesData | None:
+        """Get a series by its ID.
+
+        Args:
+            series_id (str): The ID of the series.
+
+        Returns:
+            SeriesData | None: The series object if found, None otherwise.
+        """
+        res = self.niconico.get("https://nvapi.nicovideo.jp/v1/series/" + series_id)
+        if res.status_code == requests.codes.ok:
+            res_cls = NvAPIResponse[SeriesData](**res.json())
+            if res_cls.data is not None:
+                return res_cls.data
         return None

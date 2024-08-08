@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
 from pydantic import BaseModel, Field
+
+if TYPE_CHECKING:
+    from niconico.objects.user import EssentialUser
 
 
 class VideoCount(BaseModel):
@@ -133,3 +136,41 @@ class Mylist(BaseModel):
     has_invisible_items: bool = Field(..., alias="hasInvisibleItems")
     follower_count: int = Field(..., alias="followerCount")
     is_following: bool = Field(..., alias="isFollowing")
+
+
+class SeriesOwner(BaseModel):
+    """A class that represents the owner of a series."""
+
+    _type: Literal["user"] = Field(..., alias="type")
+    _id: str = Field(..., alias="id")
+    user: EssentialUser
+
+
+class SeriesDetail(BaseModel):
+    """A class that represents the detail of a series."""
+
+    _id: int = Field(..., alias="id")
+    owner: SeriesOwner
+    title: str
+    description: str
+    decorated_description_html: str = Field(..., alias="decoratedDescriptionHtml")
+    thumbnail_url: str = Field(..., alias="thumbnailUrl")
+    is_listed: bool = Field(..., alias="isListed")
+    created_at: str = Field(..., alias="createdAt")
+    updated_at: str = Field(..., alias="updatedAt")
+
+
+class SeriesVideoMeta(BaseModel):
+    """A class that represents the metadata of a series video."""
+
+    _id: str = Field(..., alias="id")
+    order: int
+    created_at: str = Field(..., alias="createdAt")
+    updated_at: str = Field(..., alias="updatedAt")
+
+
+class SeriesItem(BaseModel):
+    """A class that represents a series item."""
+
+    meta: SeriesVideoMeta
+    video: EssentialVideo
