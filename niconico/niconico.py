@@ -4,9 +4,8 @@ from __future__ import annotations
 
 import requests
 
+from niconico.exceptions import LoginFailureError
 from niconico.video import VideoClient
-
-from .exceptions import LoginFailureError
 
 
 class NicoNico:

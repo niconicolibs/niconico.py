@@ -40,9 +40,9 @@ class Owner(BaseModel):
     """A class that represents the owner of a video."""
 
     owner_type: Literal["user", "channel", "hidden"] = Field(..., alias="ownerType")
-    _type: Literal["user", "unknown"] = Field(..., alias="type")
+    type_: Literal["user", "unknown"] = Field(..., alias="type")
     visibility: Literal["visible", "hidden"]
-    _id: str | None = Field(..., alias="id")
+    id_: str | None = Field(..., alias="id")
     name: str | None
     icon_url: str | None = Field(..., alias="iconUrl")
 
@@ -56,8 +56,8 @@ class VideoLive(BaseModel):
 class EssentialVideo(BaseModel):
     """A class that represents an essential video object."""
 
-    _type: Literal["essential"] = Field(..., alias="type")
-    _id: str = Field(..., alias="id")
+    type_: Literal["essential"] = Field(..., alias="type")
+    id_: str = Field(..., alias="id")
     title: str
     registered_at: str = Field(..., alias="registeredAt")
     count: VideoCount
@@ -89,7 +89,7 @@ class MylistSortKey(str, Enum):
     """An enumeration that represents the sort key of a mylist."""
 
     added_at = "addedAt"
-    _title = "title"
+    title_ = "title"
     mylist_comment = "mylistComment"
     registered_at = "registeredAt"
     view_count = "viewCount"
@@ -122,7 +122,7 @@ class MylistItem(BaseModel):
 class Mylist(BaseModel):
     """A class that represents a mylist."""
 
-    _id: int = Field(..., alias="id")
+    id_: int = Field(..., alias="id")
     name: str
     description: str
     decorated_description_html: str = Field(..., alias="decoratedDescriptionHtml")
@@ -141,15 +141,15 @@ class Mylist(BaseModel):
 class SeriesOwner(BaseModel):
     """A class that represents the owner of a series."""
 
-    _type: Literal["user"] = Field(..., alias="type")
-    _id: str = Field(..., alias="id")
+    type_: Literal["user"] = Field(..., alias="type")
+    id_: str = Field(..., alias="id")
     user: EssentialUser
 
 
 class SeriesDetail(BaseModel):
     """A class that represents the detail of a series."""
 
-    _id: int = Field(..., alias="id")
+    id_: int = Field(..., alias="id")
     owner: SeriesOwner
     title: str
     description: str
@@ -163,7 +163,7 @@ class SeriesDetail(BaseModel):
 class SeriesVideoMeta(BaseModel):
     """A class that represents the metadata of a series video."""
 
-    _id: str = Field(..., alias="id")
+    id_: str = Field(..., alias="id")
     order: int
     created_at: str = Field(..., alias="createdAt")
     updated_at: str = Field(..., alias="updatedAt")

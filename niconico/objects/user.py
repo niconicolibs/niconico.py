@@ -15,11 +15,11 @@ class UserIcon(BaseModel):
 class EssentialUser(BaseModel):
     """A class that represents an essential user object."""
 
-    _type: Literal["essential"] = Field(..., alias="type")
+    type_: Literal["essential"] = Field(..., alias="type")
     is_premium: bool = Field(..., alias="isPremium")
     description: str
     stripped_description: str = Field(..., alias="strippedDescription")
     short_description: str = Field(..., alias="shortDescription")
-    _id: int = Field(..., alias="id")
+    id_: int = Field(..., alias="id")
     nickname: str
     icons: UserIcon
