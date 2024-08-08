@@ -3,12 +3,11 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import TYPE_CHECKING, Literal
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
-if TYPE_CHECKING:
-    from niconico.objects.user import EssentialUser
+from niconico.objects.user import EssentialUser
 
 
 class VideoCount(BaseModel):
@@ -70,10 +69,8 @@ class EssentialVideo(BaseModel):
     playback_position: PlaybackPosition | None = Field(..., alias="playbackPosition")
     owner: Owner
     require_sensitive_masking: bool = Field(..., alias="requireSensitiveMasking")
-    video_live: VideoLive | None
+    video_live: VideoLive | None = Field(..., alias="videoLive")
     is_muted: bool | None = Field(..., alias="isMuted")
-    _9d091f87: bool = Field(..., alias="9d091f87")
-    _acf68865: bool = Field(..., alias="acf68865")
 
 
 class Tag(BaseModel):

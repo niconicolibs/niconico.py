@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Generic, TypeVar
+from typing import Generic, TypeVar
 
 from pydantic import BaseModel, Field
 
-if TYPE_CHECKING:
-    from niconico.objects.video import EssentialVideo, Mylist, SeriesDetail, SeriesItem, Tag
+from niconico.objects.video import EssentialVideo, Mylist, SeriesDetail, SeriesItem, Tag
 
 T = TypeVar("T")
 

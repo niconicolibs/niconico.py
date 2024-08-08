@@ -1,6 +1,11 @@
 """This module contains the base client class."""
 
-from niconico.niconico import NicoNico
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from niconico.niconico import NicoNico
 
 
 class BaseClient:

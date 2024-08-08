@@ -1,5 +1,7 @@
 """This module contains exceptions for the niconico package."""
 
+from __future__ import annotations
+
 
 class LoginFailureError(Exception):
     """An exception raised when login fails."""
