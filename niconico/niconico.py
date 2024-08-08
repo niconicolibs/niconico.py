@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import requests
 
+from niconico.video import VideoClient
+
 from .exceptions import LoginFailureError
 
 
@@ -13,10 +15,29 @@ class NicoNico:
     session: requests.Session
     logined: bool
 
+    video: VideoClient
+
     def __init__(self) -> None:
         """Initialize the class."""
         self.session = requests.Session()
         self.logined = False
+        self.video = VideoClient(self)
+
+    def get(self, url: str) -> requests.Response:
+        """Send a GET request to a URL.
+
+        Args:
+            url (str): The URL to send the request to.
+
+        Returns:
+            requests.Response: The response object.
+        """
+        headers = {
+            "User-Agent": "niconico.py",
+            "X-Frontend-Id": "6",
+            "X-Frontend-Version": "0",
+        }
+        return self.session.get(url, headers=headers)
 
     def login_with_mail(self, mail: str, password: str, mfa: str | None = None) -> None:
         """Login to NicoNico with a mail and password.
