@@ -6,9 +6,9 @@ from typing import Generic, TypeVar
 
 from pydantic import BaseModel, Field
 
-from niconico.objects.ranking import Genre
-from niconico.objects.search import EssentialMylist, EssentialSeries, FacetItem, VideoSearchAdditionals
 from niconico.objects.video import EssentialVideo, Mylist, SeriesDetail, SeriesItem, Tag
+from niconico.objects.video.ranking import Genre
+from niconico.objects.video.search import EssentialMylist, EssentialSeries, FacetItem, VideoSearchAdditionals
 
 T = TypeVar("T")
 

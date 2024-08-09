@@ -6,8 +6,8 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from niconico.objects.ranking import Genre
 from niconico.objects.video import Owner
+from niconico.objects.video.ranking import Genre
 
 VideoSearchSortKey = Literal[
     "registeredAt",
