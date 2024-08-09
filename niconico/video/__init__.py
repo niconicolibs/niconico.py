@@ -9,6 +9,7 @@ import requests
 from niconico.base.client import BaseClient
 from niconico.objects.nvapi import MylistData, NvAPIResponse, SeriesData, TagsData, VideosData
 from niconico.video.ranking import VideoRankingClient
+from niconico.video.search import VideoSearchClient
 
 if TYPE_CHECKING:
     from niconico.niconico import NicoNico
@@ -19,11 +20,13 @@ class VideoClient(BaseClient):
     """A class that represents a video client."""
 
     ranking: VideoRankingClient
+    search: VideoSearchClient
 
     def __init__(self, niconico: NicoNico) -> None:
         """Initialize the client."""
         super().__init__(niconico)
         self.ranking = VideoRankingClient(niconico)
+        self.search = VideoSearchClient(niconico)
 
     def get_video(self, video_id: str) -> EssentialVideo | None:
         """Get a video by its ID.
@@ -80,9 +83,9 @@ class VideoClient(BaseClient):
         """
         query = {"pageSize": str(page_size), "page": str(page)}
         if sort_key is not None:
-            query["sortKey"] = sort_key.value
+            query["sortKey"] = sort_key
         if sort_order is not None:
-            query["sortOrder"] = sort_order.value
+            query["sortOrder"] = sort_order
         query_str = "&".join([f"{key}={value}" for key, value in query.items()])
         res = self.niconico.get(f"https://nvapi.nicovideo.jp/v2/mylists/{mylist_id}?{query_str}")
         if res.status_code == requests.codes.ok:

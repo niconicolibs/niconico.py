@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from enum import Enum
 from typing import Literal
 
 from pydantic import BaseModel, Field
@@ -82,26 +81,21 @@ class Tag(BaseModel):
     is_nicodic_article_exists: bool = Field(..., alias="isNicodicArticleExists")
 
 
-class MylistSortKey(str, Enum):
-    """An enumeration that represents the sort key of a mylist."""
+MylistSortKey = Literal[
+    "addedAt",
+    "title",
+    "mylistComment",
+    "registeredAt",
+    "viewCount",
+    "lastComment",
+    "commentCount",
+    "likeCount",
+    "mylistCount",
+    "duration",
+]
 
-    added_at = "addedAt"
-    title_ = "title"
-    mylist_comment = "mylistComment"
-    registered_at = "registeredAt"
-    view_count = "viewCount"
-    last_comment = "lastComment"
-    comment_count = "commentCount"
-    like_count = "likeCount"
-    mylist_count = "mylistCount"
-    duration = "duration"
 
-
-class MylistSortOrder(str, Enum):
-    """An enumeration that represents the sort order of a mylist."""
-
-    desc = "desc"
-    asc = "asc"
+MylistSortOrder = Literal["desc", "asc"]
 
 
 class MylistItem(BaseModel):

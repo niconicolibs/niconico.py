@@ -7,6 +7,7 @@ from typing import Generic, TypeVar
 from pydantic import BaseModel, Field
 
 from niconico.objects.ranking import Genre
+from niconico.objects.search import EssentialMylist, EssentialSeries, FacetItem, VideoSearchAdditionals
 from niconico.objects.video import EssentialVideo, Mylist, SeriesDetail, SeriesItem, Tag
 
 T = TypeVar("T")
@@ -101,3 +102,40 @@ class RankingData(BaseModel):
 
     items: list[EssentialVideo]
     has_next: bool = Field(..., alias="hasNext")
+
+
+class VideoSearchData(BaseModel):
+    """A class that represents the data of a video search response from the NvAPI.
+
+    ref: https://nvapi.nicovideo.jp/v2/search/video
+    """
+
+    search_id: str = Field(..., alias="searchId")
+    keyword: str | None
+    tag: str | None
+    genres: list[Genre]
+    total_count: int = Field(..., alias="totalCount")
+    has_next: bool = Field(..., alias="hasNext")
+    items: list[EssentialVideo]
+    additionals: VideoSearchAdditionals
+
+
+class FacetData(BaseModel):
+    """A class that represents the data of a facet response from the NvAPI.
+
+    ref: https://nvapi.nicovideo.jp/v2/search/facet
+    """
+
+    items: list[FacetItem]
+
+
+class ListSearchData(BaseModel):
+    """A class that represents the data of a list search response from the NvAPI.
+
+    ref: https://nvapi.nicovideo.jp/v1/search/list
+    """
+
+    search_id: str = Field(..., alias="searchId")
+    total_count: int = Field(..., alias="totalCount")
+    has_next: bool = Field(..., alias="hasNext")
+    items: list[EssentialSeries | EssentialMylist]

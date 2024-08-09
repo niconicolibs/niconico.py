@@ -66,7 +66,7 @@ class VideoRankingClient(BaseClient):
             sensitive_contents (Literal["mask", "filter"], optional): The sensitive contents. Defaults to None.
 
         Returns:
-            list[str]: A list of video IDs in the ranking.
+            RankingData | None: The ranking data.
         """
         query = {
             "term": term,
@@ -78,7 +78,7 @@ class VideoRankingClient(BaseClient):
         if sensitive_contents is not None:
             query["sensitiveContents"] = sensitive_contents
         query_str = "&".join([f"{key}={value}" for key, value in query.items()])
-        res = self.niconico.get(f"https://nvapi.nicovideo.jp/v1/genres/{genre_key}/ranking?{query_str}")
+        res = self.niconico.get(f"https://nvapi.nicovideo.jp/v1/ranking/genre/{genre_key}?{query_str}")
         if res.status_code == requests.codes.ok:
             res_cls = NvAPIResponse[RankingData](**res.json())
             if res_cls.data is not None:

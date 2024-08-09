@@ -39,7 +39,7 @@ target-version = "py38"
 ]
 
 [tool.ruff.lint.pylint]
-max-args = 10
+max-args = 15
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
