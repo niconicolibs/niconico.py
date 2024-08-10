@@ -6,7 +6,7 @@ from typing import Generic, TypeVar
 
 from pydantic import BaseModel, Field
 
-from niconico.objects.video import EssentialVideo, Mylist, SeriesDetail, SeriesItem, Tag
+from niconico.objects.video import EssentialVideo, HistoryItem, Mylist, SeriesDetail, SeriesItem, Tag
 from niconico.objects.video.ranking import Genre
 from niconico.objects.video.search import EssentialMylist, EssentialSeries, FacetItem, VideoSearchAdditionals
 
@@ -150,3 +150,13 @@ class AccessRightsData(BaseModel):
     content_url: str | None = Field(None, alias="contentUrl")
     create_time: str | None = Field(None, alias="createTime")
     expire_time: str | None = Field(None, alias="expireTime")
+
+
+class HistoryData(BaseModel):
+    """A class that represents the data of a history response from the NvAPI.
+
+    ref: https://nvapi.nicovideo.jp/v1/users/me/watch/history
+    """
+
+    items: list[HistoryItem]
+    total_count: int = Field(..., alias="totalCount")

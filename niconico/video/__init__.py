@@ -7,7 +7,8 @@ from typing import TYPE_CHECKING
 import requests
 
 from niconico.base.client import BaseClient
-from niconico.objects.video.nvapi import MylistData, NvAPIResponse, SeriesData, TagsData, VideosData
+from niconico.decorators import login_required
+from niconico.objects.video.nvapi import HistoryData, MylistData, NvAPIResponse, SeriesData, TagsData, VideosData
 from niconico.video.ranking import VideoRankingClient
 from niconico.video.search import VideoSearchClient
 from niconico.video.watch import VideoWatchClient
@@ -113,6 +114,26 @@ class VideoClient(BaseClient):
         res = self.niconico.get(f"https://nvapi.nicovideo.jp/v1/series/{series_id}?{query_str}")
         if res.status_code == requests.codes.ok:
             res_cls = NvAPIResponse[SeriesData](**res.json())
+            if res_cls.data is not None:
+                return res_cls.data
+        return None
+
+    @login_required()
+    def get_history(self, *, page_size: int = 100, page: int = 1) -> HistoryData | None:
+        """Get the history of the authenticated user.
+
+        Args:
+            page_size (int): The number of videos to get per page.
+            page (int): The page number.
+
+        Returns:
+            HistoryData | None: The history data if successful, None otherwise.
+        """
+        query = {"pageSize": str(page_size), "page": str(page)}
+        query_str = "&".join([f"{key}={value}" for key, value in query.items()])
+        res = self.niconico.get(f"https://nvapi.nicovideo.jp/v1/users/me/watch/history?{query_str}")
+        if res.status_code == requests.codes.ok:
+            res_cls = NvAPIResponse[HistoryData](**res.json())
             if res_cls.data is not None:
                 return res_cls.data
         return None
