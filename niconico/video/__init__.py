@@ -10,6 +10,7 @@ from niconico.base.client import BaseClient
 from niconico.objects.video.nvapi import MylistData, NvAPIResponse, SeriesData, TagsData, VideosData
 from niconico.video.ranking import VideoRankingClient
 from niconico.video.search import VideoSearchClient
+from niconico.video.watch import VideoWatchClient
 
 if TYPE_CHECKING:
     from niconico.niconico import NicoNico
@@ -21,12 +22,14 @@ class VideoClient(BaseClient):
 
     ranking: VideoRankingClient
     search: VideoSearchClient
+    watch: VideoWatchClient
 
     def __init__(self, niconico: NicoNico) -> None:
         """Initialize the client."""
         super().__init__(niconico)
         self.ranking = VideoRankingClient(niconico)
         self.search = VideoSearchClient(niconico)
+        self.watch = VideoWatchClient(niconico)
 
     def get_video(self, video_id: str) -> EssentialVideo | None:
         """Get a video by its ID.

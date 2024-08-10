@@ -13,6 +13,7 @@ class NicoNico:
 
     session: requests.Session
     logined: bool
+    premium: bool
 
     video: VideoClient
 
@@ -37,6 +38,31 @@ class NicoNico:
             "X-Frontend-Version": "0",
         }
         return self.session.get(url, headers=headers)
+
+    def post(self, url: str, *, json: object | None = None, headers: dict[str, str] | None = None) -> requests.Response:
+        """Send a POST request to a URL.
+
+        Args:
+            url (str): The URL to send the request to.
+            json (object): The data to send with the request.
+            headers (dict[str, str]): The headers to send with the request.
+
+        Returns:
+            requests.Response: The response object.
+        """
+        req_headers = {
+            "User-Agent": "niconico.py",
+            "X-Frontend-Id": "6",
+            "X-Frontend-Version": "0",
+            "X-Niconico-Language": "ja-jp",
+            "X-Request-With": "https://www.nicovideo.jp",
+            "Referer": "https://www.nicovideo.jp/",
+        }
+        if headers is not None:
+            req_headers.update(headers)
+        if json is None:
+            return self.session.post(url, headers=req_headers)
+        return self.session.post(url, headers=req_headers, json=json)
 
     def login_with_mail(self, mail: str, password: str, mfa: str | None = None) -> None:
         """Login to NicoNico with a mail and password.
@@ -74,7 +100,11 @@ class NicoNico:
         if res.url != "https://www.nicovideo.jp/":
             raise LoginFailureError(message="Login failed")
 
-        if res.headers.get("x-niconico-authflag") not in ["1", "3"]:
+        if res.headers.get("x-niconico-authflag") == "1":
+            self.premium = False
+        elif res.headers.get("x-niconico-authflag") == "3":
+            self.premium = True
+        else:
             raise LoginFailureError(message="Login failed")
 
         self.logined = True
@@ -94,7 +124,11 @@ class NicoNico:
         if res.url != "https://www.nicovideo.jp/":
             raise LoginFailureError(message="Login failed")
 
-        if res.headers.get("x-niconico-authflag") not in ["1", "3"]:
+        if res.headers.get("x-niconico-authflag") == "1":
+            self.premium = False
+        elif res.headers.get("x-niconico-authflag") == "3":
+            self.premium = True
+        else:
             raise LoginFailureError(message="Login failed")
 
         self.logined = True

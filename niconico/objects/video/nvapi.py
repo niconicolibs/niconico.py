@@ -139,3 +139,14 @@ class ListSearchData(BaseModel):
     total_count: int = Field(..., alias="totalCount")
     has_next: bool = Field(..., alias="hasNext")
     items: list[EssentialSeries | EssentialMylist]
+
+
+class AccessRightsData(BaseModel):
+    """A class that represents the data of an access rights response from the NvAPI.
+
+    ref: https://nvapi.nicovideo.jp/v1/watch/<video_id>/access-rights/<type>
+    """
+
+    content_url: str | None = Field(None, alias="contentUrl")
+    create_time: str | None = Field(None, alias="createTime")
+    expire_time: str | None = Field(None, alias="expireTime")
