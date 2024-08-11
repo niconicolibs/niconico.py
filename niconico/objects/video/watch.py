@@ -584,3 +584,61 @@ class StoryboardResponse(BaseModel):
     thumbnail_height: int = Field(..., alias="thumbnailHeight")
     thumbnail_width: int = Field(..., alias="thumbnailWidth")
     version: str
+
+
+class NvCommentAPIMeta(BaseModel):
+    """Data model of the NV comment API meta."""
+
+    status: int
+    error_code: str | None = Field(None, alias="errorCode")
+
+
+class GlobalComment(BaseModel):
+    """Data model of a global comment."""
+
+    id_: str = Field(..., alias="id")
+    count: int
+
+
+class Comment(BaseModel):
+    """Data model of a comment."""
+
+    body: str
+    commands: list[str]
+    id_: str = Field(..., alias="id")
+    is_my_post: bool = Field(..., alias="isMyPost")
+    is_premium: bool = Field(..., alias="isPremium")
+    nicoru_count: int = Field(..., alias="nicoruCount")
+    nicoru_id: str | None = Field(None, alias="nicoruId")
+    no: int
+    posted_at: str = Field(..., alias="postedAt")
+    score: int
+    source: str
+    user_id: str = Field(..., alias="userId")
+    vpos_ms: int = Field(..., alias="vposMs")
+
+
+class NvCommentThread(BaseModel):
+    """Data model of an NV comment thread."""
+
+    id_: str = Field(..., alias="id")
+    fork: str
+    comment_count: int = Field(..., alias="commentCount")
+    comments: list[Comment]
+
+
+class NvCommentAPIData(BaseModel):
+    """Data model of the NV comment data."""
+
+    global_comments: list[GlobalComment] = Field(..., alias="globalComments")
+    threads: list[NvCommentThread]
+
+
+class NvCommentAPIResponse(BaseModel):
+    """Data model of the NV comment API response.
+
+    ref: https://public.nvcomment.nicovideo.jp/v1/threads
+    """
+
+    data: NvCommentAPIData
+    meta: NvCommentAPIMeta

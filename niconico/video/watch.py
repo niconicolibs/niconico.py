@@ -16,6 +16,8 @@ from niconico.decorators import login_required
 from niconico.exceptions import DownloadError, NicoAPIError, WatchAPIError
 from niconico.objects.video.nvapi import AccessRightsData, NvAPIResponse
 from niconico.objects.video.watch import (
+    NvCommentAPIData,
+    NvCommentAPIResponse,
     StoryboardResponse,
     WatchAPIData,
     WatchAPIErrorData,
@@ -203,3 +205,30 @@ class VideoWatchClient(BaseClient):
         except subprocess.CalledProcessError as e:
             raise DownloadError(message="Failed to download the video.") from e
         return (Path(path) / name).as_posix()
+
+    def get_comments(self, watch_data: WatchData, *, when: int | None = None) -> NvCommentAPIData | None:
+        """Get the comments of a video.
+
+        Args:
+            watch_data: The watch data of the video.
+            when: The time to get the comments.
+
+        Returns:
+            list[Any]: The comments of the video.
+        """
+        payload = {
+            "threadKey": watch_data.comment.nv_comment.thread_key,
+            "params": watch_data.comment.nv_comment.params.model_dump_json(by_alias=True),
+            "additionals": {},
+        }
+        if when is not None:
+            if self.niconico.premium:
+                payload["additionals"] = {"when": when}
+            else:
+                raise NicoAPIError(message="You must be a premium member to get the comments at a specific time.")
+        res = self.niconico.post(watch_data.comment.nv_comment.server + "/v1/threads", json=payload)
+        if res.status_code == requests.codes.ok:
+            res_cls = NvCommentAPIResponse(**res.json())
+            if res_cls.meta.status == requests.codes.ok:
+                return res_cls.data
+        return None
