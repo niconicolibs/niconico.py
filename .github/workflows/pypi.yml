@@ -1,8 +1,11 @@
 name: UploadPyPi
 
 on:
-  release:
-    types: [published]
+  push:
+    branches-ignore:
+      - '**'
+    tags:
+      - 'v*'
 
 jobs:
   upload:
