@@ -1,125 +1,134 @@
-# niconico.py - Client
+"""A module to interact with the NicoNico API."""
 
 from __future__ import annotations
 
-from typing import Optional
-
-from logging import getLogger
-import re
-
 import requests
 
-from .video import Client as VideoClient
-from .search import SearchClient
-from .cookies import Cookies
-
-from .exceptions import LoginFailureException
-
-
-__all__ = ("adjust_cookies", "NicoNico", "logger")
-Response = requests.Response
-logger = getLogger("niconico.py")
-"``logging`` の ``Logger`` です。"
-
-
-def adjust_cookies(cookies: Cookies) -> dict[str, str]:
-    """Cookiesを辞書に変換します。
-
-    Parameters
-    ----------
-    cookies : Cookies
-        辞書に変換するクッキーです。"""
-    return {key: morsel.value for key, morsel in cookies.items()}
+from niconico.exceptions import LoginFailureError
+from niconico.video import VideoClient
 
 
 class NicoNico:
-    """ニコニコにアクセスするために使うクラスです。
+    """A class to interact with the NicoNico API."""
 
-    Parameters
-    ----------
-    cookies : Cookies, optional
-        リクエストの際に使用するクッキーです。"""
+    session: requests.Session
+    logined: bool
+    premium: bool
 
     video: VideoClient
-    "ニコニコ動画用のクライアントクラスのインスタンスです。"
-    cookies: Optional[Cookies]
-    "リクエスト時に使用するクッキーです。"
 
-    def __init__(self, cookies: Optional[Cookies] = None):
+    def __init__(self) -> None:
+        """Initialize the class."""
+        self.session = requests.Session()
+        self.logined = False
         self.video = VideoClient(self)
-        self.searchclient = SearchClient(self)
-        self.cookies = cookies
-        self.logger = logger
 
-    def request(self, method: str, url: str, *args, **kwargs) -> requests.Response:
-        """``requests.request`` を使用して設定されているクッキーでリクエストを行います。
-        引数は ``requests.request`` と同じです。
+    def get(self, url: str) -> requests.Response:
+        """Send a GET request to a URL.
 
-        Notes
-        -----
-        引数 ``cookies`` に :class:`niconico.cookies.Cookies` を渡した場合は自動で辞書に変換されます。"""
-        save_default = True
+        Args:
+            url (str): The URL to send the request to.
 
-        # クッキーの調整をする。
-        if "cookies" not in kwargs:
-            save_default = False
-            if self.cookies is not None:
-                # kwargsにクッキーがないのならそのクッキーを設定する。
-                kwargs["cookies"] = self.cookies
-            elif kwargs.pop("require_cookies", False):
-                # もしクッキーが必須の場合かつクッキーが指定されていないのならゲスト用のクッキーを作る。
-                kwargs["cookies"] = Cookies.guest()
-        # クッキーがCookiesクラスになっているなら辞書にする。
-        if isinstance(kwargs.get("cookies", {}), Cookies):
-            kwargs["cookies"] = adjust_cookies(kwargs["cookies"])
+        Returns:
+            requests.Response: The response object.
+        """
+        headers = {
+            "User-Agent": "niconico.py",
+            "X-Frontend-Id": "6",
+            "X-Frontend-Version": "0",
+        }
+        return self.session.get(url, headers=headers)
 
-        # デバッグログを出力する。
-        self.logger.debug("リクエスト: (%s) %s" % (method, url))
-        for key, value in (
-            ("cookies", "クッキー"), ("params", "パラメーター"),
-            ("json", "JSON")
-        ):
-            if key in kwargs:
-                self.logger.debug("使用予定の%s: %s" % (value, kwargs[key]))
+    def post(self, url: str, *, json: object | None = None, headers: dict[str, str] | None = None) -> requests.Response:
+        """Send a POST request to a URL.
 
-        # リクエストをする。
-        response = requests.request(method, url, *args, **kwargs)
-        if save_default:
-            self.cookies = Cookies(response.cookies.get_dict())
-        response.raise_for_status()
-        return response
+        Args:
+            url (str): The URL to send the request to.
+            json (object): The data to send with the request.
+            headers (dict[str, str]): The headers to send with the request.
 
-    def login(self, mail: str, password: str) -> NicoNico:
-        """メールアドレスとパスワードを用いてログインを行います。
-        二段階認証が有効になっているアカウントではログインすることができません。
-        クッキーの中身を直接置き換える方法で認証をしてください。
+        Returns:
+            requests.Response: The response object.
+        """
+        req_headers = {
+            "User-Agent": "niconico.py",
+            "X-Frontend-Id": "6",
+            "X-Frontend-Version": "0",
+            "X-Niconico-Language": "ja-jp",
+            "X-Request-With": "https://www.nicovideo.jp",
+            "Referer": "https://www.nicovideo.jp/",
+        }
+        if headers is not None:
+            req_headers.update(headers)
+        if json is None:
+            return self.session.post(url, headers=req_headers)
+        return self.session.post(url, headers=req_headers, json=json)
 
-        Parameters
-        ----------
-        mail : str
-            ログインする際のメールアドレスもしくは電話番号です。
-        password : str
-            ログインする際のパスワードです。
+    def login_with_mail(self, mail: str, password: str, mfa: str | None = None) -> None:
+        """Login to NicoNico with a mail and password.
 
-        Raises
-        ------
-        LoginFailureException"""
-        session = requests.session()
-        
-        res = session.post(
-            "https://secure.nicovideo.jp/secure/login?site=niconico",
-            params={
-                "mail": mail,
-                "password": password
-            })
-        
-        if res.headers.get("x-niconico-authflag") == ('1' or '3'):
-            self.cookies = Cookies.from_string(session.cookies.get("user_session"))
-            return self
+        Args:
+            mail (str): The mail to login with.
+            password (str): The password to login with.
+            mfa (str | None): The MFA code to login with. Defaults to None.
+        """
+        self.logined = False
+
+        res = self.session.post(
+            "https://account.nicovideo.jp/login/redirector?site=niconico&next_url=%2F",
+            data={
+                "mail_tel": mail,
+                "password": password,
+                "auth_id": "1158188129",
+            },
+        )
+
+        if "/login" in res.url:
+            raise LoginFailureError(message="Login failed")
+
+        if "/mfa" in res.url:
+            if mfa is None:
+                raise LoginFailureError(message="MFA is required")
+            res = self.session.post(
+                res.url,
+                data={
+                    "otp": mfa,
+                    "device_name": "niconico.py",
+                },
+            )
+
+        if res.url != "https://www.nicovideo.jp/":
+            raise LoginFailureError(message="Login failed")
+
+        if res.headers.get("x-niconico-authflag") == "1":
+            self.premium = False
+        elif res.headers.get("x-niconico-authflag") == "3":
+            self.premium = True
         else:
-            title_ptn = re.compile('<title>(.*?)</title>')
-            title = title_ptn.search(res.text)
-            if title:
-                if "2段階認証" in title.group(1):
-                    raise LoginFailureException("Two-step verification is not supported.")
-        raise LoginFailureException("Login failed.")
+            raise LoginFailureError(message="Login failed")
+
+        self.logined = True
+
+    def login_with_session(self, session: str) -> None:
+        """Login to NicoNico with a session.
+
+        Args:
+            session (str): The session to login with.
+        """
+        self.logined = False
+
+        self.session.cookies.set("user_session", session)
+
+        res = self.session.get("https://www.nicovideo.jp/")
+
+        if res.url != "https://www.nicovideo.jp/":
+            raise LoginFailureError(message="Login failed")
+
+        if res.headers.get("x-niconico-authflag") == "1":
+            self.premium = False
+        elif res.headers.get("x-niconico-authflag") == "3":
+            self.premium = True
+        else:
+            raise LoginFailureError(message="Login failed")
+
+        self.logined = True

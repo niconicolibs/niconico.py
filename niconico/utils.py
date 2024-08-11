@@ -1,11 +1,20 @@
-# niconico.py - Utils
+"""Utility functions for niconico module."""
+
+from __future__ import annotations
+
+import re
 
 
-__all__ = ()
+def extract_video_id_from_url(url: str) -> str | None:
+    """Extract video ID from URL.
 
+    Args:
+        url (str): URL to extract video ID from.
 
-def parse_link(url: str) -> str:
-    "URLがもしスマホ用の場合はPC版に修正します。"
-    if "sp" in url:
-        url = url.replace("sp", "www")
-    return url
+    Returns:
+        str | None: Extracted video ID or None if not found.
+    """
+    match = re.search(r"(?:sm|nm|so)?\d+", url)
+    if match:
+        return match.group(0)
+    return None

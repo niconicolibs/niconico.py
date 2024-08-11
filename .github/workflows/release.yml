@@ -11,11 +11,20 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Branch Tag
         id: branch_tag
         run: echo "tag=${GITHUB_REF##*/}" >> $GITHUB_OUTPUT
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.8'
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.poetry/bin" >> $GITHUB_PATH
+      - name: Build Poetry
+        run: poetry build
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -27,3 +36,31 @@ jobs:
           body: "Please enter the content of the release here"
           draft: false
           prerelease: true
+      - name: Get Name of Artifact
+        run: |
+          ARTIFACT_PATH_NAME=$(ls dist/*.tar.gz | head -n 1)
+          ARTIFACT_NAME=$(basename $ARTIFACT_PATH_NAME)
+          echo "ARTIFACT_PATH_NAME=$ARTIFACT_PATH_NAME" >> $GITHUB_ENV
+          echo "ARTIFACT_NAME=$ARTIFACT_NAME" >> $GITHUB_ENV
+          ARTIFACT_PATH_NAME_2=$(ls dist/*.whl | head -n 1)
+          ARTIFACT_NAME_2=$(basename $ARTIFACT_PATH_NAME_2)
+          echo "ARTIFACT_PATH_NAME_2=$ARTIFACT_PATH_NAME_2" >> $GITHUB_ENV
+          echo "ARTIFACT_NAME_2=$ARTIFACT_NAME_2" >> $GITHUB_ENV
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ env.ARTIFACT_PATH_NAME }}
+          asset_name: ${{ env.ARTIFACT_NAME }}
+          asset_content_type: application/gzip
+      - name: Upload Release Asset 2
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ env.ARTIFACT_PATH_NAME_2 }}
+          asset_name: ${{ env.ARTIFACT_NAME_2 }}
+          asset_content_type: application/x-wheel+zip

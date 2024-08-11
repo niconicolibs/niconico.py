@@ -1,24 +1,51 @@
 [tool.poetry]
 name = "niconico-py"
-version = "1.2.4"
-description = "ニコニコ動画や生放送等の各種サイトの非公開APIに簡単にアクセスするためのPythonライブラリ"
-authors = [
-  "Negima1072 <67858442+Negima1072@users.noreply.github.com>",
-  "tasuren"
-]
+version = "2.0.0"
+description = "API wrapper for NicoNico services"
+authors = ["Negima1072 <ngm1072@gmail.com>"]
+license = "MIT"
 readme = "README.md"
 packages = [{include = "niconico"}]
-license = "LICENSE"
-classifiers = [
-    "Programming Language :: Python :: 3",
-]
 repository = "https://github.com/niconicolibs/niconico.py"
 
 [tool.poetry.dependencies]
-python = "^3.8"
-requests = "^2.28.1"
-beautifulsoup4 = "^4.11.1"
+python = ">=3.8"
+requests = "^2.32.3"
+pydantic = "^2.8.2"
 
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.11.1"
+ruff = "^0.5.6"
+types-requests = "^2.32.0.20240712"
+
+[tool.mypy]
+python_version = "3.8"
+show_error_context = true
+show_column_numbers = true
+disallow_untyped_defs = true
+no_implicit_optional = true
+check_untyped_defs = true
+warn_redundant_casts = true
+
+[tool.ruff]
+line-length = 120
+lint.select = ["ALL"]
+target-version = "py38"
+
+[tool.ruff.lint.per-file-ignores]
+"*.py" = [
+    "ANN101",
+    "ANN102"
+]
+
+[tool.ruff.lint.pylint]
+max-args = 15
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.flake8-type-checking]
+runtime-evaluated-base-classes = ["pydantic.BaseModel"]
 
 [build-system]
 requires = ["poetry-core"]

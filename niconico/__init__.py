@@ -1,11 +1,5 @@
-"""
-.. include:: ../README.md
-"""
+"""niconico package."""
 
-from .exceptions import ExtractFailed
-from .niconico import NicoNico
-from .cookies import Cookies
+from niconico.niconico import NicoNico
 
-
-__author__ = "Negima1072"
-__version__ = "1.2.4"
+__all__ = ("NicoNico",)
