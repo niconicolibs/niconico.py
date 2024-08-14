@@ -18,9 +18,9 @@ You can install it using pip:
 pip install niconico.py
 ```
 
-## Example
-### nicovideo
-#### Download video
+## Usage
+### video
+#### download video
 ```python
 from niconico import NicoNico
 
@@ -29,6 +29,26 @@ client = NicoNico()
 watch_data = client.video.watch.get_watch_data("sm9")
 outputs = client.video.watch.get_outputs(watch_data)
 client.video.watch.download_video(watch_data, "720p", ".")
+```
+
+#### get mylist items
+```python
+from niconico import NicoNico
+
+client = NicoNico()
+
+mylist = client.video.get_mylist("61813702")
+items = list(map(lambda x: x.video, mylist.items))
+```
+
+## Command
+### help
+```bash
+niconico -h
+```
+### download video
+```bash
+niconico download -h
 ```
 
 ## License
