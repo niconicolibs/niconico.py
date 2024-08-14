@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Literal
 import requests
 
 from niconico.base.client import BaseClient
-from niconico.objects.video.nvapi import FacetData, ListSearchData, NvAPIResponse, VideoSearchData
+from niconico.objects.nvapi import FacetData, ListSearchData, NvAPIResponse, VideoSearchData
 
 if TYPE_CHECKING:
     from niconico.objects.video.search import (

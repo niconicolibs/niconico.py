@@ -6,6 +6,19 @@ from typing import Generic, TypeVar
 
 from pydantic import BaseModel, Field
 
+from niconico.objects.user import (
+    NicoUser,
+    OwnNicoUser,
+    OwnVideoItem,
+    OwnVideosLimitation,
+    RelationshipUser,
+    RelationshipUsersSummary,
+    UserMylistItem,
+    UserRelationships,
+    UserSeriesItem,
+    UserSeriesThumbnails,
+    UserVideoItem,
+)
 from niconico.objects.video import EssentialVideo, HistoryItem, Mylist, SeriesDetail, SeriesItem, Tag
 from niconico.objects.video.ranking import Genre
 from niconico.objects.video.search import EssentialMylist, EssentialSeries, FacetItem, VideoSearchAdditionals
@@ -160,3 +173,84 @@ class HistoryData(BaseModel):
 
     items: list[HistoryItem]
     total_count: int = Field(..., alias="totalCount")
+
+
+class UserData(BaseModel):
+    """A class that represents the data of a user response from the NvAPI.
+
+    ref: https://nvapi.nicovideo.jp/v1/users/<user_id>
+    """
+
+    user: NicoUser
+    relationships: UserRelationships
+
+
+class OwnUserData(BaseModel):
+    """A class that represents the data of own user response from the NvAPI.
+
+    ref: https://nvapi.nicovideo.jp/v1/users/me
+    """
+
+    user: OwnNicoUser
+
+
+class RelationshipUsersData(BaseModel):
+    """A class that represents the data of a relationship users response from the NvAPI.
+
+    ref: https://nvapi.nicovideo.jp/v1/users/<user_id>/<type>/users
+    """
+
+    items: list[RelationshipUser]
+    summary: RelationshipUsersSummary
+
+
+class UserVideosData(BaseModel):
+    """A class that represents the data of a user video response from the NvAPI.
+
+    ref: https://nvapi.nicovideo.jp/v3/users/<user_id>/videos
+    """
+
+    items: list[UserVideoItem]
+    total_count: int = Field(..., alias="totalCount")
+
+
+class OwnVideosData(BaseModel):
+    """A class that represents the data of own videos response from the NvAPI.
+
+    ref: https://nvapi.nicovideo.jp/v2/users/me/videos
+    """
+
+    items: list[OwnVideoItem]
+    total_count: int = Field(..., alias="totalCount")
+    total_item_count: int = Field(..., alias="totalItemCount")
+    limitation: OwnVideosLimitation
+
+
+class UserMylistsData(BaseModel):
+    """A class that represents the data of mylists response from the NvAPI.
+
+    ref: https://nvapi.nicovideo.jp/v1/users/<user_id>/mylists
+    """
+
+    mylists: list[UserMylistItem]
+
+
+class UserSeriesData(BaseModel):
+    """A class that represents the data of a series response from the NvAPI.
+
+    ref: https://nvapi.nicovideo.jp/v1/users/<user_id>/series
+    """
+
+    total_count: int = Field(..., alias="totalCount")
+    items: list[UserSeriesItem]
+
+
+class OwnSeriesData(BaseModel):
+    """A class that represents the data of a series response from the NvAPI.
+
+    ref: https://nvapi.nicovideo.jp/v1/users/me/series
+    """
+
+    total_count: int = Field(..., alias="totalCount")
+    items: list[UserSeriesItem]
+    thumbnails: UserSeriesThumbnails

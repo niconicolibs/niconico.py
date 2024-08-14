@@ -14,7 +14,7 @@ import requests
 from niconico.base.client import BaseClient
 from niconico.decorators import login_required
 from niconico.exceptions import DownloadError, NicoAPIError, WatchAPIError
-from niconico.objects.video.nvapi import AccessRightsData, NvAPIResponse
+from niconico.objects.nvapi import AccessRightsData, NvAPIResponse
 from niconico.objects.video.watch import (
     NvCommentAPIData,
     NvCommentAPIResponse,

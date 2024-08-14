@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Literal
 import requests
 
 from niconico.base.client import BaseClient
-from niconico.objects.video.nvapi import GenresData, NvAPIResponse, PopularTagsData, RankingData
+from niconico.objects.nvapi import GenresData, NvAPIResponse, PopularTagsData, RankingData
 
 if TYPE_CHECKING:
     from niconico.objects.video.ranking import Genre

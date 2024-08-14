@@ -8,7 +8,7 @@ import requests
 
 from niconico.base.client import BaseClient
 from niconico.decorators import login_required
-from niconico.objects.video.nvapi import HistoryData, MylistData, NvAPIResponse, SeriesData, TagsData, VideosData
+from niconico.objects.nvapi import HistoryData, MylistData, NvAPIResponse, SeriesData, TagsData, VideosData
 from niconico.video.ranking import VideoRankingClient
 from niconico.video.search import VideoSearchClient
 from niconico.video.watch import VideoWatchClient
