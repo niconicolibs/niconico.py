@@ -59,4 +59,4 @@ class WatchAPIError(Exception):
     def __init__(self, response: WatchResponseError) -> None:
         """Initialize the exception."""
         self.response = response
-        super().__init__(response.reason_code)
+        super().__init__(response.error_code)

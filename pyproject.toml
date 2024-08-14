@@ -8,6 +8,9 @@ readme = "README.md"
 packages = [{include = "niconico"}]
 repository = "https://github.com/niconicolibs/niconico.py"
 
+[tool.poetry.scripts]
+niconico = "niconico.__main__:main"
+
 [tool.poetry.dependencies]
 python = ">=3.8"
 requests = "^2.32.3"

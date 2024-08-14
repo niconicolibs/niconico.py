@@ -28,12 +28,6 @@ class VideoThumbnail(BaseModel):
     nhd_url: str = Field(..., alias="nHdUrl")
 
 
-class PlaybackPosition(BaseModel):
-    """A class that represents the playback position of a video."""
-
-    position: int | None
-
-
 class Owner(BaseModel):
     """A class that represents the owner of a video."""
 
@@ -65,7 +59,7 @@ class EssentialVideo(BaseModel):
     latest_comment_summary: str = Field(..., alias="latestCommentSummary")
     is_channel_video: bool = Field(..., alias="isChannelVideo")
     is_payment_required: bool = Field(..., alias="isPaymentRequired")
-    playback_position: PlaybackPosition | None = Field(..., alias="playbackPosition")
+    playback_position: float | None = Field(..., alias="playbackPosition")
     owner: Owner
     require_sensitive_masking: bool = Field(..., alias="requireSensitiveMasking")
     video_live: VideoLive | None = Field(..., alias="videoLive")

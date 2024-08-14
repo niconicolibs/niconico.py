@@ -533,7 +533,11 @@ class WatchResponseError(BaseModel):
     is_custom_error: bool = Field(..., alias="isCustomError")
     status_code: int = Field(..., alias="statusCode")
     error_code: str = Field(..., alias="errorCode")
-    reason_code: str = Field(..., alias="reasonCode")
+    reason_code: str | None = Field(..., alias="reasonCode")
+    deleted_message: str | None = Field(..., alias="deletedMessage")
+    community_link: str | None = Field(..., alias="communityLink")
+    publish_scheduled_at: str | None = Field(..., alias="publishScheduledAt")
+    data: None
 
 
 class WatchAPIData(BaseModel):
