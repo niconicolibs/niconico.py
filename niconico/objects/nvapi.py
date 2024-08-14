@@ -19,6 +19,7 @@ from niconico.objects.user import (
     UserSeriesThumbnails,
     UserVideoItem,
 )
+from niconico.objects.user.search import UserSearchItem
 from niconico.objects.video import EssentialVideo, HistoryItem, Mylist, SeriesDetail, SeriesItem, Tag
 from niconico.objects.video.ranking import Genre
 from niconico.objects.video.search import EssentialMylist, EssentialSeries, FacetItem, VideoSearchAdditionals
@@ -254,3 +255,15 @@ class OwnSeriesData(BaseModel):
     total_count: int = Field(..., alias="totalCount")
     items: list[UserSeriesItem]
     thumbnails: UserSeriesThumbnails
+
+
+class UserSearchData(BaseModel):
+    """A class that represents the data of a list search response from the NvAPI.
+
+    ref: https://nvapi.nicovideo.jp/v1/search/user
+    """
+
+    request_id: str = Field(..., alias="requestId")
+    total_count: int = Field(..., alias="totalCount")
+    has_next: bool = Field(..., alias="hasNext")
+    items: list[UserSearchItem]

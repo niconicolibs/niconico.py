@@ -19,6 +19,7 @@ from niconico.objects.nvapi import (
     UserSeriesData,
     UserVideosData,
 )
+from niconico.user.search import UserSearchClient
 
 if TYPE_CHECKING:
     from niconico.niconico import NicoNico
@@ -35,9 +36,12 @@ if TYPE_CHECKING:
 class UserClient(BaseClient):
     """A class that represents a user client."""
 
+    search: UserSearchClient
+
     def __init__(self, niconico: NicoNico) -> None:
         """Initialize the client."""
         super().__init__(niconico)
+        self.search = UserSearchClient(niconico)
 
     def get_user(self, user_id: str) -> NicoUser | None:
         """Get a user by its ID.
