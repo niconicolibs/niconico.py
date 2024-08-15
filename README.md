@@ -13,6 +13,10 @@
 niconico.py is a Python library for retrieving Niconico video content and information, and is compatible with the latest version of Niconico.
 It allows you to download videos, retrieve information, get comments, and more.
 
+## Requirement
+
+To use the video download function, you need to install [FFmpeg](https://www.ffmpeg.org/) and set the path.
+
 ## Installation
 
 You can install it using pip:
