@@ -8,48 +8,43 @@
 [![Test](https://github.com/niconicolibs/niconico.py/actions/workflows/release.yml/badge.svg)](https://github.com/niconicolibs/niconico.py/actions/workflows/release.yml)
 [![Test](https://github.com/niconicolibs/niconico.py/actions/workflows/pypi.yml/badge.svg)](https://github.com/niconicolibs/niconico.py/actions/workflows/pypi.yml)
 
-# niconico.py
+# <img src="https://avatars.githubusercontent.com/u/113749892" height="30" /> niconico.py
+
 niconico.py is a Python library for retrieving Niconico video content and information, and is compatible with the latest version of Niconico.
 It allows you to download videos, retrieve information, get comments, and more.
 
 ## Installation
+
 You can install it using pip:
 ```bash
 pip install niconico.py
 ```
 
 ## Usage
-### video
-#### download video
+
 ```python
 from niconico import NicoNico
-
 client = NicoNico()
-
-watch_data = client.video.watch.get_watch_data("sm9")
-outputs = client.video.watch.get_outputs(watch_data)
-client.video.watch.download_video(watch_data, "720p", ".")
 ```
 
-#### get mylist items
-```python
-from niconico import NicoNico
+### Examples
 
-client = NicoNico()
-
-mylist = client.video.get_mylist("61813702")
-items = list(map(lambda x: x.video, mylist.items))
-```
+All examples can be found [here](https://github.com/niconicolibs/niconico.py/tree/main/examples).
 
 ## Command
-### help
+
+Console commands are available, see the following commands for usage:
 ```bash
 niconico -h
 ```
-### download video
-```bash
-niconico download -h
-```
+
+## Contributing
+
+All contributions are welcome, but please:
+- Use the `develop` branch.
+- Follow PEP8.
+- Be clear about the meaning and purpose of your issue or PR.
 
 ## License
+
 [MIT License](LICENSE)
