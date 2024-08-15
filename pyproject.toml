@@ -40,6 +40,10 @@ target-version = "py38"
     "ANN101",
     "ANN102"
 ]
+"examples/*.py" = [
+    "INP001",
+    "T201"
+]
 
 [tool.ruff.lint.pylint]
 max-args = 15
