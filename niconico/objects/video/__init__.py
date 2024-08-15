@@ -6,7 +6,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from niconico.objects.user import EssentialUser
+from niconico.objects.common import EssentialUser
 
 
 class VideoCount(BaseModel):
