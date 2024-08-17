@@ -5,6 +5,7 @@ from __future__ import annotations
 import requests
 
 from niconico.exceptions import LoginFailureError
+from niconico.user import UserClient
 from niconico.video import VideoClient
 
 
@@ -16,12 +17,14 @@ class NicoNico:
     premium: bool
 
     video: VideoClient
+    user: UserClient
 
     def __init__(self) -> None:
         """Initialize the class."""
         self.session = requests.Session()
         self.logined = False
         self.video = VideoClient(self)
+        self.user = UserClient(self)
 
     def get(self, url: str) -> requests.Response:
         """Send a GET request to a URL.
