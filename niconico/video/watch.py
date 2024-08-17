@@ -129,44 +129,55 @@ class VideoWatchClient(BaseClient):
         return None
 
     @login_required(premium=True)
-    def download_storyboards(self, watch_data: WatchData, path: str) -> None:
+    def download_storyboards(self, watch_data: WatchData, output_path: str) -> str:
         """Download the storyboards of a video.
 
         Args:
             watch_data: The watch data of the video.
-            path: The folder path to save the storyboards.
+            output_path: The folder path to save the storyboards.
+
+        Returns:
+            str: The path of the downloaded storyboards.
         """
         storyboard_url = self.get_storyboard_url(watch_data)
         if storyboard_url is None:
             raise NicoAPIError(message="Failed to get the storyboards URL.")
+        output_path = output_path % {
+            "id": watch_data.video.id_,
+            "title": watch_data.video.title,
+            "owner": watch_data.owner.nickname,
+            "owner_id": str(watch_data.owner.id_),
+            "timestamp": str(int(time.time())),
+        }
         res = self.niconico.get(storyboard_url)
         if res.status_code == requests.codes.ok:
             res_cls = StoryboardResponse(**res.json())
-            if not Path(path).is_dir():
-                Path(path).mkdir(parents=True)
-            if Path(f"{path}/storyboard.json").exists():
+            if not Path(output_path).is_dir():
+                Path(output_path).mkdir(parents=True)
+            if Path(f"{output_path}/storyboard.json").exists():
                 raise DownloadError(message="The storyboard.json file already exists.")
-            with Path(f"{path}/storyboard.json").open(mode="w") as f:
+            with Path(f"{output_path}/storyboard.json").open(mode="w") as f:
                 f.write(res.text)
             for image in res_cls.images:
                 image_res = self.niconico.get(re.sub(r"(?<=/)[^/]+(?=\?)", image.url, storyboard_url))
                 if image_res.status_code == requests.codes.ok:
-                    if Path(f"{path}/{image.url}.jpg").exists():
+                    if Path(f"{output_path}/{image.url}.jpg").exists():
                         raise DownloadError(message=f"The storyboard image already exists: {image.url}")
-                    with Path(f"{path}/{image.url}.jpg").open(mode="wb") as f:
+                    with Path(f"{output_path}/{image.url}.jpg").open(mode="wb") as f:
                         f.write(image_res.content)
                 else:
                     raise DownloadError(message=f"Failed to download the storyboard image: {image.url}")
         else:
             raise DownloadError(message="Failed to download the storyboards.")
+        return output_path
 
-    def download_video(self, watch_data: WatchData, output_label: str, path: str) -> str:
+    def download_video(self, watch_data: WatchData, output_label: str, output_path: str = "%(title)s.%(ext)s") -> str:
         """Download a video.
 
         Args:
             watch_data: The watch data of the video.
             output_label: The output label of the video.
-            path: The folder path to save the video.
+            output_path: The path to save the video.
 
         Returns:
             str: The path of the downloaded video.
@@ -177,10 +188,17 @@ class VideoWatchClient(BaseClient):
         hls_content_url = self.get_hls_content_url(watch_data, [outputs[output_label]])
         if hls_content_url is None:
             raise NicoAPIError(message="Failed to get the HLS content URL.")
-        name = f"{watch_data.video.id_}_{watch_data.video.title}.mp4"
-        if not Path(path).is_dir():
-            Path(path).mkdir(parents=True)
-        if (Path(path) / name).exists():
+        output_path = output_path % {
+            "id": watch_data.video.id_,
+            "title": watch_data.video.title,
+            "owner": watch_data.owner.nickname,
+            "owner_id": str(watch_data.owner.id_),
+            "timestamp": str(int(time.time())),
+            "ext": "mp4",
+        }
+        if not Path(output_path).parent.exists():
+            Path(output_path).parent.mkdir(parents=True)
+        if Path(output_path).exists():
             raise DownloadError(message="The video file already exists.")
         cookies = {
             "domand_bid": self.niconico.session.cookies.get("domand_bid"),
@@ -196,7 +214,7 @@ class VideoWatchClient(BaseClient):
                 f"'{hls_content_url}'",
                 "-c",
                 "copy",
-                f"'{(Path(path) / name).as_posix()}'",
+                f"'{output_path}'",
             ],
         )
         try:
@@ -204,7 +222,7 @@ class VideoWatchClient(BaseClient):
                 p.wait()
         except subprocess.CalledProcessError as e:
             raise DownloadError(message="Failed to download the video.") from e
-        return (Path(path) / name).as_posix()
+        return output_path
 
     def get_comments(self, watch_data: WatchData, *, when: int | None = None) -> NvCommentAPIData | None:
         """Get the comments of a video.
