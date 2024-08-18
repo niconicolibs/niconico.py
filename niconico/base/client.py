@@ -16,3 +16,7 @@ class BaseClient:
     def __init__(self, niconico: NicoNico) -> None:
         """Initialize the base client."""
         self.niconico = niconico
+
+    def log(self, type_: str, message: str) -> None:
+        """Log a message."""
+        return getattr(self.niconico.logger, type_)(message)
