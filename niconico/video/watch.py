@@ -218,7 +218,14 @@ class VideoWatchClient(BaseClient):
             ],
         )
         try:
-            with subprocess.Popen(commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, text=True) as p:  # noqa: S602
+            with subprocess.Popen(  # noqa: S602
+                commands,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                shell=True,
+            ) as p:
+                for line in iter(p.stdout.readline, b""):  # type: ignore[union-attr]
+                    self.log("debug", line.rstrip())
                 p.wait()
         except subprocess.CalledProcessError as e:
             raise DownloadError(message="Failed to download the video.") from e

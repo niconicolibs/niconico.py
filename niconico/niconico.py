@@ -2,16 +2,21 @@
 
 from __future__ import annotations
 
+from logging import Logger, getLogger
+
 import requests
 
 from niconico.exceptions import LoginFailureError
 from niconico.user import UserClient
 from niconico.video import VideoClient
 
+logger = getLogger("niconico.py")
+
 
 class NicoNico:
     """A class to interact with the NicoNico API."""
 
+    logger: Logger
     session: requests.Session
     logined: bool
     premium: bool
@@ -21,6 +26,7 @@ class NicoNico:
 
     def __init__(self) -> None:
         """Initialize the class."""
+        self.logger = logger
         self.session = requests.Session()
         self.logined = False
         self.video = VideoClient(self)
