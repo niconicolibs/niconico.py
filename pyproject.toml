@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "niconico.py"
-version = "2.0.6"
+version = "2.0.7"
 description = "API wrapper for NicoNico services"
 authors = ["Negima1072 <ngm1072@gmail.com>"]
 license = "MIT"
