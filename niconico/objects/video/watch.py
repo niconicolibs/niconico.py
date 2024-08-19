@@ -644,5 +644,5 @@ class NvCommentAPIResponse(BaseModel):
     ref: https://public.nvcomment.nicovideo.jp/v1/threads
     """
 
-    data: NvCommentAPIData
+    data: NvCommentAPIData | None
     meta: NvCommentAPIMeta

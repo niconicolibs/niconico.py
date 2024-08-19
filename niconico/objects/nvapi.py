@@ -267,3 +267,12 @@ class UserSearchData(BaseModel):
     total_count: int = Field(..., alias="totalCount")
     has_next: bool = Field(..., alias="hasNext")
     items: list[UserSearchItem]
+
+
+class ThreadKeyData(BaseModel):
+    """A class that represents the data of a thread key response from the NvAPI.
+
+    ref: https://nvapi.nicovideo.jp/v1/comment/keys/thread?videoId=<video_id>
+    """
+
+    thread_key: str = Field(..., alias="threadKey")

@@ -48,11 +48,19 @@ class NicoNico:
         }
         return self.session.get(url, headers=headers)
 
-    def post(self, url: str, *, json: object | None = None, headers: dict[str, str] | None = None) -> requests.Response:
+    def post(
+        self,
+        url: str,
+        *,
+        data: any | None = None,  # type: ignore[valid-type]
+        json: object | None = None,
+        headers: dict[str, str] | None = None,
+    ) -> requests.Response:
         """Send a POST request to a URL.
 
         Args:
             url (str): The URL to send the request to.
+            data (any): The data to send with the request.
             json (object): The data to send with the request.
             headers (dict[str, str]): The headers to send with the request.
 
@@ -64,13 +72,14 @@ class NicoNico:
             "X-Frontend-Id": "6",
             "X-Frontend-Version": "0",
             "X-Niconico-Language": "ja-jp",
+            "X-Client-Os-Type": "others",
             "X-Request-With": "https://www.nicovideo.jp",
             "Referer": "https://www.nicovideo.jp/",
         }
         if headers is not None:
             req_headers.update(headers)
         if json is None:
-            return self.session.post(url, headers=req_headers)
+            return self.session.post(url, headers=req_headers, data=data)
         return self.session.post(url, headers=req_headers, json=json)
 
     def login_with_mail(self, mail: str, password: str, mfa: str | None = None) -> None:

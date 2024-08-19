@@ -60,3 +60,12 @@ class WatchAPIError(Exception):
         """Initialize the exception."""
         self.response = response
         super().__init__(response.error_code)
+
+
+class CommentAPIError(Exception):
+    """An exception raised when an error occurs in the comment API."""
+
+    def __init__(self, message: str | None) -> None:
+        """Initialize the exception."""
+        self.message = message
+        super().__init__(message)

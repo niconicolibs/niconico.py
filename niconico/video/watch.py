@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import re
 import secrets
 import string
@@ -13,8 +14,8 @@ import requests
 
 from niconico.base.client import BaseClient
 from niconico.decorators import login_required
-from niconico.exceptions import DownloadError, NicoAPIError, WatchAPIError
-from niconico.objects.nvapi import AccessRightsData, NvAPIResponse
+from niconico.exceptions import CommentAPIError, DownloadError, NicoAPIError, WatchAPIError
+from niconico.objects.nvapi import AccessRightsData, NvAPIResponse, ThreadKeyData
 from niconico.objects.video.watch import (
     NvCommentAPIData,
     NvCommentAPIResponse,
@@ -231,19 +232,42 @@ class VideoWatchClient(BaseClient):
             raise DownloadError(message="Failed to download the video.") from e
         return output_path
 
-    def get_comments(self, watch_data: WatchData, *, when: int | None = None) -> NvCommentAPIData | None:
+    def get_thread_key(self, video_id: str) -> str | None:
+        """Get the thread key of a video.
+
+        Args:
+            video_id: The ID of the video.
+
+        Returns:
+            str: The thread key of the video.
+        """
+        res = self.niconico.get(f"https://nvapi.nicovideo.jp/v1/comment/keys/thread?videoId={video_id}")
+        if res.status_code == requests.codes.ok:
+            res_cls = NvAPIResponse[ThreadKeyData](**res.json())
+            if res_cls.data is not None:
+                return res_cls.data.thread_key
+        return None
+
+    def get_comments(
+        self,
+        watch_data: WatchData,
+        *,
+        when: int | None = None,
+        thread_key: str | None = None,
+    ) -> NvCommentAPIData | None:
         """Get the comments of a video.
 
         Args:
             watch_data: The watch data of the video.
             when: The time to get the comments.
+            thread_key: The thread key of the video.
 
         Returns:
             list[Any]: The comments of the video.
         """
         payload = {
             "threadKey": watch_data.comment.nv_comment.thread_key,
-            "params": watch_data.comment.nv_comment.params.model_dump_json(by_alias=True),
+            "params": watch_data.comment.nv_comment.params.model_dump(by_alias=True),
             "additionals": {},
         }
         if when is not None:
@@ -251,9 +275,13 @@ class VideoWatchClient(BaseClient):
                 payload["additionals"] = {"when": when}
             else:
                 raise NicoAPIError(message="You must be a premium member to get the comments at a specific time.")
-        res = self.niconico.post(watch_data.comment.nv_comment.server + "/v1/threads", json=payload)
-        if res.status_code == requests.codes.ok:
-            res_cls = NvCommentAPIResponse(**res.json())
-            if res_cls.meta.status == requests.codes.ok:
-                return res_cls.data
-        return None
+        if thread_key is not None:
+            payload["threadKey"] = thread_key
+        res = self.niconico.post(
+            watch_data.comment.nv_comment.server + "/v1/threads",
+            data=json.dumps(payload),
+        )
+        res_cls = NvCommentAPIResponse(**res.json())
+        if res_cls.meta.status == requests.codes.ok:
+            return res_cls.data
+        raise CommentAPIError(message=res_cls.meta.error_code)
