@@ -18,6 +18,7 @@ watch_data = niconico_client.video.watch.get_watch_data(video_id)
 
 when_unix = int(time.time())
 main_min_no = 0
+easy_min_no = 0
 owner_comments_fecthed = False
 is_finished = False
 comment_count = 0
@@ -50,11 +51,20 @@ while not is_finished:
             thread.comments.reverse()
             comments_dict[thread.fork].extend(thread.comments)
         elif thread.fork == "easy":
-            if len(thread.comments) <= 0:
+            if easy_min_no == 0:
+                easy_min_no = thread.comments[-1].no + 1
+            comment_index = len(thread.comments) - 1
+            while comment_index >= 0:
+                if thread.comments[comment_index].no < easy_min_no:
+                    break
+                comment_index -= 1
+            comments = thread.comments[: comment_index + 1]
+            if len(comments) <= 0:
                 continue
             comment_count += len(thread.comments)
-            thread.comments.reverse()
-            comments_dict[thread.fork].extend(thread.comments)
+            easy_min_no = thread.comments[0].no
+            comments.reverse()
+            comments_dict[thread.fork].extend(comments)
         else:
             if main_min_no == 0:
                 main_min_no = thread.comments[-1].no + 1
