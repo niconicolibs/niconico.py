@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 import re
 import secrets
@@ -238,6 +239,73 @@ class VideoWatchClient(BaseClient):
                     self.log("debug", line.rstrip())
                 p.wait()
         except subprocess.CalledProcessError as e:
+            raise DownloadError(message="Failed to download the video.") from e
+        return output_path
+
+    async def download_video_async(
+        self,
+        watch_data: WatchData,
+        output_label: str,
+        output_path: str = "%(title)s.%(ext)s",
+        *,
+        audio_only: bool = False,
+    ) -> str:
+        """Asynchronously download a video.
+
+        Args:
+            watch_data: The watch data of the video.
+            output_label: The output label of the video.
+            output_path: The path to save the video.
+            audio_only: Whether to download the audio only.
+
+        Returns:
+            str: The path of the downloaded video.
+        """
+        outputs = self.get_outputs(watch_data, audio_only=audio_only)
+        if output_label not in outputs:
+            raise DownloadError(message="The output label is not available.")
+        hls_content_url = self.get_hls_content_url(watch_data, [outputs[output_label]])
+        if hls_content_url is None:
+            raise NicoAPIError(message="Failed to get the HLS content URL.")
+        output_path = output_path % {
+            "id": watch_data.video.id_,
+            "title": watch_data.video.title,
+            "owner": watch_data.owner.nickname,
+            "owner_id": str(watch_data.owner.id_),
+            "timestamp": str(int(time.time())),
+            "ext": "m4a" if audio_only else "mp4",
+        }
+        if not Path(output_path).parent.exists():
+            Path(output_path).parent.mkdir(parents=True)
+        if Path(output_path).exists():
+            raise DownloadError(message="The video file already exists.")
+        cookies = {
+            "domand_bid": self.niconico.session.cookies.get("domand_bid"),
+        }
+        commands = " ".join(
+            [
+                "ffmpeg",
+                "-headers",
+                f"'cookie: {';'.join(f'{k}={v}' for k, v in cookies.items())}'",
+                "-protocol_whitelist",
+                "file,http,https,tcp,tls,crypto",
+                "-i",
+                f"'{hls_content_url}'",
+                "-c",
+                "copy",
+                f"'{output_path}'",
+            ],
+        )
+        try:
+            process = await asyncio.create_subprocess_shell(
+                commands,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.STDOUT,
+            )
+            async for line in process.stdout:  # type: ignore[union-attr]
+                self.log("debug", line.decode().rstrip())
+            await process.wait()
+        except Exception as e:
             raise DownloadError(message="Failed to download the video.") from e
         return output_path
 
