@@ -57,11 +57,12 @@ class VideoWatchClient(BaseClient):
         lh = int(time.time() * 1000)
         return f"{fh}_{lh}"
 
-    def get_outputs(self, watch_data: WatchData) -> dict[str, list[str]]:
+    def get_outputs(self, watch_data: WatchData, *, audio_only: bool = False) -> dict[str, list[str]]:
         """Get the outputs of a video.
 
         Args:
             watch_data: The watch data of the video.
+            audio_only: Whether to get the audio only.
 
         Returns:
             dict[str, list[str]]: The outputs of the video.
@@ -77,7 +78,7 @@ class VideoWatchClient(BaseClient):
             return outputs
         for video in watch_data.media.domand.videos:
             if video.is_available:
-                outputs[video.label] = [video.id_, top_audio_id]
+                outputs[video.label] = [top_audio_id] if audio_only else [video.id_, top_audio_id]
         return outputs
 
     def get_hls_content_url(self, watch_data: WatchData, outputs: list[list[str]]) -> str | None:
@@ -172,18 +173,26 @@ class VideoWatchClient(BaseClient):
             raise DownloadError(message="Failed to download the storyboards.")
         return output_path
 
-    def download_video(self, watch_data: WatchData, output_label: str, output_path: str = "%(title)s.%(ext)s") -> str:
+    def download_video(
+        self,
+        watch_data: WatchData,
+        output_label: str,
+        output_path: str = "%(title)s.%(ext)s",
+        *,
+        audio_only: bool = False,
+    ) -> str:
         """Download a video.
 
         Args:
             watch_data: The watch data of the video.
             output_label: The output label of the video.
             output_path: The path to save the video.
+            audio_only: Whether to download the audio only.
 
         Returns:
             str: The path of the downloaded video.
         """
-        outputs = self.get_outputs(watch_data)
+        outputs = self.get_outputs(watch_data, audio_only=audio_only)
         if output_label not in outputs:
             raise DownloadError(message="The output label is not available.")
         hls_content_url = self.get_hls_content_url(watch_data, [outputs[output_label]])
@@ -195,7 +204,7 @@ class VideoWatchClient(BaseClient):
             "owner": watch_data.owner.nickname,
             "owner_id": str(watch_data.owner.id_),
             "timestamp": str(int(time.time())),
-            "ext": "mp4",
+            "ext": "m4a" if audio_only else "mp4",
         }
         if not Path(output_path).parent.exists():
             Path(output_path).parent.mkdir(parents=True)
