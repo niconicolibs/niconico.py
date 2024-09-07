@@ -150,3 +150,11 @@ class NicoNico:
             raise LoginFailureError(message="Login failed")
 
         self.logined = True
+
+    def get_user_session(self) -> str | None:
+        """Get the user session.
+
+        Returns:
+            str: The user session.
+        """
+        return self.session.cookies.get("user_session")
