@@ -6,6 +6,7 @@ from logging import Logger, getLogger
 
 import requests
 
+from niconico.channel import ChannelClient
 from niconico.exceptions import LoginFailureError
 from niconico.user import UserClient
 from niconico.video import VideoClient
@@ -23,6 +24,7 @@ class NicoNico:
 
     video: VideoClient
     user: UserClient
+    channel: ChannelClient
 
     def __init__(self) -> None:
         """Initialize the class."""
@@ -31,6 +33,7 @@ class NicoNico:
         self.logined = False
         self.video = VideoClient(self)
         self.user = UserClient(self)
+        self.channel = ChannelClient(self)
 
     def get(self, url: str) -> requests.Response:
         """Send a GET request to a URL.
