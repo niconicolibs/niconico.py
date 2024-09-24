@@ -6,7 +6,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from niconico.objects.common import UserIcon
+from niconico.objects.common import EssentialChannel, UserIcon
 from niconico.objects.video import EssentialVideo, MylistItem, MylistSortKey, MylistSortOrder, Owner
 
 
@@ -30,16 +30,6 @@ class UserLevel(BaseModel):
     next_level_threshold_experience: int = Field(..., alias="nextLevelThresholdExperience")
     next_level_experience: int = Field(..., alias="nextLevelExperience")
     current_level_experience: int = Field(..., alias="currentLevelExperience")
-
-
-class UserChannel(BaseModel):
-    """A class that represents a user channel object."""
-
-    id_: str = Field(..., alias="id")
-    name: str
-    description: str
-    thumbnail_url: str = Field(..., alias="thumbnailUrl")
-    thumbnail_small_url: str = Field(..., alias="thumbnailSmallUrl")
 
 
 class UserSNS(BaseModel):
@@ -71,7 +61,7 @@ class NicoUser(BaseModel):
     followee_count: int = Field(..., alias="followeeCount")
     follower_count: int = Field(..., alias="followerCount")
     user_level: UserLevel = Field(..., alias="userLevel")
-    user_channel: UserChannel | None = Field(..., alias="userChannel")
+    user_channel: EssentialChannel | None = Field(..., alias="userChannel")
     is_nicorepo_readable: bool = Field(..., alias="isNicorepoReadable")
     sns: list[UserSNS] = Field(..., alias="sns")
     cover_image: UserCoverImage | None = Field(..., alias="coverImage")

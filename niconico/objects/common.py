@@ -25,3 +25,13 @@ class EssentialUser(BaseModel):
     id_: int = Field(..., alias="id")
     nickname: str
     icons: UserIcon
+
+
+class EssentialChannel(BaseModel):
+    """A class that represents a essential channel object."""
+
+    id_: str = Field(..., alias="id")
+    name: str
+    description: str
+    thumbnail_url: str = Field(..., alias="thumbnailUrl")
+    thumbnail_small_url: str = Field(..., alias="thumbnailSmallUrl")

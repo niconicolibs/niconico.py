@@ -6,7 +6,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from niconico.objects.common import EssentialUser
+from niconico.objects.common import EssentialChannel, EssentialUser
 
 
 class VideoCount(BaseModel):
@@ -32,7 +32,7 @@ class Owner(BaseModel):
     """A class that represents the owner of a video."""
 
     owner_type: Literal["user", "channel", "hidden"] = Field(..., alias="ownerType")
-    type_: Literal["user", "unknown"] = Field(..., alias="type")
+    type_: Literal["user", "channel", "unknown"] = Field(..., alias="type")
     visibility: Literal["visible", "hidden"]
     id_: str | None = Field(..., alias="id")
     name: str | None
@@ -126,9 +126,10 @@ class Mylist(BaseModel):
 class SeriesOwner(BaseModel):
     """A class that represents the owner of a series."""
 
-    type_: Literal["user"] = Field(..., alias="type")
+    type_: Literal["user", "channel"] = Field(..., alias="type")
     id_: str = Field(..., alias="id")
-    user: EssentialUser
+    user: EssentialUser | None
+    channel: EssentialChannel | None
 
 
 class SeriesDetail(BaseModel):
