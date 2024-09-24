@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 import requests
 
 from niconico.base.client import BaseClient
+from niconico.channel.search import ChannelSearchClient
 from niconico.objects.channel import ChannelData, ChAPIResponse
 
 if TYPE_CHECKING:
@@ -16,9 +17,12 @@ if TYPE_CHECKING:
 class ChannelClient(BaseClient):
     """A client that represents a channel client."""
 
+    search: ChannelSearchClient
+
     def __init__(self, niconico: NicoNico) -> None:
         """Initialize the client."""
         super().__init__(niconico)
+        self.search = ChannelSearchClient(niconico)
 
     def get_channel(self, channel_id: str) -> ChannelData | None:
         """Get a channel."""
