@@ -348,10 +348,7 @@ class VideoWatchClient(BaseClient):
             "additionals": {},
         }
         if when is not None:
-            if self.niconico.premium:
-                payload["additionals"] = {"when": when}
-            else:
-                raise NicoAPIError(message="You must be a premium member to get the comments at a specific time.")
+            payload["additionals"] = {"when": when}
         if thread_key is not None:
             payload["threadKey"] = thread_key
         res = self.niconico.post(
