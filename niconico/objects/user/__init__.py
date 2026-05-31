@@ -21,7 +21,7 @@ class SessionRelationships(BaseModel):
 class UserRelationships(BaseModel):
     """A class that represents the relationships of a user."""
 
-    session_user: SessionRelationships = Field(..., alias="sessionUser")
+    session_user: SessionRelationships | None = Field(default=None, alias="sessionUser")
     is_me: bool = Field(default=False, alias="isMe")
 
 
