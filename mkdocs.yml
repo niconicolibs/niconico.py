@@ -9,12 +9,18 @@ theme:
   language: ja
   logo: https://avatars.githubusercontent.com/u/113749892
   favicon: https://avatars.githubusercontent.com/u/113749892
+  palette:
+    primary: custom
+    accent: custom
   features:
     - navigation.instant
     - navigation.sections
     - navigation.top
     - search.highlight
     - content.code.copy
+
+extra_css:
+  - stylesheets/extra.css
 
 nav:
   - はじめに: index.md
