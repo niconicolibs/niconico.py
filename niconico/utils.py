@@ -19,6 +19,7 @@ def extract_video_id_from_url(url: str) -> str | None:
         return match.group(0)
     return None
 
+
 def add_optional_param(query: dict[str, str], key: str, value: int | str | None) -> None:
     """Add an optional parameter to the query dict if value is not None."""
     if value is not None:

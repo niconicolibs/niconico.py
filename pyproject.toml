@@ -12,7 +12,7 @@ repository = "https://github.com/niconicolibs/niconico.py"
 niconico = "niconico.__main__:main"
 
 [tool.poetry.dependencies]
-python = ">=3.8"
+python = ">=3.10"
 requests = "^2.32.3"
 pydantic = "^2.8.2"
 
@@ -20,9 +20,10 @@ pydantic = "^2.8.2"
 mypy = "^1.11.1"
 ruff = "^0.5.6"
 types-requests = "^2.32.0.20240712"
+pytest = "^9.0.3"
 
 [tool.mypy]
-python_version = "3.8"
+python_version = "3.10"
 show_error_context = true
 show_column_numbers = true
 disallow_untyped_defs = true
@@ -33,7 +34,7 @@ warn_redundant_casts = true
 [tool.ruff]
 line-length = 120
 lint.select = ["ALL"]
-target-version = "py38"
+target-version = "py310"
 
 [tool.ruff.lint.per-file-ignores]
 "*.py" = [
@@ -43,6 +44,9 @@ target-version = "py38"
 "examples/*.py" = [
     "INP001",
     "T201"
+]
+"tests/*.py" = [
+    "S101"
 ]
 
 [tool.ruff.lint.pylint]
