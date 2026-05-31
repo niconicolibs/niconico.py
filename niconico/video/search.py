@@ -270,6 +270,7 @@ class VideoSearchClient(BaseClient):
         self,
         keyword: str,
         sort_key: ListSearchSortKey = "_hotTotalScore",
+        sort_order: VideoSearchSortOrder = "desc",
         types: list[ListType] | None = None,
         page_size: int = 100,
         page: int = 1,
@@ -279,6 +280,7 @@ class VideoSearchClient(BaseClient):
         Args:
             keyword (str): The keyword to search.
             sort_key (ListSearchSortKey): The sort key.
+            sort_order (VideoSearchSortOrder): The sort order.
             types (list[ListType]): The types. If None, all types are included.
             page_size (int): The page size.
             page (int): The page.
@@ -289,6 +291,7 @@ class VideoSearchClient(BaseClient):
         query = {
             "keyword": keyword,
             "sortKey": sort_key,
+            "sortOrder": sort_order,
             "pageSize": str(page_size),
             "page": str(page),
         }

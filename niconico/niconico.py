@@ -93,6 +93,36 @@ class NicoNico:
             return self.session.post(url, headers=req_headers, data=data)
         return self.session.post(url, headers=req_headers, json=json)
 
+    def delete(
+        self,
+        url: str,
+        *,
+        headers: dict[str, str] | None = None,
+    ) -> requests.Response:
+        """Send a DELETE request to a URL.
+
+        Args:
+            url (str): The URL to send the request to.
+            headers (dict[str, str]): The headers to send with the request.
+
+        Returns:
+            requests.Response: The response object.
+        """
+        parsed_url = urlparse(url)
+        req_headers = {
+            "User-Agent": "niconico.py",
+            "X-Frontend-Id": "6",
+            "X-Frontend-Version": "0",
+            "X-Niconico-Language": "ja-jp",
+            "X-Client-Os-Type": "others",
+            "X-Request-With": "https://www.nicovideo.jp",
+            "Referer": "https://www.nicovideo.jp/",
+            "Host": parsed_url.netloc,
+        }
+        if headers is not None:
+            req_headers.update(headers)
+        return self.session.delete(url, headers=req_headers)
+
     def login_with_mail(self, mail: str, password: str, mfa: str | None = None) -> None:
         """Login to NicoNico with a mail and password.
 

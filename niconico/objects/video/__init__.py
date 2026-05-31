@@ -128,8 +128,8 @@ class SeriesOwner(BaseModel):
 
     type_: Literal["user", "channel"] = Field(..., alias="type")
     id_: str = Field(..., alias="id")
-    user: EssentialUser | None
-    channel: EssentialChannel | None
+    user: EssentialUser | None = None
+    channel: EssentialChannel | None = None
 
 
 class SeriesDetail(BaseModel):
