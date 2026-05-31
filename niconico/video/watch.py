@@ -31,6 +31,25 @@ from niconico.objects.video.watch import (
 class VideoWatchClient(BaseClient):
     """A client for watching videos on Niconico."""
 
+    def _build_ffmpeg_command(self, hls_content_url: str, output_path: str) -> list[str]:
+        """Build a safe FFmpeg command argument list."""
+        cookies = {
+            "domand_bid": self.niconico.session.cookies.get("domand_bid"),
+        }
+        cookie_header = "cookie: " + ";".join(f"{k}={v}" for k, v in cookies.items() if v is not None)
+        return [
+            "ffmpeg",
+            "-headers",
+            cookie_header,
+            "-protocol_whitelist",
+            "file,http,https,tcp,tls,crypto",
+            "-i",
+            hls_content_url,
+            "-c",
+            "copy",
+            output_path,
+        ]
+
     def get_watch_data(self, video_id: str) -> WatchData:
         """Get the watch data of a video.
 
@@ -148,8 +167,8 @@ class VideoWatchClient(BaseClient):
         output_path = output_path % {
             "id": watch_data.video.id_,
             "title": watch_data.video.title,
-            "owner": watch_data.owner.nickname,
-            "owner_id": str(watch_data.owner.id_),
+            "owner": watch_data.owner.nickname if watch_data.owner else "Unknown",
+            "owner_id": str(watch_data.owner.id_) if watch_data.owner else "0",
             "timestamp": str(int(time.time())),
         }
         res = self.niconico.get(storyboard_url)
@@ -202,8 +221,8 @@ class VideoWatchClient(BaseClient):
         output_path = output_path % {
             "id": watch_data.video.id_,
             "title": watch_data.video.title,
-            "owner": watch_data.owner.nickname,
-            "owner_id": str(watch_data.owner.id_),
+            "owner": watch_data.owner.nickname if watch_data.owner else "Unknown",
+            "owner_id": str(watch_data.owner.id_) if watch_data.owner else "0",
             "timestamp": str(int(time.time())),
             "ext": "m4a" if audio_only else "mp4",
         }
@@ -211,34 +230,20 @@ class VideoWatchClient(BaseClient):
             Path(output_path).parent.mkdir(parents=True)
         if Path(output_path).exists():
             raise DownloadError(message="The video file already exists.")
-        cookies = {
-            "domand_bid": self.niconico.session.cookies.get("domand_bid"),
-        }
-        commands = " ".join(
-            [
-                "ffmpeg",
-                "-headers",
-                f"'cookie: {';'.join(f'{k}={v}' for k, v in cookies.items())}'",
-                "-protocol_whitelist",
-                "file,http,https,tcp,tls,crypto",
-                "-i",
-                f"'{hls_content_url}'",
-                "-c",
-                "copy",
-                f"'{output_path}'",
-            ],
-        )
+        command = self._build_ffmpeg_command(hls_content_url, output_path)
         try:
-            with subprocess.Popen(  # noqa: S602
-                commands,
+            with subprocess.Popen(  # noqa: S603
+                command,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
-                shell=True,
             ) as p:
-                for line in iter(p.stdout.readline, b""):  # type: ignore[union-attr]
-                    self.log("debug", line.rstrip())
-                p.wait()
-        except subprocess.CalledProcessError as e:
+                if p.stdout is not None:
+                    for line in iter(p.stdout.readline, b""):
+                        self.log("debug", line.rstrip().decode("utf-8", errors="replace"))
+                return_code = p.wait()
+                if return_code != 0:
+                    raise DownloadError(message="Failed to download the video.")
+        except OSError as e:
             raise DownloadError(message="Failed to download the video.") from e
         return output_path
 
@@ -270,8 +275,8 @@ class VideoWatchClient(BaseClient):
         output_path = output_path % {
             "id": watch_data.video.id_,
             "title": watch_data.video.title,
-            "owner": watch_data.owner.nickname,
-            "owner_id": str(watch_data.owner.id_),
+            "owner": watch_data.owner.nickname if watch_data.owner else "Unknown",
+            "owner_id": str(watch_data.owner.id_) if watch_data.owner else "0",
             "timestamp": str(int(time.time())),
             "ext": "m4a" if audio_only else "mp4",
         }
@@ -279,34 +284,21 @@ class VideoWatchClient(BaseClient):
             Path(output_path).parent.mkdir(parents=True)
         if Path(output_path).exists():
             raise DownloadError(message="The video file already exists.")
-        cookies = {
-            "domand_bid": self.niconico.session.cookies.get("domand_bid"),
-        }
-        commands = " ".join(
-            [
-                "ffmpeg",
-                "-headers",
-                f"'cookie: {';'.join(f'{k}={v}' for k, v in cookies.items())}'",
-                "-protocol_whitelist",
-                "file,http,https,tcp,tls,crypto",
-                "-i",
-                f"'{hls_content_url}'",
-                "-c",
-                "copy",
-                f"'{output_path}'",
-            ],
-        )
+        command = self._build_ffmpeg_command(hls_content_url, output_path)
         try:
-            process = await asyncio.create_subprocess_shell(
-                commands,
+            process = await asyncio.create_subprocess_exec(
+                *command,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.STDOUT,
             )
-            async for line in process.stdout:  # type: ignore[union-attr]
-                self.log("debug", line.decode().rstrip())
-            await process.wait()
-        except Exception as e:
+        except OSError as e:
             raise DownloadError(message="Failed to download the video.") from e
+        if process.stdout is not None:
+            async for line in process.stdout:
+                self.log("debug", line.decode().rstrip())
+        return_code = await process.wait()
+        if return_code != 0:
+            raise DownloadError(message="Failed to download the video.")
         return output_path
 
     def get_thread_key(self, video_id: str) -> str | None:
@@ -348,10 +340,7 @@ class VideoWatchClient(BaseClient):
             "additionals": {},
         }
         if when is not None:
-            if self.niconico.premium:
-                payload["additionals"] = {"when": when}
-            else:
-                raise NicoAPIError(message="You must be a premium member to get the comments at a specific time.")
+            payload["additionals"] = {"when": when}
         if thread_key is not None:
             payload["threadKey"] = thread_key
         res = self.niconico.post(

@@ -106,15 +106,19 @@ class VideoRankingClient(BaseClient):
         """
         query = {
             "term": term,
-            "pageSize": str(page_size),
             "page": str(page),
+            "responseType": "json",
         }
         if sensitive_contents is not None:
             query["sensitiveContents"] = sensitive_contents
         query_str = "&".join([f"{key}={value}" for key, value in query.items()])
-        res = self.niconico.get(f"https://nvapi.nicovideo.jp/v1/ranking/hot-topic?{query_str}")
+        res = self.niconico.get(f"https://www.nicovideo.jp/ranking/hot_topic?{query_str}")
         if res.status_code == requests.codes.ok:
-            res_cls = NvAPIResponse[RankingData](**res.json())
-            if res_cls.data is not None:
-                return res_cls.data
+            ranking = res.json()["data"]["response"]["$getTeibanRanking"]["data"]
+            return RankingData.model_validate(
+                {
+                    "items": ranking["items"][:page_size],
+                    "hasNext": ranking["hasNext"],
+                },
+            )
         return None

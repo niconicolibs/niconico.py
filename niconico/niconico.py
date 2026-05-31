@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from logging import Logger, getLogger
+from urllib.parse import urlparse
 
 import requests
 
@@ -35,21 +36,26 @@ class NicoNico:
         self.user = UserClient(self)
         self.channel = ChannelClient(self)
 
-    def get(self, url: str) -> requests.Response:
+    def get(self, url: str, *, headers: dict[str, str] | None = None) -> requests.Response:
         """Send a GET request to a URL.
 
         Args:
             url (str): The URL to send the request to.
+            headers (dict[str, str] | None): Additional headers to send with the request.
 
         Returns:
             requests.Response: The response object.
         """
-        headers = {
+        parsed_url = urlparse(url)
+        req_headers = {
             "User-Agent": "niconico.py",
             "X-Frontend-Id": "6",
             "X-Frontend-Version": "0",
+            "Host": parsed_url.netloc,
         }
-        return self.session.get(url, headers=headers)
+        if headers is not None:
+            req_headers.update(headers)
+        return self.session.get(url, headers=req_headers)
 
     def post(
         self,
@@ -70,6 +76,7 @@ class NicoNico:
         Returns:
             requests.Response: The response object.
         """
+        parsed_url = urlparse(url)
         req_headers = {
             "User-Agent": "niconico.py",
             "X-Frontend-Id": "6",
@@ -78,12 +85,43 @@ class NicoNico:
             "X-Client-Os-Type": "others",
             "X-Request-With": "https://www.nicovideo.jp",
             "Referer": "https://www.nicovideo.jp/",
+            "Host": parsed_url.netloc,
         }
         if headers is not None:
             req_headers.update(headers)
         if json is None:
             return self.session.post(url, headers=req_headers, data=data)
         return self.session.post(url, headers=req_headers, json=json)
+
+    def delete(
+        self,
+        url: str,
+        *,
+        headers: dict[str, str] | None = None,
+    ) -> requests.Response:
+        """Send a DELETE request to a URL.
+
+        Args:
+            url (str): The URL to send the request to.
+            headers (dict[str, str]): The headers to send with the request.
+
+        Returns:
+            requests.Response: The response object.
+        """
+        parsed_url = urlparse(url)
+        req_headers = {
+            "User-Agent": "niconico.py",
+            "X-Frontend-Id": "6",
+            "X-Frontend-Version": "0",
+            "X-Niconico-Language": "ja-jp",
+            "X-Client-Os-Type": "others",
+            "X-Request-With": "https://www.nicovideo.jp",
+            "Referer": "https://www.nicovideo.jp/",
+            "Host": parsed_url.netloc,
+        }
+        if headers is not None:
+            req_headers.update(headers)
+        return self.session.delete(url, headers=req_headers)
 
     def login_with_mail(self, mail: str, password: str, mfa: str | None = None) -> None:
         """Login to NicoNico with a mail and password.
@@ -143,6 +181,7 @@ class NicoNico:
         res = self.session.get("https://www.nicovideo.jp/")
 
         if res.url != "https://www.nicovideo.jp/":
+            self.session.cookies.clear("", "/", "user_session")
             raise LoginFailureError(message="Login failed")
 
         if res.headers.get("x-niconico-authflag") == "1":
@@ -150,6 +189,7 @@ class NicoNico:
         elif res.headers.get("x-niconico-authflag") == "3":
             self.premium = True
         else:
+            self.session.cookies.clear("", "/", "user_session")
             raise LoginFailureError(message="Login failed")
 
         self.logined = True
@@ -161,3 +201,18 @@ class NicoNico:
             str: The user session.
         """
         return self.session.cookies.get("user_session")
+
+    def logout(self) -> None:
+        """Logout from NicoNico.
+
+        Properly logs out by calling logout endpoint and clearing session data.
+        Updates authentication state to reflect logged out status.
+        """
+        if self.logined:
+            self.session.get("https://account.nicovideo.jp/logout")
+            self.session.cookies.clear("", "/", "user_session")
+            self.logined = False
+            self.premium = False
+            self.logger.debug("Logged out from NicoNico")
+        else:
+            self.logger.warning("Not logged in, cannot logout")

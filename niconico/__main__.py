@@ -106,7 +106,13 @@ def main() -> None:
 
     parser_download = subparsers.add_parser("download", help="download video")
     parser_download.add_argument("id", help="video id", type=str)
-    parser_download.add_argument("-o", "--output", help="output file path", default=".", type=str)
+    parser_download.add_argument(
+        "-o",
+        "--output",
+        help="output file path template",
+        default="%(title)s.%(ext)s",
+        type=str,
+    )
     parser_download.add_argument("-s", "--session", help="user_session cookie", default=None, type=str)
     parser_download.add_argument("-q", "--quality", help="video quality (default: best)", default=None, type=str)
     parser_download.add_argument("-a", "--audio", help="download audio only", action="store_true")

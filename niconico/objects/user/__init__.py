@@ -9,6 +9,8 @@ from pydantic import BaseModel, Field
 from niconico.objects.common import EssentialChannel, UserIcon
 from niconico.objects.video import EssentialVideo, MylistItem, MylistSortKey, MylistSortOrder, Owner
 
+RecipeId = Literal["video_watch_recommendation", "video_recommendation_recommend", "video_top_recommend"]
+
 
 class SessionRelationships(BaseModel):
     """A class that represents the relationships of a user in a session."""
@@ -19,8 +21,8 @@ class SessionRelationships(BaseModel):
 class UserRelationships(BaseModel):
     """A class that represents the relationships of a user."""
 
-    session_user: SessionRelationships = Field(..., alias="sessionUser")
-    is_me: bool = Field(0, alias="isMe")
+    session_user: SessionRelationships | None = Field(default=None, alias="sessionUser")
+    is_me: bool = Field(default=False, alias="isMe")
 
 
 class UserLevel(BaseModel):
@@ -158,7 +160,7 @@ class OwnVideoItem(BaseModel):
     is_cpp_registered: bool = Field(..., alias="isCppRegistered")
     is_contents_tree_exists: bool = Field(..., alias="isContentsTreeExists")
     publish_timer_detail: str | None = Field(..., alias="publishTimerDetail")
-    auto_delete_detail: str | None = Field(..., alias="autoDeleteDetail")
+    auto_delete_detail: str | None = Field(None, alias="autoDeleteDetail")
     is_exclude_from_upload_list: bool = Field(..., alias="isExcludeFromUploadList")
     like_count: int = Field(..., alias="likeCount")
     gift_point: int = Field(..., alias="giftPoint")
@@ -178,7 +180,7 @@ class UserMylistItem(BaseModel):
     default_sort_order: MylistSortOrder = Field(..., alias="defaultSortOrder")
     items_count: int = Field(..., alias="itemsCount")
     owner: Owner
-    sample_items: list[MylistItem]
+    sample_items: list[MylistItem] = Field(..., alias="sampleItems")
     follower_count: int = Field(..., alias="followerCount")
     created_at: str = Field(..., alias="createdAt")
     is_following: bool = Field(..., alias="isFollowing")

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Generic, TypeVar
+from typing import Any, Generic, TypeVar
 
 from pydantic import BaseModel, Field
 
@@ -60,7 +60,7 @@ class VideosData(BaseModel):
 class TagsData(BaseModel):
     """A class that represents the data of a tags response from the NvAPI.
 
-    ref: https://nvapi.nicovideo.jp/v1/videos/<video_id>/tags
+    ref: https://nvapi.nicovideo.jp/v2/videos/<video_id>/tags
     """
 
     is_lockable: bool = Field(..., alias="isLockable")
@@ -169,11 +169,12 @@ class AccessRightsData(BaseModel):
 class HistoryData(BaseModel):
     """A class that represents the data of a history response from the NvAPI.
 
-    ref: https://nvapi.nicovideo.jp/v1/users/me/watch/history
+    ref: https://nvapi.nicovideo.jp/v2/users/me/watch/history
     """
 
     items: list[HistoryItem]
-    total_count: int = Field(..., alias="totalCount")
+    total_count: int | None = Field(None, alias="totalCount")
+    next_cursor: str | None = Field(None, alias="nextCursor")
 
 
 class UserData(BaseModel):
@@ -269,6 +270,50 @@ class UserSearchData(BaseModel):
     items: list[UserSearchItem]
 
 
+class FollowingMylistItem(BaseModel):
+    """A class that represents a following mylist item."""
+
+    id_: int = Field(..., alias="id")
+    status: str
+    detail: UserMylistItem | None = None
+
+
+class FollowingMylistsData(BaseModel):
+    """A class that represents the data of following mylists response from the NvAPI.
+
+    ref: https://nvapi.nicovideo.jp/v1/users/me/following/mylists
+    """
+
+    follow_limit: int = Field(..., alias="followLimit")
+    mylists: list[FollowingMylistItem]
+
+
+class FollowingTagItem(BaseModel):
+    """A class that represents a following tag item."""
+
+    name: str
+    followed_at: str = Field(..., alias="followedAt")
+    niconic_summary: str | None = Field(None, alias="nicodicSummary")
+
+
+class FollowingTagsData(BaseModel):
+    """A class that represents the data of following tags response from the NvAPI.
+
+    ref: https://nvapi.nicovideo.jp/v1/users/me/following/tags
+    """
+
+    tags: list[FollowingTagItem]
+
+class CreateMylistData(BaseModel):
+    """A class that represents the data of a create mylist response from the NvAPI.
+
+    ref: https://nvapi.nicovideo.jp/v1/users/me/mylists
+    """
+
+    mylist_id: int = Field(..., alias="mylistId")
+    mylist: Mylist
+
+
 class ThreadKeyData(BaseModel):
     """A class that represents the data of a thread key response from the NvAPI.
 
@@ -276,3 +321,141 @@ class ThreadKeyData(BaseModel):
     """
 
     thread_key: str = Field(..., alias="threadKey")
+
+
+class LikeData(BaseModel):
+    """A class that represents the data of a like response from the NvAPI.
+
+    ref: https://nvapi.nicovideo.jp/v1/users/me/likes/items?videoId=<video_id>
+    """
+
+    thanks_message: str | None = Field(None, alias="thanksMessage")
+
+
+class LikeHistoryItem(BaseModel):
+    """A class that represents a like history item."""
+
+    liked_at: str = Field(..., alias="likedAt")
+    thanks_message: str | None = Field(None, alias="thanksMessage")
+    video: EssentialVideo
+    status: str
+
+
+class LikeHistorySummary(BaseModel):
+    """A class that represents the summary of like history."""
+
+    has_next: bool = Field(..., alias="hasNext")
+    can_get_next_page: bool = Field(..., alias="canGetNextPage")
+    get_next_page_ng_reason: str | None = Field(None, alias="getNextPageNgReason")
+
+
+class LikeHistoryData(BaseModel):
+    """A class that represents the data of a like history response from the NvAPI.
+
+    ref: https://nvapi.nicovideo.jp/v1/users/me/likes
+    """
+
+    items: list[LikeHistoryItem]
+    summary: LikeHistorySummary
+
+
+class RecommendRecipe(BaseModel):
+    """A class that represents a recipe of a recommend response from the NvAPI."""
+
+    id_: str = Field(..., alias="id")
+    meta: None
+
+
+class RecommendReason(BaseModel):
+    """A class that represents a reason of a recommend item response from the NvAPI."""
+
+    tag: str | None = None
+
+
+class RecommendItem(BaseModel):
+    """A class that represents an item of a recommend response from the NvAPI."""
+
+    id_: str = Field(..., alias="id")
+    content_type: str = Field(..., alias="contentType")
+    recommend_type: str = Field(..., alias="recommendType")
+    # Currently only EssentialVideo is confirmed.
+    # We use Any to allow for future variations in format.
+    content: EssentialVideo | Any
+    reason: RecommendReason | None = None
+
+
+class RecommendData(BaseModel):
+    """A class that represents the data of a recommend response from the NvAPI.
+
+    ref: https://nvapi.nicovideo.jp/v1/recommend
+    """
+
+    recipe: RecommendRecipe
+    recommend_id: str = Field(..., alias="recommendId")
+    items: list[RecommendItem]
+
+
+class ActivityActor(BaseModel):
+    """A class that represents an actor in a feed activity."""
+
+    id_: str = Field(..., alias="id")
+    type_: str = Field(..., alias="type")
+    name: str
+    icon_url: str = Field(..., alias="iconUrl")
+    url: str
+    is_live: bool = Field(..., alias="isLive")
+
+
+class ActivityMessage(BaseModel):
+    """A class that represents a message in a feed activity."""
+
+    text: str
+
+
+class ActivityLabel(BaseModel):
+    """A class that represents a label in a feed activity."""
+
+    text: str
+
+
+class ActivityVideoContent(BaseModel):
+    """A class that represents video content in a feed activity."""
+
+    duration: int
+
+
+class ActivityContent(BaseModel):
+    """A class that represents content in a feed activity."""
+
+    type_: str = Field(..., alias="type")
+    id_: str = Field(..., alias="id")
+    title: str
+    url: str
+    started_at: str = Field(..., alias="startedAt")
+    video: ActivityVideoContent | None = None
+
+
+class Activity(BaseModel):
+    """A class that represents a feed activity."""
+
+    sensitive: bool
+    message: ActivityMessage
+    thumbnail_url: str = Field(..., alias="thumbnailUrl")
+    label: ActivityLabel
+    content: ActivityContent
+    id_: str = Field(..., alias="id")
+    kind: str
+    created_at: str = Field(..., alias="createdAt")
+    actor: ActivityActor
+
+
+class FeedData(BaseModel):
+    """A class that represents the data of a feed response from the Feed API.
+
+    ref: https://api.feed.nicovideo.jp/v1/activities/followings/publish?context=header_timeline
+    """
+
+    activities: list[Activity]
+    code: str
+    impression_id: str = Field(..., alias="impressionId")
+    next_cursor: str | None = Field(None, alias="nextCursor")
