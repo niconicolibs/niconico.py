@@ -1,10 +1,10 @@
 ![niconico](https://img.shields.io/badge/niconico-(to%20i)-auto?logo=niconico&logoColor=%23e6e6e6&color=%23252525)
 
 [![PyPI](https://img.shields.io/pypi/v/niconico.py?logo=pypi)](https://pypi.org/project/niconico.py/)
-[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-252525?logo=githubpages&logoColor=white)](https://niconicolibs.github.io/niconico.py/)
 ![Python](https://img.shields.io/badge/python-%3E%3D3.11-blue?logo=python&logoColor=white)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/niconico.py?logo=pypi)
 ![PyPI - License](https://img.shields.io/pypi/l/niconico.py?logo=pypi)
+[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-252525?logo=githubpages&logoColor=white)](https://niconicolibs.github.io/niconico.py/)
 
 [![Release](https://github.com/niconicolibs/niconico.py/actions/workflows/release.yml/badge.svg)](https://github.com/niconicolibs/niconico.py/actions/workflows/release.yml)
 [![PyPI Publish](https://github.com/niconicolibs/niconico.py/actions/workflows/pypi.yml/badge.svg)](https://github.com/niconicolibs/niconico.py/actions/workflows/pypi.yml)
