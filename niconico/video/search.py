@@ -293,7 +293,7 @@ class VideoSearchClient(BaseClient):
             "page": str(page),
         }
         if types is not None and len(types) == 1:
-            query["type"] = types[0]
+            query["types"] = types[0]
         query_str = "&".join([f"{key}={value}" for key, value in query.items()])
         res = self.niconico.get(f"https://nvapi.nicovideo.jp/v1/search/list?{query_str}")
         if res.status_code == requests.codes.ok:

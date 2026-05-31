@@ -148,8 +148,8 @@ class VideoWatchClient(BaseClient):
         output_path = output_path % {
             "id": watch_data.video.id_,
             "title": watch_data.video.title,
-            "owner": watch_data.owner.nickname,
-            "owner_id": str(watch_data.owner.id_),
+            "owner": watch_data.owner.nickname if watch_data.owner else "Unknown",
+            "owner_id": str(watch_data.owner.id_) if watch_data.owner else "0",
             "timestamp": str(int(time.time())),
         }
         res = self.niconico.get(storyboard_url)
@@ -202,8 +202,8 @@ class VideoWatchClient(BaseClient):
         output_path = output_path % {
             "id": watch_data.video.id_,
             "title": watch_data.video.title,
-            "owner": watch_data.owner.nickname,
-            "owner_id": str(watch_data.owner.id_),
+            "owner": watch_data.owner.nickname if watch_data.owner else "Unknown",
+            "owner_id": str(watch_data.owner.id_) if watch_data.owner else "0",
             "timestamp": str(int(time.time())),
             "ext": "m4a" if audio_only else "mp4",
         }
@@ -270,8 +270,8 @@ class VideoWatchClient(BaseClient):
         output_path = output_path % {
             "id": watch_data.video.id_,
             "title": watch_data.video.title,
-            "owner": watch_data.owner.nickname,
-            "owner_id": str(watch_data.owner.id_),
+            "owner": watch_data.owner.nickname if watch_data.owner else "Unknown",
+            "owner_id": str(watch_data.owner.id_) if watch_data.owner else "0",
             "timestamp": str(int(time.time())),
             "ext": "m4a" if audio_only else "mp4",
         }

@@ -48,16 +48,22 @@ class VideoClient(BaseClient):
                 return res_cls.data.items[0].video
         return None
 
-    def get_video_tags(self, video_id: str) -> list[Tag] | None:
+    def get_video_tags(self, video_id: str, edit_key: str) -> list[Tag] | None:
         """Get the tags of a video by its ID.
 
         Args:
             video_id (str): The ID of the video.
+            edit_key (str): The edit key for tag operations (required for v2 API).
+                            Can be obtained from WatchData.tag.edit.edit_key or WatchData.tag.viewer.edit_key.
 
         Returns:
             list[Tag] | None: The tags of the video if found, None otherwise.
         """
-        res = self.niconico.get(f"https://nvapi.nicovideo.jp/v1/videos/{video_id}/tags")
+        headers = {}
+        if edit_key is not None:
+            headers["X-Tag-Edit-Key"] = edit_key
+
+        res = self.niconico.get(f"https://nvapi.nicovideo.jp/v2/videos/{video_id}/tags", headers=headers)
         if res.status_code == requests.codes.ok:
             res_cls = NvAPIResponse[TagsData](**res.json())
             if res_cls.data is not None:

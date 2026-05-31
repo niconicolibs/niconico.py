@@ -60,7 +60,7 @@ class VideosData(BaseModel):
 class TagsData(BaseModel):
     """A class that represents the data of a tags response from the NvAPI.
 
-    ref: https://nvapi.nicovideo.jp/v1/videos/<video_id>/tags
+    ref: https://nvapi.nicovideo.jp/v2/videos/<video_id>/tags
     """
 
     is_lockable: bool = Field(..., alias="isLockable")

@@ -20,7 +20,7 @@ class UserRelationships(BaseModel):
     """A class that represents the relationships of a user."""
 
     session_user: SessionRelationships = Field(..., alias="sessionUser")
-    is_me: bool = Field(0, alias="isMe")
+    is_me: bool = Field(default=False, alias="isMe")
 
 
 class UserLevel(BaseModel):
@@ -178,7 +178,7 @@ class UserMylistItem(BaseModel):
     default_sort_order: MylistSortOrder = Field(..., alias="defaultSortOrder")
     items_count: int = Field(..., alias="itemsCount")
     owner: Owner
-    sample_items: list[MylistItem]
+    sample_items: list[MylistItem] = Field(..., alias="sampleItems")
     follower_count: int = Field(..., alias="followerCount")
     created_at: str = Field(..., alias="createdAt")
     is_following: bool = Field(..., alias="isFollowing")

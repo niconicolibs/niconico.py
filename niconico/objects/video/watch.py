@@ -74,6 +74,14 @@ class WatchChannel(BaseModel):
     viewer: WatchChannelViewer
 
 
+class WatchOwnerChannel(BaseModel):
+    """Data model of a watch owner channel."""
+
+    id_: str = Field(..., alias="id")
+    name: str
+    url: str
+
+
 class WatchClient(BaseModel):
     """Data model of the client of the watch API response."""
 
@@ -270,14 +278,27 @@ class WatchOwnerViewer(BaseModel):
     is_following: bool = Field(..., alias="isFollowing")
 
 
+class WatchOwnerLive(BaseModel):
+    """Data model of a live stream of a watch owner."""
+
+    id_: str = Field(..., alias="id")
+    title: str
+    url: str
+    begun_at: str = Field(..., alias="begunAt")
+    is_video_live: bool = Field(..., alias="isVideoLive")
+    video_live_on_air_start_time: str | None = Field(..., alias="videoLiveOnAirStartTime")
+    thumbnail_url: str = Field(..., alias="thumbnailUrl")
+    flip_thumbnail_url: str | None = Field(..., alias="flipThumbnailUrl")
+
+
 class WatchOwner(BaseModel):
     """Data model of a watch owner."""
 
     id_: int = Field(..., alias="id")
     nickname: str
     icon_url: str = Field(..., alias="iconUrl")
-    channel: None
-    live: None
+    channel: WatchOwnerChannel | None
+    live: WatchOwnerLive | None
     is_videos_public: bool = Field(..., alias="isVideosPublic")
     is_mylists_public: bool = Field(..., alias="isMylistsPublic")
     video_live_notice: None = Field(..., alias="videoLiveNotice")
@@ -322,7 +343,7 @@ class PlayerInitialPlayback(BaseModel):
     """Data model of the initial playback of a player."""
 
     type_: str = Field(..., alias="type")
-    position_sec: float = Field(..., alias="positionSec")
+    position_sec: float | None = Field(None, alias="positionSec")
 
 
 class WatchPlayerComment(BaseModel):
@@ -390,6 +411,16 @@ class WatchSystem(BaseModel):
     is_stella_alive: bool = Field(..., alias="isStellaAlive")
 
 
+class WatchTagItem(BaseModel):
+    """Data model of a tag item."""
+
+    name: str
+    is_category: bool = Field(..., alias="isCategory")
+    is_category_candidate: bool = Field(..., alias="isCategoryCandidate")
+    is_nicodic_article_exists: bool = Field(..., alias="isNicodicArticleExists")
+    is_locked: bool = Field(..., alias="isLocked")
+
+
 class WatchTagEdit(BaseModel):
     """Data model of an edit of a watch tag."""
 
@@ -401,7 +432,7 @@ class WatchTagEdit(BaseModel):
 class WatchTag(BaseModel):
     """Data model of a tag of the watch API response."""
 
-    items: list
+    items: list[WatchTagItem]
     has_r18_tag: bool = Field(..., alias="hasR18Tag")
     is_published_nicoscript: bool = Field(..., alias="isPublishedNicoscript")
     edit: WatchTagEdit
@@ -510,7 +541,7 @@ class WatchData(BaseModel):
     marquee: Any
     media: WatchMedia
     ok_reason: str = Field(..., alias="okReason")
-    owner: WatchOwner
+    owner: WatchOwner | None
     payment: WatchPayment
     pc_watch_page: Any = Field(..., alias="pcWatchPage")
     player: WatchPlayer
