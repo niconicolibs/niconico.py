@@ -74,4 +74,6 @@ jobs:
         env:
           NICONICO_LIVE_TESTS: "1"
           NICONICO_MUTATING_LIVE_TESTS: "1"
+          NICONICO_TEST_EMAIL: ${{ secrets.NICONICO_TEST_EMAIL }}
+          NICONICO_TEST_PASSWORD: ${{ secrets.NICONICO_TEST_PASSWORD }}
           NICONICO_USER_SESSION: ${{ secrets.NICONICO_USER_SESSION }}
