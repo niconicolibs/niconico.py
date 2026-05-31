@@ -276,3 +276,40 @@ class ThreadKeyData(BaseModel):
     """
 
     thread_key: str = Field(..., alias="threadKey")
+
+
+class LikeData(BaseModel):
+    """A class that represents the data of a like response from the NvAPI.
+
+    ref: https://nvapi.nicovideo.jp/v1/users/me/likes/items?videoId=<video_id>
+    """
+
+    thanks_message: str | None = Field(None, alias="thanksMessage")
+
+
+class LikeHistoryItem(BaseModel):
+    """A class that represents a like history item."""
+
+    liked_at: str = Field(..., alias="likedAt")
+    thanks_message: str | None = Field(None, alias="thanksMessage")
+    video: EssentialVideo
+    status: str
+
+
+class LikeHistorySummary(BaseModel):
+    """A class that represents the summary of like history."""
+
+    has_next: bool = Field(..., alias="hasNext")
+    can_get_next_page: bool = Field(..., alias="canGetNextPage")
+    get_next_page_ng_reason: str | None = Field(None, alias="getNextPageNgReason")
+
+
+class LikeHistoryData(BaseModel):
+    """A class that represents the data of a like history response from the NvAPI.
+
+    ref: https://nvapi.nicovideo.jp/v1/users/me/likes
+    """
+
+    items: list[LikeHistoryItem]
+    summary: LikeHistorySummary
+

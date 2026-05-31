@@ -8,7 +8,16 @@ import requests
 
 from niconico.base.client import BaseClient
 from niconico.decorators import login_required
-from niconico.objects.nvapi import HistoryData, MylistData, NvAPIResponse, SeriesData, TagsData, VideosData
+from niconico.objects.nvapi import (
+    HistoryData,
+    LikeData,
+    LikeHistoryData,
+    MylistData,
+    NvAPIResponse,
+    SeriesData,
+    TagsData,
+    VideosData,
+)
 from niconico.video.ranking import VideoRankingClient
 from niconico.video.search import VideoSearchClient
 from niconico.video.watch import VideoWatchClient
@@ -140,6 +149,43 @@ class VideoClient(BaseClient):
         res = self.niconico.get(f"https://nvapi.nicovideo.jp/v1/users/me/watch/history?{query_str}")
         if res.status_code == requests.codes.ok:
             res_cls = NvAPIResponse[HistoryData](**res.json())
+            if res_cls.data is not None:
+                return res_cls.data
+        return None
+
+    @login_required()
+    def like_video(self, video_id: str) -> LikeData | None:
+        """Like a video.
+
+        Args:
+            video_id (str): The ID of the video to like.
+
+        Returns:
+            LikeData | None: The like data if successful, None otherwise.
+        """
+        res = self.niconico.post(f"https://nvapi.nicovideo.jp/v1/users/me/likes/items?videoId={video_id}")
+        if res.status_code == requests.codes.ok:
+            res_cls = NvAPIResponse[LikeData](**res.json())
+            if res_cls.data is not None:
+                return res_cls.data
+        return None
+
+    @login_required()
+    def get_like_history(self, *, page_size: int = 25, page: int = 1) -> LikeHistoryData | None:
+        """Get the like history of the authenticated user.
+
+        Args:
+            page_size (int): The number of liked videos to get per page.
+            page (int): The page number.
+
+        Returns:
+            LikeHistoryData | None: The like history data if successful, None otherwise.
+        """
+        query = {"pageSize": str(page_size), "page": str(page)}
+        query_str = "&".join([f"{key}={value}" for key, value in query.items()])
+        res = self.niconico.get(f"https://nvapi.nicovideo.jp/v1/users/me/likes?{query_str}")
+        if res.status_code == requests.codes.ok:
+            res_cls = NvAPIResponse[LikeHistoryData](**res.json())
             if res_cls.data is not None:
                 return res_cls.data
         return None
