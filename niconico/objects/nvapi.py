@@ -20,7 +20,18 @@ from niconico.objects.user import (
     UserVideoItem,
 )
 from niconico.objects.user.search import UserSearchItem
-from niconico.objects.video import EssentialVideo, HistoryItem, Mylist, SeriesDetail, SeriesItem, Tag
+from niconico.objects.video import (
+    EssentialVideo,
+    HistoryItem,
+    Mylist,
+    MylistItem,
+    MylistSortKey,
+    MylistSortOrder,
+    Owner,
+    SeriesDetail,
+    SeriesItem,
+    Tag,
+)
 from niconico.objects.video.ranking import Genre
 from niconico.objects.video.search import EssentialMylist, EssentialSeries, FacetItem, VideoSearchAdditionals
 
@@ -304,6 +315,7 @@ class FollowingTagsData(BaseModel):
 
     tags: list[FollowingTagItem]
 
+
 class CreateMylistData(BaseModel):
     """A class that represents the data of a create mylist response from the NvAPI.
 
@@ -312,6 +324,44 @@ class CreateMylistData(BaseModel):
 
     mylist_id: int = Field(..., alias="mylistId")
     mylist: Mylist
+
+
+class OwnMylistItemsData(BaseModel):
+    """A class that represents the data of an own mylist items response from the NvAPI.
+
+    ref: https://nvapi.nicovideo.jp/v1/users/me/mylists/<mylist_id>/items
+    """
+
+    id_: int = Field(..., alias="id")
+    name: str
+    description: str
+    decorated_description_html: str = Field(..., alias="decoratedDescriptionHtml")
+    default_sort_key: MylistSortKey = Field(..., alias="defaultSortKey")
+    default_sort_order: MylistSortOrder = Field(..., alias="defaultSortOrder")
+    items: list[MylistItem]
+    total_item_count: int = Field(..., alias="totalItemCount")
+    has_next: bool = Field(..., alias="hasNext")
+    is_public: bool = Field(..., alias="isPublic")
+    owner: Owner
+
+
+class ReorderMylistsData(BaseModel):
+    """A class that represents the data of a reorder mylists response from the NvAPI.
+
+    ref: https://nvapi.nicovideo.jp/v1/users/me/mylists/order
+    """
+
+    mylist_ids: list[int] = Field(..., alias="mylistIds")
+
+
+class CopyMylistItemsData(BaseModel):
+    """A class that represents the data of a copy mylist items response from the NvAPI.
+
+    ref: https://nvapi.nicovideo.jp/v1/users/me/copy-mylist-items
+    """
+
+    duplicated_ids: list[str] = Field(..., alias="duplicatedIds")
+    processed_ids: list[str] = Field(..., alias="processedIds")
 
 
 class ThreadKeyData(BaseModel):
