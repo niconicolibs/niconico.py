@@ -84,6 +84,8 @@ class NicoNico:
             "X-Niconico-Language": "ja-jp",
             "X-Client-Os-Type": "others",
             "X-Request-With": "https://www.nicovideo.jp",
+            "X-Requested-With": "XMLHttpRequest",
+            "Origin": "https://www.nicovideo.jp",
             "Referer": "https://www.nicovideo.jp/",
             "Host": parsed_url.netloc,
         }
@@ -116,6 +118,8 @@ class NicoNico:
             "X-Niconico-Language": "ja-jp",
             "X-Client-Os-Type": "others",
             "X-Request-With": "https://www.nicovideo.jp",
+            "X-Requested-With": "XMLHttpRequest",
+            "Origin": "https://www.nicovideo.jp",
             "Referer": "https://www.nicovideo.jp/",
             "Host": parsed_url.netloc,
         }
