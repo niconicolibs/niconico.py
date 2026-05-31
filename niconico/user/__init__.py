@@ -347,8 +347,6 @@ class UserClient(BaseClient):
         self,
         mylist_id: str,
         *,
-        page_size: int = 20,
-        page: int = 1,
         sort_key: MylistSortKey | None = None,
         sort_order: MylistSortOrder | None = None,
     ) -> OwnMylistItemsData | None:
@@ -356,19 +354,20 @@ class UserClient(BaseClient):
 
         Args:
             mylist_id (str): The ID of the mylist.
-            page_size (int): The number of videos to get per page.
-            page (int): The page number.
             sort_key (MylistSortKey | None): The sort key.
             sort_order (MylistSortOrder | None): The sort order.
 
         Returns:
             OwnMylistItemsData | None: The mylist items data if found, None otherwise.
         """
-        query = {"pageSize": str(page_size), "page": str(page)}
+        query: dict[str, str] = {}
         add_optional_param(query, "sortKey", sort_key)
         add_optional_param(query, "sortOrder", sort_order)
         query_str = urlencode(query)
-        res = self.niconico.get(f"https://nvapi.nicovideo.jp/v1/users/me/mylists/{mylist_id}/items?{query_str}")
+        url = f"https://nvapi.nicovideo.jp/v1/users/me/mylists/{mylist_id}/items"
+        if query_str:
+            url = f"{url}?{query_str}"
+        res = self.niconico.get(url)
         if res.status_code == requests.codes.ok:
             res_cls = NvAPIResponse[OwnMylistItemsData](**res.json())
             if res_cls.data is not None:

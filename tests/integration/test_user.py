@@ -94,7 +94,6 @@ def test_authenticated_mylist_write_apis(authenticated_client: NicoNico) -> None
         items = require(
             authenticated_client.user.get_own_mylist_items(
                 source_id,
-                page_size=5,
                 sort_key="addedAt",
                 sort_order="desc",
             ),

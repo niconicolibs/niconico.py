@@ -190,12 +190,12 @@ def test_get_own_mylist_items_returns_item_focused_data() -> None:
     niconico = DummyNicoNico(payload)
     client = UserClient(niconico)  # type: ignore[arg-type]
 
-    result = client.get_own_mylist_items("1", page_size=5, sort_key="viewCount", sort_order="desc")
+    result = client.get_own_mylist_items("1", sort_key="viewCount", sort_order="desc")
 
     assert result is not None
     assert result.items[0].watch_id == "sm9"
     assert niconico.urls == [
-        "https://nvapi.nicovideo.jp/v1/users/me/mylists/1/items?pageSize=5&page=1&sortKey=viewCount&sortOrder=desc",
+        "https://nvapi.nicovideo.jp/v1/users/me/mylists/1/items?sortKey=viewCount&sortOrder=desc",
     ]
 
 
