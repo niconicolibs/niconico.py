@@ -73,4 +73,5 @@ jobs:
         run: uv run pytest tests/integration -m live
         env:
           NICONICO_LIVE_TESTS: "1"
+          NICONICO_MUTATING_LIVE_TESTS: "1"
           NICONICO_USER_SESSION: ${{ secrets.NICONICO_USER_SESSION }}

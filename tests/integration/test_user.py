@@ -91,13 +91,15 @@ def test_authenticated_mylist_write_apis(authenticated_client: NicoNico) -> None
         )
         assert any(item.watch_id == SM9_VIDEO_ID for item in detail.items)
 
-        items = authenticated_client.user.get_own_mylist_items(
-            source_id,
-            sort_key="addedAt",
-            sort_order="asc",
+        items = require(
+            authenticated_client.user.get_own_mylist_items(
+                source_id,
+                sort_key="addedAt",
+                sort_order="asc",
+            ),
+            "own mylist items",
         )
-        if items is not None:
-            assert any(item.watch_id == SM9_VIDEO_ID for item in items.items)
+        assert any(item.watch_id == SM9_VIDEO_ID for item in items.items)
 
         target = require(
             authenticated_client.user.create_mylist(

@@ -28,9 +28,10 @@ class DummyNicoNico:
     logined = True
     premium = False
 
-    def __init__(self, payload: dict[str, Any]) -> None:
+    def __init__(self, payload: dict[str, Any], *, status_code: int = requests.codes.ok) -> None:
         """Initialize captured URLs and response payload."""
         self.payload = payload
+        self.status_code = status_code
         self.urls: list[str] = []
         self.calls: list[tuple[str, str, dict[str, Any]]] = []
 
@@ -39,7 +40,7 @@ class DummyNicoNico:
         _ = headers
         self.urls.append(url)
         self.calls.append(("GET", url, {}))
-        return DummyResponse(self.payload)
+        return DummyResponse(self.payload, self.status_code)
 
     def post(
         self,

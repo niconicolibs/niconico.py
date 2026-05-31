@@ -347,6 +347,8 @@ class UserClient(BaseClient):
         self,
         mylist_id: str,
         *,
+        page_size: int = 20,
+        page: int = 1,
         sort_key: MylistSortKey | None = None,
         sort_order: MylistSortOrder | None = None,
     ) -> OwnMylistItemsData | None:
@@ -354,6 +356,8 @@ class UserClient(BaseClient):
 
         Args:
             mylist_id (str): The ID of the mylist.
+            page_size (int): The number of videos to get per page.
+            page (int): The page number.
             sort_key (MylistSortKey | None): The sort key.
             sort_order (MylistSortOrder | None): The sort order.
 
@@ -372,6 +376,15 @@ class UserClient(BaseClient):
             res_cls = NvAPIResponse[OwnMylistItemsData](**res.json())
             if res_cls.data is not None:
                 return res_cls.data
+        mylist = self.get_own_mylist(
+            mylist_id,
+            page_size=page_size,
+            page=page,
+            sort_key=sort_key,
+            sort_order=sort_order,
+        )
+        if mylist is not None:
+            return OwnMylistItemsData.model_validate(mylist.model_dump(by_alias=True))
         return None
 
     @login_required()
