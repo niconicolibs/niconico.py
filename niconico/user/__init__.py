@@ -3,23 +3,27 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Literal
+from urllib.parse import urlencode
 
 import requests
 
 from niconico.base.client import BaseClient
 from niconico.decorators import login_required
 from niconico.objects.nvapi import (
+    CopyMylistItemsData,
     CreateMylistData,
     FeedData,
     FollowingMylistsData,
     FollowingTagsData,
     MylistData,
     NvAPIResponse,
+    OwnMylistItemsData,
     OwnSeriesData,
     OwnUserData,
     OwnVideosData,
     RecommendData,
     RelationshipUsersData,
+    ReorderMylistsData,
     SeriesData,
     UserData,
     UserMylistsData,
@@ -41,6 +45,7 @@ if TYPE_CHECKING:
         UserVideosSortOrder,
     )
     from niconico.objects.video import Mylist, MylistSortKey, MylistSortOrder
+
 
 class UserClient(BaseClient):
     """A class that represents a user client."""
@@ -311,6 +316,8 @@ class UserClient(BaseClient):
         *,
         page_size: int = 20,
         page: int = 1,
+        sort_key: MylistSortKey | None = None,
+        sort_order: MylistSortOrder | None = None,
     ) -> Mylist | None:
         """Get a own mylist by its ID.
 
@@ -318,17 +325,66 @@ class UserClient(BaseClient):
             mylist_id (str): The ID of the mylist.
             page_size (int): The number of videos to get per page.
             page (int): The page number.
+            sort_key (MylistSortKey | None): The sort key.
+            sort_order (MylistSortOrder | None): The sort order.
 
         Returns:
             Mylist | None: The mylist object if found, None otherwise.
         """
         query = {"pageSize": str(page_size), "page": str(page)}
-        query_str = "&".join([f"{key}={value}" for key, value in query.items()])
+        add_optional_param(query, "sortKey", sort_key)
+        add_optional_param(query, "sortOrder", sort_order)
+        query_str = urlencode(query)
         res = self.niconico.get(f"https://nvapi.nicovideo.jp/v1/users/me/mylists/{mylist_id}?{query_str}")
         if res.status_code == requests.codes.ok:
             res_cls = NvAPIResponse[MylistData](**res.json())
             if res_cls.data is not None:
                 return res_cls.data.mylist
+        return None
+
+    @login_required()
+    def get_own_mylist_items(
+        self,
+        mylist_id: str,
+        *,
+        page_size: int = 20,
+        page: int = 1,
+        sort_key: MylistSortKey | None = None,
+        sort_order: MylistSortOrder | None = None,
+    ) -> OwnMylistItemsData | None:
+        """Get item-focused data for an own mylist by its ID.
+
+        Args:
+            mylist_id (str): The ID of the mylist.
+            page_size (int): The number of videos to get per page.
+            page (int): The page number.
+            sort_key (MylistSortKey | None): The sort key.
+            sort_order (MylistSortOrder | None): The sort order.
+
+        Returns:
+            OwnMylistItemsData | None: The mylist items data if found, None otherwise.
+        """
+        query: dict[str, str] = {}
+        add_optional_param(query, "sortKey", sort_key)
+        add_optional_param(query, "sortOrder", sort_order)
+        query_str = urlencode(query)
+        url = f"https://nvapi.nicovideo.jp/v1/users/me/mylists/{mylist_id}/items"
+        if query_str:
+            url = f"{url}?{query_str}"
+        res = self.niconico.get(url)
+        if res.status_code == requests.codes.ok:
+            res_cls = NvAPIResponse[OwnMylistItemsData](**res.json())
+            if res_cls.data is not None:
+                return res_cls.data
+        mylist = self.get_own_mylist(
+            mylist_id,
+            page_size=page_size,
+            page=page,
+            sort_key=sort_key,
+            sort_order=sort_order,
+        )
+        if mylist is not None:
+            return OwnMylistItemsData.model_validate(mylist.model_dump(by_alias=True))
         return None
 
     @login_required()
@@ -351,18 +407,22 @@ class UserClient(BaseClient):
         return []
 
     @login_required()
-    def add_mylist_item(self, mylist_id: str, item_id: str) -> bool:
+    def add_mylist_item(self, mylist_id: str, item_id: str, *, description: str | None = None) -> bool:
         """Add a video to a mylist.
 
         Args:
             mylist_id (str): The ID of the mylist to add the video to.
             item_id (str): The ID of the video to add to the mylist.
+            description (str | None): The note to add to the video.
 
         Returns:
             bool: True if the video was successfully added, False otherwise.
         """
-        res = self.niconico.post(f"https://nvapi.nicovideo.jp/v1/users/me/mylists/{mylist_id}/items?itemId={item_id}")
-        return res.status_code == requests.codes.created
+        query = {"itemId": item_id}
+        add_optional_param(query, "description", description)
+        query_str = urlencode(query)
+        res = self.niconico.post(f"https://nvapi.nicovideo.jp/v1/users/me/mylists/{mylist_id}/items?{query_str}")
+        return res.status_code in (requests.codes.ok, requests.codes.created)
 
     @login_required()
     def remove_mylist_items(self, mylist_id: str, item_ids: list[str]) -> bool:
@@ -411,6 +471,106 @@ class UserClient(BaseClient):
         res = self.niconico.post("https://nvapi.nicovideo.jp/v1/users/me/mylists", data=data)
         if res.status_code == requests.codes.ok:
             res_cls = NvAPIResponse[CreateMylistData](**res.json())
+            if res_cls.data is not None:
+                return res_cls.data
+        return None
+
+    @login_required()
+    def update_mylist(
+        self,
+        mylist_id: str,
+        *,
+        name: str | None = None,
+        description: str | None = None,
+        is_public: bool | None = None,
+        default_sort_key: MylistSortKey | None = None,
+        default_sort_order: MylistSortOrder | None = None,
+    ) -> Mylist | None:
+        """Update own mylist metadata.
+
+        Args:
+            mylist_id (str): The ID of the mylist to update.
+            name (str | None): The new mylist name.
+            description (str | None): The new mylist description.
+            is_public (bool | None): Whether the mylist is public.
+            default_sort_key (MylistSortKey | None): The default sort key.
+            default_sort_order (MylistSortOrder | None): The default sort order.
+
+        Returns:
+            Mylist | None: The updated mylist if successful, None otherwise.
+        """
+        data: dict[str, str] = {}
+        add_optional_param(data, "name", name)
+        add_optional_param(data, "description", description)
+        if is_public is not None:
+            data["isPublic"] = "true" if is_public else "false"
+        add_optional_param(data, "defaultSortKey", default_sort_key)
+        add_optional_param(data, "defaultSortOrder", default_sort_order)
+
+        res = self.niconico.put(f"https://nvapi.nicovideo.jp/v1/users/me/mylists/{mylist_id}", data=data)
+        if res.status_code == requests.codes.ok:
+            res_cls = NvAPIResponse[MylistData](**res.json())
+            if res_cls.data is not None:
+                return res_cls.data.mylist
+        return None
+
+    @login_required()
+    def reorder_mylists(self, mylist_ids: list[str | int]) -> ReorderMylistsData | None:
+        """Reorder all own mylists.
+
+        Args:
+            mylist_ids (list[str | int]): All own mylist IDs in the desired order.
+
+        Returns:
+            ReorderMylistsData | None: The reordered mylist IDs if successful, None otherwise.
+        """
+        data = {"order": ",".join(str(mylist_id) for mylist_id in mylist_ids)}
+        res = self.niconico.put("https://nvapi.nicovideo.jp/v1/users/me/mylists/order", data=data)
+        if res.status_code == requests.codes.ok:
+            res_cls = NvAPIResponse[ReorderMylistsData](**res.json())
+            if res_cls.data is not None:
+                return res_cls.data
+        return None
+
+    @login_required()
+    def delete_mylist(self, mylist_id: str) -> bool:
+        """Delete an own mylist.
+
+        Args:
+            mylist_id (str): The ID of the mylist to delete.
+
+        Returns:
+            bool: True if the mylist was successfully deleted, False otherwise.
+        """
+        res = self.niconico.delete(f"https://nvapi.nicovideo.jp/v1/users/me/mylists/{mylist_id}")
+        return res.status_code == requests.codes.ok
+
+    @login_required()
+    def copy_mylist_items(
+        self,
+        from_mylist_id: str,
+        to_mylist_id: str,
+        item_ids: list[str],
+    ) -> CopyMylistItemsData | None:
+        """Copy videos from an own mylist to another own mylist.
+
+        Args:
+            from_mylist_id (str): The source mylist ID.
+            to_mylist_id (str): The destination mylist ID.
+            item_ids (list[str]): The video IDs to copy.
+
+        Returns:
+            CopyMylistItemsData | None: The copied item result if successful, None otherwise.
+        """
+        query = {
+            "from": from_mylist_id,
+            "to": to_mylist_id,
+            "itemIds": ",".join(item_ids),
+        }
+        query_str = urlencode(query, safe=",")
+        res = self.niconico.post(f"https://nvapi.nicovideo.jp/v1/users/me/copy-mylist-items?{query_str}")
+        if res.status_code == requests.codes.ok:
+            res_cls = NvAPIResponse[CopyMylistItemsData](**res.json())
             if res_cls.data is not None:
                 return res_cls.data
         return None

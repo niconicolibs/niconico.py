@@ -1,0 +1,40 @@
+site_name: niconico.py
+site_description: ニコニコ動画の情報取得と動画ダウンロードを扱う Python ライブラリ
+site_url: https://niconicolibs.github.io/niconico.py/
+repo_url: https://github.com/niconicolibs/niconico.py
+repo_name: niconicolibs/niconico.py
+
+theme:
+  name: material
+  language: ja
+  logo: https://avatars.githubusercontent.com/u/113749892
+  favicon: https://avatars.githubusercontent.com/u/113749892
+  palette:
+    primary: custom
+    accent: custom
+  features:
+    - navigation.instant
+    - navigation.sections
+    - navigation.top
+    - search.highlight
+    - content.code.copy
+
+extra_css:
+  - stylesheets/extra.css
+
+nav:
+  - はじめに: index.md
+  - インストール: installation.md
+  - クイックスタート: quickstart.md
+  - 動画: video.md
+  - ユーザー: user.md
+  - 開発: development.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      permalink: true

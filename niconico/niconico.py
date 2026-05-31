@@ -61,7 +61,7 @@ class NicoNico:
         self,
         url: str,
         *,
-        data: any | None = None,  # type: ignore[valid-type]
+        data: dict[str, str] | str | bytes | None = None,
         json: object | None = None,
         headers: dict[str, str] | None = None,
     ) -> requests.Response:
@@ -69,7 +69,7 @@ class NicoNico:
 
         Args:
             url (str): The URL to send the request to.
-            data (any): The data to send with the request.
+            data (dict[str, str] | str | bytes): The data to send with the request.
             json (object): The data to send with the request.
             headers (dict[str, str]): The headers to send with the request.
 
@@ -94,6 +94,44 @@ class NicoNico:
         if json is None:
             return self.session.post(url, headers=req_headers, data=data)
         return self.session.post(url, headers=req_headers, json=json)
+
+    def put(
+        self,
+        url: str,
+        *,
+        data: dict[str, str] | str | bytes | None = None,
+        json: object | None = None,
+        headers: dict[str, str] | None = None,
+    ) -> requests.Response:
+        """Send a PUT request to a URL.
+
+        Args:
+            url (str): The URL to send the request to.
+            data (dict[str, str] | str | bytes): The data to send with the request.
+            json (object): The JSON data to send with the request.
+            headers (dict[str, str]): The headers to send with the request.
+
+        Returns:
+            requests.Response: The response object.
+        """
+        parsed_url = urlparse(url)
+        req_headers = {
+            "User-Agent": "niconico.py",
+            "X-Frontend-Id": "6",
+            "X-Frontend-Version": "0",
+            "X-Niconico-Language": "ja-jp",
+            "X-Client-Os-Type": "others",
+            "X-Request-With": "https://www.nicovideo.jp",
+            "X-Requested-With": "XMLHttpRequest",
+            "Origin": "https://www.nicovideo.jp",
+            "Referer": "https://www.nicovideo.jp/",
+            "Host": parsed_url.netloc,
+        }
+        if headers is not None:
+            req_headers.update(headers)
+        if json is None:
+            return self.session.put(url, headers=req_headers, data=data)
+        return self.session.put(url, headers=req_headers, json=json)
 
     def delete(
         self,

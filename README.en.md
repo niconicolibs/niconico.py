@@ -13,14 +13,14 @@
 
 # <img src="https://avatars.githubusercontent.com/u/113749892" height="30" /> niconico.py
 
-niconico.py は、ニコニコ動画のコンテンツや情報を取得するための Python ライブラリです。
-動画のダウンロード、動画情報の取得、コメント取得などを扱えます。
+niconico.py is a Python library for retrieving Niconico video content and information.
+It supports video downloads, metadata retrieval, comment retrieval, and more.
 
-## Requirements
+## Requirement
 
-Python 3.11 以降が必要です。
+Python 3.11 or later is required.
 
-動画ダウンロード機能を利用する場合は、[FFmpeg](https://www.ffmpeg.org/) をインストールしてパスを通してください。
+To use the video download function, install [FFmpeg](https://www.ffmpeg.org/) and make it available on your PATH.
 
 ## Installation
 
@@ -38,11 +38,11 @@ client = NicoNico()
 
 ### Examples
 
-サンプルコードは [examples](https://github.com/niconicolibs/niconico.py/tree/main/examples) にあります。
+Example code is available in [examples](https://github.com/niconicolibs/niconico.py/tree/main/examples).
 
-## CLI
+## Command
 
-CLI の使い方は次のコマンドで確認できます。
+Use the following command to see CLI usage.
 
 ```bash
 niconico -h
@@ -50,7 +50,7 @@ niconico -h
 
 ## Contributing
 
-コントリビューションは歓迎します。Issue や PR では、目的と変更内容が分かるように記載してください。
+Contributions are welcome. Please describe the purpose and scope clearly in issues and pull requests.
 
 ## License
 

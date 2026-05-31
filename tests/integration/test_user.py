@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import os
 from typing import TYPE_CHECKING
+from uuid import uuid4
 
 import pytest
 
@@ -52,3 +54,77 @@ def test_authenticated_video_history_apis(authenticated_client: NicoNico) -> Non
     """Exercise authenticated video history wrappers against live endpoints."""
     assert authenticated_client.video.get_history(page_size=5) is not None
     assert authenticated_client.video.get_like_history(page_size=5) is not None
+
+
+@pytest.mark.mutating()
+def test_authenticated_mylist_write_apis(authenticated_client: NicoNico) -> None:
+    """Exercise own mylist write API wrappers against live endpoints."""
+    if os.environ.get("NICONICO_MUTATING_LIVE_TESTS") != "1":
+        pytest.skip("Set NICONICO_MUTATING_LIVE_TESTS=1 to run mutating live API tests")
+
+    marker = f"niconico.py live test {uuid4().hex[:8]}"
+    source = require(
+        authenticated_client.user.create_mylist(marker, "created by niconico.py live test", is_public=False),
+        "source mylist creation",
+    )
+    source_id = str(source.mylist_id)
+    target_id: str | None = None
+
+    try:
+        updated = require(
+            authenticated_client.user.update_mylist(
+                source_id,
+                name=f"{marker} updated",
+                description="updated by niconico.py live test",
+                is_public=False,
+                default_sort_key="addedAt",
+                default_sort_order="desc",
+            ),
+            "mylist metadata update",
+        )
+        assert updated.name == f"{marker} updated"
+        assert authenticated_client.user.add_mylist_item(source_id, SM9_VIDEO_ID, description="live test") is True
+
+        detail = require(
+            authenticated_client.user.get_own_mylist(source_id, page_size=5, sort_key="addedAt", sort_order="desc"),
+            "own mylist detail",
+        )
+        assert any(item.watch_id == SM9_VIDEO_ID for item in detail.items)
+
+        items = require(
+            authenticated_client.user.get_own_mylist_items(
+                source_id,
+                sort_key="addedAt",
+                sort_order="asc",
+            ),
+            "own mylist items",
+        )
+        assert any(item.watch_id == SM9_VIDEO_ID for item in items.items)
+
+        target = require(
+            authenticated_client.user.create_mylist(
+                f"{marker} copy",
+                "created by niconico.py live test",
+                is_public=False,
+            ),
+            "target mylist creation",
+        )
+        target_id = str(target.mylist_id)
+        copied = require(
+            authenticated_client.user.copy_mylist_items(source_id, target_id, [SM9_VIDEO_ID]),
+            "mylist item copy",
+        )
+        assert SM9_VIDEO_ID in copied.processed_ids or SM9_VIDEO_ID in copied.duplicated_ids
+
+        ordered = require(
+            authenticated_client.user.reorder_mylists(
+                [mylist.id_ for mylist in authenticated_client.user.get_own_mylists()],
+            ),
+            "mylist reorder",
+        )
+        assert int(source_id) in ordered.mylist_ids
+        assert authenticated_client.user.remove_mylist_items(source_id, [SM9_VIDEO_ID]) is True
+    finally:
+        if target_id is not None:
+            authenticated_client.user.delete_mylist(target_id)
+        authenticated_client.user.delete_mylist(source_id)
