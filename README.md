@@ -15,10 +15,7 @@ It allows you to download videos, retrieve information, get comments, and more.
 
 ## Requirement
 
-| niconico.py version | Python version |
-| --- | --- |
-| 2.2.x | 3.11 or later |
-| 2.1.x | 3.8 or later |
+Python 3.11 or later is required.
 
 To use the video download function, you need to install [FFmpeg](https://www.ffmpeg.org/) and set the path.
 
