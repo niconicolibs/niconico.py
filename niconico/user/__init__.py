@@ -13,6 +13,7 @@ from niconico.objects.nvapi import (
     OwnSeriesData,
     OwnUserData,
     OwnVideosData,
+    RecommendData,
     RelationshipUsersData,
     UserData,
     UserMylistsData,
@@ -20,12 +21,14 @@ from niconico.objects.nvapi import (
     UserVideosData,
 )
 from niconico.user.search import UserSearchClient
+from niconico.utils import add_optional_param
 
 if TYPE_CHECKING:
     from niconico.niconico import NicoNico
     from niconico.objects.user import (
         NicoUser,
         OwnNicoUser,
+        RecipeId,
         UserMylistItem,
         UserSeriesItem,
         UserVideosSortKey,
@@ -308,3 +311,54 @@ class UserClient(BaseClient):
             if res_cls.data is not None:
                 return res_cls.data.items
         return []
+
+    @login_required()
+    def get_recommendations(
+        self,
+        recipe_id: RecipeId,
+        *,
+        video_id: str | None = None,
+        site: str = "nicovideo",
+        limit: int | None = None,
+        with_reason: bool | None = None,
+        sensitive_contents: Literal["mask", "filter"] | None = None,
+        recipe_version: int | None = None,
+    ) -> RecommendData | None:
+        """Get recommendations based on a specific video or general recommendations.
+
+        Args:
+            recipe_id (str): The ID of the recommendation recipe. Available options:
+                - "video_watch_recommendation": Watch-based recommendations (requires video_id)
+                - "video_recommendation_recommend": General video recommendations
+                - "video_top_recommend": Top recommended videos
+            video_id (str | None): The ID of the video to base the recommendations on.
+            site (str): The site to get recommendations from. Defaults to "nicovideo".
+            limit (int | None): The maximum number of recommendations to return.
+            with_reason (bool | None): Whether to include reasons for recommendations.
+            sensitive_contents (Literal["mask", "filter"] | None):  The sensitive contents to get.
+            recipe_version (int | None): The version of the recommendation recipe.
+
+        Returns:
+            RecommendData | None: The recommendation data if found, None otherwise.
+        """
+        query: dict[str, str] = {"recipeId": recipe_id, "site": site}
+
+        # Set defaults and add video_id if provided
+        if video_id is not None:
+            query["videoId"] = video_id
+            limit = limit or 25
+
+        # Build query parameters
+        add_optional_param(query, "recipeVersion", recipe_version)
+        add_optional_param(query, "limit", limit)
+        add_optional_param(query, "with_reason", "true" if with_reason else None)
+        add_optional_param(query, "sensitiveContents", sensitive_contents)
+
+        query_str = "&".join([f"{key}={value}" for key, value in query.items()])
+        res = self.niconico.get(f"https://nvapi.nicovideo.jp/v1/recommend?{query_str}")
+        if res.status_code == requests.codes.ok:
+            res_cls = NvAPIResponse[RecommendData](**res.json())
+            if res_cls.data is not None:
+                return res_cls.data
+        return None
+

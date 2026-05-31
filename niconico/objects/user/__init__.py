@@ -9,6 +9,8 @@ from pydantic import BaseModel, Field
 from niconico.objects.common import EssentialChannel, UserIcon
 from niconico.objects.video import EssentialVideo, MylistItem, MylistSortKey, MylistSortOrder, Owner
 
+RecipeId = Literal["video_watch_recommendation", "video_recommendation_recommend", "video_top_recommend"]
+
 
 class SessionRelationships(BaseModel):
     """A class that represents the relationships of a user in a session."""

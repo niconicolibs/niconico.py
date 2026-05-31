@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Generic, TypeVar
+from typing import Any, Generic, TypeVar
 
 from pydantic import BaseModel, Field
 
@@ -313,3 +313,38 @@ class LikeHistoryData(BaseModel):
     items: list[LikeHistoryItem]
     summary: LikeHistorySummary
 
+
+class RecommendRecipe(BaseModel):
+    """A class that represents a recipe of a recommend response from the NvAPI."""
+
+    id_: str = Field(..., alias="id")
+    meta: None
+
+
+class RecommendReason(BaseModel):
+    """A class that represents a reason of a recommend item response from the NvAPI."""
+
+    tag: str | None = None
+
+
+class RecommendItem(BaseModel):
+    """A class that represents an item of a recommend response from the NvAPI."""
+
+    id_: str = Field(..., alias="id")
+    content_type: str = Field(..., alias="contentType")
+    recommend_type: str = Field(..., alias="recommendType")
+    # Currently only EssentialVideo is confirmed.
+    # We use Any to allow for future variations in format.
+    content: EssentialVideo | Any
+    reason: RecommendReason | None = None
+
+
+class RecommendData(BaseModel):
+    """A class that represents the data of a recommend response from the NvAPI.
+
+    ref: https://nvapi.nicovideo.jp/v1/recommend
+    """
+
+    recipe: RecommendRecipe
+    recommend_id: str = Field(..., alias="recommendId")
+    items: list[RecommendItem]
