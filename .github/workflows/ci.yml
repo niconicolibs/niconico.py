@@ -17,6 +17,64 @@ permissions:
   contents: read
 
 jobs:
+  changes:
+    if: github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    outputs:
+      live: ${{ steps.filter.outputs.live }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+      - name: Detect live test changes
+        id: filter
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          changed_files="$(mktemp)"
+          case "$GITHUB_EVENT_NAME" in
+            workflow_dispatch)
+              echo "live=true" >> "$GITHUB_OUTPUT"
+              echo "workflow_dispatch always runs live tests." >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+              ;;
+            pull_request)
+              base_ref="$(jq -r '.pull_request.base.ref' "$GITHUB_EVENT_PATH")"
+              git fetch --no-tags --prune origin "$base_ref"
+              git diff --name-only "origin/$base_ref"...HEAD > "$changed_files"
+              ;;
+            push)
+              before_sha="$(jq -r '.before // ""' "$GITHUB_EVENT_PATH")"
+              if [[ -z "$before_sha" || "$before_sha" =~ ^0+$ ]]; then
+                git diff-tree --no-commit-id --name-only -r "$GITHUB_SHA" > "$changed_files"
+              else
+                git diff --name-only "$before_sha" "$GITHUB_SHA" > "$changed_files"
+              fi
+              ;;
+            *)
+              : > "$changed_files"
+              ;;
+          esac
+
+          live=false
+          while IFS= read -r file; do
+            case "$file" in
+              niconico/*|tests/integration/*|pyproject.toml|uv.lock|.github/workflows/ci.yml)
+                live=true
+                break
+                ;;
+            esac
+          done < "$changed_files"
+
+          echo "live=$live" >> "$GITHUB_OUTPUT"
+          {
+            echo "### Changed files"
+            sed 's/^/- /' "$changed_files"
+            echo
+            echo "live=$live"
+          } >> "$GITHUB_STEP_SUMMARY"
+
   test:
     if: github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
@@ -62,7 +120,8 @@ jobs:
         run: uv build
 
   live:
-    if: github.actor != 'dependabot[bot]'
+    needs: changes
+    if: github.actor != 'dependabot[bot]' && needs.changes.outputs.live == 'true'
     runs-on: ubuntu-latest
     concurrency:
       group: live-${{ github.repository }}
