@@ -95,7 +95,7 @@ def test_authenticated_mylist_write_apis(authenticated_client: NicoNico) -> None
             authenticated_client.user.get_own_mylist_items(
                 source_id,
                 sort_key="addedAt",
-                sort_order="desc",
+                sort_order="asc",
             ),
             "own mylist items",
         )
