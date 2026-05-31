@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import shutil
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -88,8 +89,12 @@ def test_sm9_downloads_video(live_client: NicoNico, tmp_path: Path) -> None:
     assert downloaded.stat().st_size > MIN_SM9_DOWNLOAD_BYTES
 
 
+@pytest.mark.mutating()
 def test_authenticated_video_like_apis(authenticated_client: NicoNico) -> None:
     """Exercise authenticated video like wrappers against live endpoints."""
+    if os.environ.get("NICONICO_MUTATING_LIVE_TESTS") != "1":
+        pytest.skip("Set NICONICO_MUTATING_LIVE_TESTS=1 to run mutating live API tests")
+
     liked = False
     try:
         mutation_cooldown()
