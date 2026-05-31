@@ -8,7 +8,7 @@ from uuid import uuid4
 
 import pytest
 
-from tests.integration.helpers import SM9_VIDEO_ID, get_sample_user_id, require
+from tests.integration.helpers import SM9_VIDEO_ID, get_sample_user_id, mutation_cooldown, require
 
 if TYPE_CHECKING:
     from niconico import NicoNico
@@ -63,6 +63,7 @@ def test_authenticated_mylist_write_apis(authenticated_client: NicoNico) -> None
         pytest.skip("Set NICONICO_MUTATING_LIVE_TESTS=1 to run mutating live API tests")
 
     marker = f"niconico.py live test {uuid4().hex[:8]}"
+    mutation_cooldown()
     source = require(
         authenticated_client.user.create_mylist(marker, "created by niconico.py live test", is_public=False),
         "source mylist creation",
@@ -71,6 +72,7 @@ def test_authenticated_mylist_write_apis(authenticated_client: NicoNico) -> None
     target_id: str | None = None
 
     try:
+        mutation_cooldown()
         updated = require(
             authenticated_client.user.update_mylist(
                 source_id,
@@ -83,6 +85,7 @@ def test_authenticated_mylist_write_apis(authenticated_client: NicoNico) -> None
             "mylist metadata update",
         )
         assert updated.name == f"{marker} updated"
+        mutation_cooldown()
         assert authenticated_client.user.add_mylist_item(source_id, SM9_VIDEO_ID, description="live test") is True
 
         detail = require(
@@ -101,6 +104,7 @@ def test_authenticated_mylist_write_apis(authenticated_client: NicoNico) -> None
         )
         assert any(item.watch_id == SM9_VIDEO_ID for item in items.items)
 
+        mutation_cooldown()
         target = require(
             authenticated_client.user.create_mylist(
                 f"{marker} copy",
@@ -110,12 +114,14 @@ def test_authenticated_mylist_write_apis(authenticated_client: NicoNico) -> None
             "target mylist creation",
         )
         target_id = str(target.mylist_id)
+        mutation_cooldown()
         copied = require(
             authenticated_client.user.copy_mylist_items(source_id, target_id, [SM9_VIDEO_ID]),
             "mylist item copy",
         )
         assert SM9_VIDEO_ID in copied.processed_ids or SM9_VIDEO_ID in copied.duplicated_ids
 
+        mutation_cooldown()
         ordered = require(
             authenticated_client.user.reorder_mylists(
                 [mylist.id_ for mylist in authenticated_client.user.get_own_mylists()],
@@ -123,8 +129,11 @@ def test_authenticated_mylist_write_apis(authenticated_client: NicoNico) -> None
             "mylist reorder",
         )
         assert int(source_id) in ordered.mylist_ids
+        mutation_cooldown()
         assert authenticated_client.user.remove_mylist_items(source_id, [SM9_VIDEO_ID]) is True
     finally:
         if target_id is not None:
+            mutation_cooldown()
             authenticated_client.user.delete_mylist(target_id)
+        mutation_cooldown()
         authenticated_client.user.delete_mylist(source_id)

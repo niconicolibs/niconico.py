@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import shutil
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -15,6 +16,7 @@ from tests.integration.helpers import (
     get_sample_list_id,
     get_sm9_watch_data,
     get_tag_edit_key,
+    mutation_cooldown,
     require,
 )
 
@@ -87,9 +89,19 @@ def test_sm9_downloads_video(live_client: NicoNico, tmp_path: Path) -> None:
     assert downloaded.stat().st_size > MIN_SM9_DOWNLOAD_BYTES
 
 
+@pytest.mark.mutating()
 def test_authenticated_video_like_apis(authenticated_client: NicoNico) -> None:
     """Exercise authenticated video like wrappers against live endpoints."""
+    if os.environ.get("NICONICO_MUTATING_LIVE_TESTS") != "1":
+        pytest.skip("Set NICONICO_MUTATING_LIVE_TESTS=1 to run mutating live API tests")
+
+    liked = False
     try:
-        assert require(authenticated_client.video.like_video(SM9_VIDEO_ID), "like video") is not None
+        mutation_cooldown()
+        like_data = authenticated_client.video.like_video(SM9_VIDEO_ID)
+        liked = like_data is not None
+        assert require(like_data, "like video") is not None
     finally:
-        assert authenticated_client.video.unlike_video(SM9_VIDEO_ID) is True
+        if liked:
+            mutation_cooldown()
+            assert authenticated_client.video.unlike_video(SM9_VIDEO_ID) is True
