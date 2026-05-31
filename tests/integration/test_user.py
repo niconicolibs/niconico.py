@@ -64,7 +64,7 @@ def test_authenticated_mylist_write_apis(authenticated_client: NicoNico) -> None
 
     marker = f"niconico.py live test {uuid4().hex[:8]}"
     source = require(
-        authenticated_client.user.create_mylist(marker, "created by niconico.py live test", is_public=False),
+        authenticated_client.user.create_mylist(marker, "created by niconico.py live test", is_public=True),
         "source mylist creation",
     )
     source_id = str(source.mylist_id)
@@ -76,7 +76,7 @@ def test_authenticated_mylist_write_apis(authenticated_client: NicoNico) -> None
                 source_id,
                 name=f"{marker} updated",
                 description="updated by niconico.py live test",
-                is_public=False,
+                is_public=True,
                 default_sort_key="addedAt",
                 default_sort_order="desc",
             ),
