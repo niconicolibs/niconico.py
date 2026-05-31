@@ -57,6 +57,22 @@ class VideoClient(BaseClient):
                 return res_cls.data.items[0].video
         return None
 
+    def get_videos(self, video_ids: list[str]) -> list[EssentialVideo]:
+        """Get videos by their IDs.
+
+        Args:
+            video_ids (list[str]): The IDs of the videos.
+
+        Returns:
+            list[EssentialVideo]: The video objects if found, an empty list otherwise.
+        """
+        videos = []
+        for video_id in video_ids:
+            video = self.get_video(video_id)
+            if video is not None:
+                videos.append(video)
+        return videos
+
     def get_video_tags(self, video_id: str, edit_key: str) -> list[Tag] | None:
         """Get the tags of a video by its ID.
 
@@ -164,11 +180,24 @@ class VideoClient(BaseClient):
             LikeData | None: The like data if successful, None otherwise.
         """
         res = self.niconico.post(f"https://nvapi.nicovideo.jp/v1/users/me/likes/items?videoId={video_id}")
-        if res.status_code == requests.codes.ok:
+        if res.status_code in (requests.codes.ok, requests.codes.created):
             res_cls = NvAPIResponse[LikeData](**res.json())
             if res_cls.data is not None:
                 return res_cls.data
         return None
+
+    @login_required()
+    def unlike_video(self, video_id: str) -> bool:
+        """Remove a like from a video.
+
+        Args:
+            video_id (str): The ID of the video to unlike.
+
+        Returns:
+            bool: True if the like was successfully removed, False otherwise.
+        """
+        res = self.niconico.delete(f"https://nvapi.nicovideo.jp/v1/users/me/likes/items?videoId={video_id}")
+        return res.status_code == requests.codes.ok
 
     @login_required()
     def get_like_history(self, *, page_size: int = 25, page: int = 1) -> LikeHistoryData | None:

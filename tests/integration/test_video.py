@@ -34,6 +34,8 @@ def test_sm9_metadata(live_client: NicoNico) -> None:
     assert video.id_ == SM9_VIDEO_ID
     assert video.title == SM9_TITLE
     assert video.owner.name == SM9_OWNER_NAME
+    videos = live_client.video.get_videos([SM9_VIDEO_ID, "sm1097445"])
+    assert [item.id_ for item in videos] == [SM9_VIDEO_ID, "sm1097445"]
     assert watch_data.video.id_ == SM9_VIDEO_ID
     assert watch_data.video.title == SM9_TITLE
     assert watch_data.owner is not None
@@ -83,3 +85,11 @@ def test_sm9_downloads_video(live_client: NicoNico, tmp_path: Path) -> None:
     assert downloaded.name == "sm9.mp4"
     assert downloaded.exists()
     assert downloaded.stat().st_size > MIN_SM9_DOWNLOAD_BYTES
+
+
+def test_authenticated_video_like_apis(authenticated_client: NicoNico) -> None:
+    """Exercise authenticated video like wrappers against live endpoints."""
+    try:
+        assert require(authenticated_client.video.like_video(SM9_VIDEO_ID), "like video") is not None
+    finally:
+        assert authenticated_client.video.unlike_video(SM9_VIDEO_ID) is True
