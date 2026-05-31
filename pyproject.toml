@@ -30,6 +30,7 @@ dev = [
 [tool.pytest.ini_options]
 markers = [
     "live: tests that call live Niconico endpoints",
+    "mutating: tests that modify live Niconico account state",
 ]
 
 [tool.ruff]

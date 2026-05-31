@@ -31,6 +31,18 @@ class DummySession:
         self.calls.append(("POST", url, {"headers": headers, "data": data, "json": json}))
         return object()
 
+    def put(
+        self,
+        url: str,
+        *,
+        headers: dict[str, str],
+        data: object | None = None,
+        json: object | None = None,
+    ) -> object:
+        """Capture a PUT request."""
+        self.calls.append(("PUT", url, {"headers": headers, "data": data, "json": json}))
+        return object()
+
     def delete(self, url: str, *, headers: dict[str, str]) -> object:
         """Capture a DELETE request."""
         self.calls.append(("DELETE", url, {"headers": headers}))
@@ -67,4 +79,21 @@ def test_post_sends_json_when_provided() -> None:
     assert method == "POST"
     assert kwargs["json"] == payload
     assert kwargs["data"] is None
+    assert kwargs["headers"]["X-Niconico-Language"] == "ja-jp"
+
+
+def test_put_sends_form_data_when_json_is_absent() -> None:
+    """PUT requests send form data by default."""
+    client = NicoNico()
+    session = DummySession()
+    client.session = session  # type: ignore[assignment]
+
+    payload = {"name": "new name"}
+    client.put("https://nvapi.nicovideo.jp/v1/users/me/mylists/1", data=payload)
+
+    method, url, kwargs = session.calls[0]
+    assert method == "PUT"
+    assert url == "https://nvapi.nicovideo.jp/v1/users/me/mylists/1"
+    assert kwargs["data"] == payload
+    assert kwargs["json"] is None
     assert kwargs["headers"]["X-Niconico-Language"] == "ja-jp"

@@ -69,8 +69,9 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - name: Install dependencies
         run: uv sync --locked --group dev
-      - name: Run live read-only tests
+      - name: Run live tests
         run: uv run pytest tests/integration -m live
         env:
           NICONICO_LIVE_TESTS: "1"
+          NICONICO_MUTATING_LIVE_TESTS: "1"
           NICONICO_USER_SESSION: ${{ secrets.NICONICO_USER_SESSION }}
