@@ -51,3 +51,21 @@ jobs:
         run: uv run pyright
       - name: Build
         run: uv build
+
+  live:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: "3.11"
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          version: "0.9.26"
+      - name: Install dependencies
+        run: uv sync --locked --group dev
+      - name: Run live read-only tests
+        run: uv run pytest tests/integration -m live
+        env:
+          NICONICO_LIVE_TESTS: "1"
+          NICONICO_USER_SESSION: ${{ secrets.NICONICO_USER_SESSION }}

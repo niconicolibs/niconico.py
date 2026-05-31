@@ -82,6 +82,7 @@ MylistSortKey = Literal[
     "registeredAt",
     "viewCount",
     "lastComment",
+    "lastCommentTime",
     "commentCount",
     "likeCount",
     "mylistCount",
@@ -165,10 +166,12 @@ class SeriesItem(BaseModel):
 class HistoryItem(BaseModel):
     """A class that represents a history item."""
 
-    frontend_id: int = Field(..., alias="frontendId")
+    item_id: str | None = Field(None, alias="itemId")
+    viewed_at: str | None = Field(None, alias="viewedAt")
+    frontend_id: int | None = Field(None, alias="frontendId")
     is_maybe_like_user_item: bool = Field(..., alias="isMaybeLikeUserItem")
-    last_viewed_at: str = Field(..., alias="lastViewedAt")
-    playback_position: float = Field(..., alias="playbackPosition")
+    last_viewed_at: str | None = Field(None, alias="lastViewedAt")
+    playback_position: float | None = Field(None, alias="playbackPosition")
     video: EssentialVideo
-    views: int
-    watch_id: str = Field(..., alias="watchId")
+    views: int | None = None
+    watch_id: str | None = Field(None, alias="watchId")

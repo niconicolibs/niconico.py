@@ -146,7 +146,7 @@ class VideoClient(BaseClient):
         """
         query = {"pageSize": str(page_size), "page": str(page)}
         query_str = "&".join([f"{key}={value}" for key, value in query.items()])
-        res = self.niconico.get(f"https://nvapi.nicovideo.jp/v1/users/me/watch/history?{query_str}")
+        res = self.niconico.get(f"https://nvapi.nicovideo.jp/v2/users/me/watch/history?{query_str}")
         if res.status_code == requests.codes.ok:
             res_cls = NvAPIResponse[HistoryData](**res.json())
             if res_cls.data is not None:

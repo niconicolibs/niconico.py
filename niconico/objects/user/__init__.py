@@ -160,7 +160,7 @@ class OwnVideoItem(BaseModel):
     is_cpp_registered: bool = Field(..., alias="isCppRegistered")
     is_contents_tree_exists: bool = Field(..., alias="isContentsTreeExists")
     publish_timer_detail: str | None = Field(..., alias="publishTimerDetail")
-    auto_delete_detail: str | None = Field(..., alias="autoDeleteDetail")
+    auto_delete_detail: str | None = Field(None, alias="autoDeleteDetail")
     is_exclude_from_upload_list: bool = Field(..., alias="isExcludeFromUploadList")
     like_count: int = Field(..., alias="likeCount")
     gift_point: int = Field(..., alias="giftPoint")
