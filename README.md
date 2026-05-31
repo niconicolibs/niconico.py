@@ -1,7 +1,7 @@
 ![niconico](https://img.shields.io/badge/niconico-(%E5%B8%B0%E3%81%A3%E3%81%A6%E3%81%8D%E3%81%9F)-auto?logo=niconico&logoColor=%23e6e6e6&color=%23252525)
 
 [![PyPI](https://img.shields.io/pypi/v/niconico.py?logo=pypi)](https://pypi.org/project/niconico.py/)
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/niconico.py?logo=pypi)
+![Python](https://img.shields.io/badge/python-%3E%3D3.11-blue?logo=python&logoColor=white)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/niconico.py?logo=pypi)
 ![PyPI - License](https://img.shields.io/pypi/l/niconico.py?logo=pypi)
 
@@ -14,6 +14,11 @@ niconico.py is a Python library for retrieving Niconico video content and inform
 It allows you to download videos, retrieve information, get comments, and more.
 
 ## Requirement
+
+| niconico.py version | Python version |
+| --- | --- |
+| 2.2.x | 3.11 or later |
+| 2.1.x | 3.8 or later |
 
 To use the video download function, you need to install [FFmpeg](https://www.ffmpeg.org/) and set the path.
 

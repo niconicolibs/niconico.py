@@ -1,6 +1,6 @@
 [project]
 name = "niconico.py"
-version = "2.1.0"
+version = "2.2.0"
 description = "API wrapper for NicoNico services"
 authors = [{ name = "Negima1072", email = "ngm1072@gmail.com" }]
 license = "MIT"
