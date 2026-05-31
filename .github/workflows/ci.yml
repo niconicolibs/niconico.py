@@ -5,6 +5,13 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      mutating_live_tests:
+        description: Run live tests that mutate the Niconico test account
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -61,8 +68,8 @@ jobs:
       group: live-${{ github.repository }}
       cancel-in-progress: false
     env:
-      NICONICO_MUTATION_COOLDOWN_SECONDS: "10"
-      NICONICO_MUTATION_START_COOLDOWN_SECONDS: "60"
+      NICONICO_MUTATION_COOLDOWN_SECONDS: ${{ github.event_name == 'workflow_dispatch' && inputs.mutating_live_tests && '10' || '0' }}
+      NICONICO_MUTATION_START_COOLDOWN_SECONDS: ${{ github.event_name == 'workflow_dispatch' && inputs.mutating_live_tests && '300' || '0' }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
@@ -76,12 +83,13 @@ jobs:
       - name: Install dependencies
         run: uv sync --locked --group dev
       - name: Wait before live mutation tests
+        if: env.NICONICO_MUTATION_START_COOLDOWN_SECONDS != '0'
         run: sleep "$NICONICO_MUTATION_START_COOLDOWN_SECONDS"
       - name: Run live tests
         run: uv run pytest tests/integration -m live
         env:
           NICONICO_LIVE_TESTS: "1"
-          NICONICO_MUTATING_LIVE_TESTS: "1"
+          NICONICO_MUTATING_LIVE_TESTS: ${{ github.event_name == 'workflow_dispatch' && inputs.mutating_live_tests && '1' || '0' }}
           NICONICO_TEST_EMAIL: ${{ secrets.NICONICO_TEST_EMAIL }}
           NICONICO_TEST_PASSWORD: ${{ secrets.NICONICO_TEST_PASSWORD }}
           NICONICO_USER_SESSION: ${{ secrets.NICONICO_USER_SESSION }}
