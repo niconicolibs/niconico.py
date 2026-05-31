@@ -21,6 +21,15 @@ def live_client() -> NicoNico:
 @pytest.fixture(scope="module")
 def authenticated_client(live_client: NicoNico) -> NicoNico:
     """Return an authenticated client for live tests."""
+    session = os.environ.get("NICONICO_USER_SESSION")
+    if session:
+        try:
+            live_client.login_with_session(session)
+        except LoginFailureError:
+            pass
+        else:
+            return live_client
+
     mail = os.environ.get("NICONICO_TEST_EMAIL")
     password = os.environ.get("NICONICO_TEST_PASSWORD")
     if mail and password:
@@ -31,17 +40,10 @@ def authenticated_client(live_client: NicoNico) -> NicoNico:
         else:
             return live_client
 
-    session = os.environ.get("NICONICO_USER_SESSION")
-    if not session:
+    if not mail or not password:
         pytest.skip(
-            "Set NICONICO_TEST_EMAIL and NICONICO_TEST_PASSWORD or NICONICO_USER_SESSION "
+            "Set NICONICO_USER_SESSION or NICONICO_TEST_EMAIL and NICONICO_TEST_PASSWORD "
             "to run authenticated live API tests",
         )
-    try:
-        live_client.login_with_session(session)
-    except LoginFailureError:
-        pass
-    else:
-        return live_client
-    pytest.fail("NICONICO_USER_SESSION is invalid or expired", pytrace=False)
+    pytest.fail("NICONICO_USER_SESSION and NICONICO_TEST_EMAIL login both failed", pytrace=False)
     return live_client
