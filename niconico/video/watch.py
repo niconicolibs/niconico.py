@@ -235,8 +235,9 @@ class VideoWatchClient(BaseClient):
                 stderr=subprocess.STDOUT,
                 shell=True,
             ) as p:
-                for line in iter(p.stdout.readline, b""):  # type: ignore[union-attr]
-                    self.log("debug", line.rstrip())
+                if p.stdout is not None:
+                    for line in iter(p.stdout.readline, b""):
+                        self.log("debug", line.rstrip().decode("utf-8", errors="replace"))
                 p.wait()
         except subprocess.CalledProcessError as e:
             raise DownloadError(message="Failed to download the video.") from e
