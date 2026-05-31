@@ -7,6 +7,7 @@ __pycache__
 .*_cache
 .vscode
 _build
+site
 cookies.txt
 build
 *.egg-info
