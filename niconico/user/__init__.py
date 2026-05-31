@@ -562,7 +562,7 @@ class UserClient(BaseClient):
         base_url = "https://api.feed.nicovideo.jp/v1/activities/followings"
         url = f"{base_url}/{endpoint}"
 
-        query = {"context": context}
+        query: dict[str, str] = {"context": context}
         if cursor is not None:
             query["cursor"] = cursor
         query_str = "&".join([f"{key}={value}" for key, value in query.items()])
