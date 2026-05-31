@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import os
+import time
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
@@ -18,6 +20,13 @@ def require(value: Any, label: str) -> Any:  # noqa: ANN401
     assert value is not None, f"{label} returned None"
     assert not isinstance(value, dict | list | set | tuple) or value, f"{label} returned an empty collection"
     return value
+
+
+def mutation_cooldown() -> None:
+    """Wait between live test mutations when configured."""
+    seconds = float(os.environ.get("NICONICO_MUTATION_COOLDOWN_SECONDS", "0"))
+    if seconds > 0:
+        time.sleep(seconds)
 
 
 def get_sm9_watch_data(client: NicoNico) -> WatchData:
