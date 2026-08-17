@@ -282,7 +282,7 @@ class VideoWatchClient(BaseClient):
         }
         if not Path(output_path).parent.exists():
             Path(output_path).parent.mkdir(parents=True)
-        if Path(output_path).exists():
+        if Path(output_path).exists():  # noqa: ASYNC240
             raise DownloadError(message="The video file already exists.")
         command = self._build_ffmpeg_command(hls_content_url, output_path)
         try:

@@ -56,7 +56,7 @@ def test_authenticated_video_history_apis(authenticated_client: NicoNico) -> Non
     assert authenticated_client.video.get_like_history(page_size=5) is not None
 
 
-@pytest.mark.mutating()
+@pytest.mark.mutating
 def test_authenticated_mylist_write_apis(authenticated_client: NicoNico) -> None:
     """Exercise own mylist write API wrappers against live endpoints."""
     if os.environ.get("NICONICO_MUTATING_LIVE_TESTS") != "1":
