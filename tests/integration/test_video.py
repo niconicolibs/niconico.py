@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
+import requests
 
 from tests.integration.helpers import (
     SM9_OWNER_NAME,
@@ -60,6 +61,17 @@ def test_video_read_apis(live_client: NicoNico) -> None:
     assert require(live_client.video.search.get_facet_by_keyword("VOCALOID"), "keyword facet")
     assert require(live_client.video.search.search_facet_by_tag("VOCALOID"), "tag facet")
     assert require(live_client.video.search.search_lists("VOCALOID", page_size=5), "list search")
+    snapshot = require(
+        live_client.video.search.search_videos_by_snapshot(
+            "VOCALOID",
+            ["tagsExact"],
+            fields=["contentId", "title", "viewCounter"],
+            limit=5,
+        ),
+        "snapshot search",
+    )
+    assert snapshot.meta.status == requests.codes.ok
+    assert all(item.content_id is not None for item in snapshot.data)
     assert require(live_client.video.get_video_tags(SM9_VIDEO_ID, get_tag_edit_key(watch_data)), "sm9 tags")
     assert require(live_client.video.get_mylist(get_sample_list_id(live_client, "mylist"), page_size=5), "mylist")
     assert require(live_client.video.get_series(get_sample_list_id(live_client, "series"), page_size=5), "series")
