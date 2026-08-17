@@ -138,6 +138,7 @@ class VideoSearchData(BaseModel):
     search_id: str = Field(..., alias="searchId")
     keyword: str | None
     tag: str | None
+    lock_tag: str | None = Field(None, alias="lockTag")
     genres: list[Genre]
     total_count: int = Field(..., alias="totalCount")
     has_next: bool = Field(..., alias="hasNext")

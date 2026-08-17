@@ -180,9 +180,23 @@ class NvCommentData(BaseModel):
     params: NvCommentDataParams
 
 
+class WatchCommentServer(BaseModel):
+    """Data model of the comment server of the watch API response."""
+
+    url: str
+
+
+class WatchCommentKeys(BaseModel):
+    """Data model of the comment keys of the watch API response."""
+
+    user_key: str | None = Field(None, alias="userKey")
+
+
 class WatchComment(BaseModel):
     """Data model of the comment of the watch API response."""
 
+    server: WatchCommentServer | None = None
+    keys: WatchCommentKeys | None = None
     layers: list[CommentLayer]
     threads: list[CommentThread]
     ng: CommentNg
@@ -242,11 +256,19 @@ class AudioLoudness(BaseModel):
     value: float
 
 
+class WatchMediaDomandAudioLabel(BaseModel):
+    """Data model of the label of an audio of a watch media DOMAND."""
+
+    quality: str
+    bitrate: str
+
+
 class WatchMediaDomandAudio(BaseModel):
     """Data model of an audio of a watch media DOMAND."""
 
     id_: str = Field(..., alias="id")
     is_available: bool = Field(..., alias="isAvailable")
+    label: WatchMediaDomandAudioLabel | None = None
     bit_rate: int = Field(..., alias="bitRate")
     sampling_rate: int = Field(..., alias="samplingRate")
     integrated_loudness: float = Field(..., alias="integratedLoudness")
@@ -378,11 +400,20 @@ class RankingTag(BaseModel):
     date_time: str = Field(..., alias="dateTime")
 
 
+class RankingTeiban(BaseModel):
+    """Data model of a teiban (featured) ranking of a watch video."""
+
+    featured_key: str = Field(..., alias="featuredKey")
+    label: str
+    rank: int
+
+
 class WatchRanking(BaseModel):
     """Data model of a ranking of the watch API response."""
 
     genre: RankingGenre | None
     popular_tag: list[RankingTag] = Field(..., alias="popularTag")
+    teiban: RankingTeiban | None = None
 
 
 class WatchSeriesVideos(BaseModel):
@@ -456,6 +487,7 @@ class WatchVideoThumbnail(BaseModel):
     large_url: str | None = Field(..., alias="largeUrl")
     player: str
     ogp: str
+    short: str | None = None
 
 
 class WatchVideoRating(BaseModel):
@@ -482,10 +514,12 @@ class WatchVideo(BaseModel):
     """Data model of a video of the watch API response."""
 
     id_: str = Field(..., alias="id")
+    content_type: str | None = Field(None, alias="contentType")
     title: str
     description: str
     count: WatchVideoCount
     duration: int
+    has_lyrics: bool | None = Field(None, alias="hasLyrics")
     thumbnail: WatchVideoThumbnail
     rating: WatchVideoRating
     registered_at: str = Field(..., alias="registeredAt")
