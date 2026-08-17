@@ -504,7 +504,7 @@ class WatchViewerExistence(BaseModel):
     """Data model of the existence of a watch viewer."""
 
     age: int
-    prefecture: str
+    prefecture: str | None = None
     sex: str
 
 
