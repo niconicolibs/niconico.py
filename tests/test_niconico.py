@@ -118,18 +118,18 @@ class DummyCookieContext:
 
 
 class DummyPage:
-    """Record fill calls, optionally failing like a changed form would."""
+    """Record fill calls, accepting only the selectors the page is said to have."""
 
-    def __init__(self, *, fails: bool = False) -> None:
-        """Initialize the recorded fills."""
+    def __init__(self, known: tuple[str, ...] = ()) -> None:
+        """Initialize the recorded fills and the selectors this page knows."""
         self.fills: list[tuple[str, str]] = []
-        self.fails = fails
+        self.known = known
 
     def fill(self, selector: str, value: str, timeout: float | None = None) -> None:
-        """Record a fill, or raise when the selector is meant to be missing."""
+        """Record a fill, or raise when the selector is not on this page."""
         _ = timeout
-        if self.fails:
-            msg = "selector not found"
+        if selector not in self.known:
+            msg = f"selector not found: {selector}"
             raise RuntimeError(msg)
         self.fills.append((selector, value))
 
@@ -169,10 +169,34 @@ def test_wait_for_session_cookie_times_out() -> None:
     assert NicoNico._wait_for_session_cookie(context, timeout=0.0) is None  # type: ignore[arg-type] # noqa: SLF001
 
 
-def test_prefill_login_form_skips_missing_values_and_survives_changes() -> None:
-    """Only supplied credentials are filled, and layout changes are tolerated."""
-    page = DummyPage()
-    NicoNico._prefill_login_form(page, "sample@example.com", None)  # type: ignore[arg-type] # noqa: SLF001
-    assert page.fills == [("input#mail_tel", "sample@example.com")]
+def test_prefill_login_form_uses_the_current_field_names() -> None:
+    """The fields the login SPA actually renders are filled."""
+    page = DummyPage(known=('input[name="mailOrTel"]', 'input[name="password"]'))
 
-    NicoNico._prefill_login_form(DummyPage(fails=True), "sample@example.com", "password")  # type: ignore[arg-type] # noqa: SLF001
+    NicoNico._prefill_login_form(page, "sample@example.com", "password")  # type: ignore[arg-type] # noqa: SLF001
+
+    assert page.fills == [
+        ('input[name="mailOrTel"]', "sample@example.com"),
+        ('input[name="password"]', "password"),
+    ]
+
+
+def test_prefill_login_form_falls_back_to_generic_selectors() -> None:
+    """A renamed field is still filled through the fallback selector."""
+    page = DummyPage(known=('input[autocomplete="username"]', 'input[type="password"]'))
+
+    NicoNico._prefill_login_form(page, "sample@example.com", "password")  # type: ignore[arg-type] # noqa: SLF001
+
+    assert page.fills == [
+        ('input[autocomplete="username"]', "sample@example.com"),
+        ('input[type="password"]', "password"),
+    ]
+
+
+def test_prefill_login_form_skips_missing_values_and_survives_changes() -> None:
+    """Only supplied credentials are filled, and an unknown form is tolerated."""
+    page = DummyPage(known=('input[name="mailOrTel"]',))
+    NicoNico._prefill_login_form(page, "sample@example.com", None)  # type: ignore[arg-type] # noqa: SLF001
+    assert page.fills == [('input[name="mailOrTel"]', "sample@example.com")]
+
+    NicoNico._prefill_login_form(DummyPage(), "sample@example.com", "password")  # type: ignore[arg-type] # noqa: SLF001

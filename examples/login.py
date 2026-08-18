@@ -12,8 +12,9 @@ client.login_with_browser()
 # The mail and password can be prefilled, but you still submit the form yourself.
 client.login_with_browser("mail@example.com", "password")
 
-# Reusing a profile directory keeps you signed in between runs.
-client.login_with_browser(user_data_dir="./.niconico-profile")
+# Reusing a profile directory keeps you signed in between runs, and launching an
+# installed browser instead of the bundled Chromium helps with the bot challenge.
+client.login_with_browser(user_data_dir="./.niconico-profile", channel="chrome")
 
 # If you already have a session token, use it directly.
 client.login_with_session("user_session_~~~~")

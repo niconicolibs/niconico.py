@@ -25,6 +25,8 @@ logger = getLogger("niconico.py")
 
 LOGIN_PAGE_URL = "https://account.nicovideo.jp/login"
 SESSION_COOKIE_NAME = "user_session"
+MAIL_SELECTORS = ('input[name="mailOrTel"]', 'input[autocomplete="username"]')
+PASSWORD_SELECTORS = ('input[name="password"]', 'input[type="password"]')
 
 
 class NicoNico:
@@ -211,6 +213,7 @@ class NicoNico:
         *,
         timeout: float = 300.0,
         user_data_dir: str | None = None,
+        channel: str | None = None,
         headless: bool = False,
     ) -> None:
         """Login to NicoNico by completing the login form in a real browser.
@@ -232,13 +235,16 @@ class NicoNico:
             user_data_dir (str | None): A directory to persist the browser profile in.
                 Reusing a profile keeps you signed in and makes the bot challenge less
                 likely to fail. A throwaway profile is used when None.
+            channel (str | None): The browser channel to launch, such as "chrome" or
+                "msedge". The bundled Chromium is used when None. The bot challenge is
+                less likely to reject an installed browser.
             headless (bool): Whether to run the browser headless. The bot challenge
                 usually fails without a visible browser, so leave this False.
 
         Raises:
             LoginFailureError: If the login did not complete within the timeout.
         """
-        with self._browser_page(user_data_dir=user_data_dir, headless=headless) as (context, page):
+        with self._browser_page(user_data_dir=user_data_dir, channel=channel, headless=headless) as (context, page):
             page.goto(LOGIN_PAGE_URL)
             self._prefill_login_form(page, mail, password)
             self.logger.info("Waiting for the login to be completed in the browser.")
@@ -248,7 +254,13 @@ class NicoNico:
         self.login_with_session(session)
 
     @contextmanager
-    def _browser_page(self, *, user_data_dir: str | None, headless: bool) -> Iterator[tuple[BrowserContext, Page]]:
+    def _browser_page(
+        self,
+        *,
+        user_data_dir: str | None,
+        channel: str | None,
+        headless: bool,
+    ) -> Iterator[tuple[BrowserContext, Page]]:
         """Open a Playwright browser context and yield it together with a blank page."""
         try:
             from playwright.sync_api import sync_playwright  # noqa: PLC0415
@@ -261,14 +273,18 @@ class NicoNico:
             ) from e
         with sync_playwright() as playwright:
             if user_data_dir is not None:
-                context = playwright.chromium.launch_persistent_context(user_data_dir, headless=headless)
+                context = playwright.chromium.launch_persistent_context(
+                    user_data_dir,
+                    channel=channel,
+                    headless=headless,
+                )
                 page = context.pages[0] if context.pages else context.new_page()
                 try:
                     yield context, page
                 finally:
                     context.close()
                 return
-            browser = playwright.chromium.launch(headless=headless)
+            browser = playwright.chromium.launch(channel=channel, headless=headless)
             context = browser.new_context()
             try:
                 yield context, context.new_page()
@@ -278,13 +294,20 @@ class NicoNico:
     @staticmethod
     def _prefill_login_form(page: Page, mail: str | None, password: str | None) -> None:
         """Fill the login form when credentials were supplied, ignoring layout changes."""
-        for selector, value in (("input#mail_tel", mail), ("input#password", password)):
+        for selectors, value in ((MAIL_SELECTORS, mail), (PASSWORD_SELECTORS, password)):
             if value is None:
                 continue
-            try:
-                page.fill(selector, value, timeout=5000)
-            except Exception:  # noqa: BLE001 - the form is free to change, the user can still type
-                logger.debug("Could not prefill %s; fill it in manually.", selector)
+            filled = False
+            for selector in selectors:
+                try:
+                    page.fill(selector, value, timeout=2000)
+                except Exception as e:  # noqa: BLE001 - the form is free to change
+                    logger.debug("Could not prefill %s: %s", selector, e)
+                else:
+                    filled = True
+                    break
+            if not filled:
+                logger.warning("Could not find the login field for %s; fill it in manually.", selectors[0])
 
     @staticmethod
     def _wait_for_session_cookie(context: BrowserContext, *, timeout: float) -> str | None:

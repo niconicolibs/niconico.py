@@ -28,6 +28,13 @@ client = NicoNico()
 client.login_with_browser()
 ```
 
+!!! note "bot 対策について"
+    ログインフォームは Cloudflare Turnstile で保護されています。Playwright が同梱する Chromium ではチャレンジが通らずログインボタンが押せないことが確認されています。`channel="chrome"` で実際にインストールされているブラウザを起動し、`user_data_dir` でプロファイルを再利用することを推奨します。
+
+    ```python
+    client.login_with_browser(user_data_dir="./.niconico-profile", channel="chrome")
+    ```
+
 `login_with_browser` は追加依存が必要です。
 
 ```bash
