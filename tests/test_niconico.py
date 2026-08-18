@@ -4,7 +4,10 @@ from __future__ import annotations
 
 from typing import Any
 
+import pytest
+
 from niconico import NicoNico
+from niconico.exceptions import LoginFailureError
 
 
 class DummySession:
@@ -97,3 +100,105 @@ def test_put_sends_form_data_when_json_is_absent() -> None:
     assert kwargs["data"] == payload
     assert kwargs["json"] is None
     assert kwargs["headers"]["X-Niconico-Language"] == "ja-jp"
+
+
+class DummyCookie:
+    """A minimal stand-in for a cookie in a browser cookie jar."""
+
+    def __init__(self, name: str, value: str) -> None:
+        """Initialize the cookie name and value."""
+        self.name = name
+        self.value = value
+
+
+def test_login_with_mail_is_deprecated_and_refuses() -> None:
+    """The removed mail login raises instead of sending credentials anywhere."""
+    client = NicoNico()
+
+    with (
+        pytest.warns(DeprecationWarning, match="no longer supported"),
+        pytest.raises(LoginFailureError) as excinfo,
+    ):
+        client.login_with_mail("sample@example.com", "password")
+
+    assert "login_with_browser_cookies" in str(excinfo.value)
+    assert client.logined is False
+
+
+def test_extract_session_cookie_finds_the_session() -> None:
+    """The session cookie is picked out of the jar."""
+    cookies = [
+        DummyCookie("nicosid", "1"),
+        DummyCookie("user_session", "user_session_sample"),
+    ]
+
+    assert NicoNico._extract_session_cookie(cookies) == "user_session_sample"  # noqa: SLF001
+
+
+def test_extract_session_cookie_ignores_empty_and_unrelated_cookies() -> None:
+    """An empty or missing session cookie yields None."""
+    assert NicoNico._extract_session_cookie([DummyCookie("user_session", "")]) is None  # noqa: SLF001
+    assert NicoNico._extract_session_cookie([DummyCookie("nicosid", "1")]) is None  # noqa: SLF001
+    assert NicoNico._extract_session_cookie([]) is None  # noqa: SLF001
+
+
+def test_login_with_browser_cookies_reports_a_signed_out_browser(monkeypatch: pytest.MonkeyPatch) -> None:
+    """A browser without a NicoNico session gives an actionable error."""
+    client = NicoNico()
+    monkeypatch.setattr(NicoNico, "_load_browser_cookies", staticmethod(lambda _browser: [DummyCookie("nicosid", "1")]))
+
+    with pytest.raises(LoginFailureError, match="Sign in"):
+        client.login_with_browser_cookies()
+
+
+def test_login_with_browser_cookies_uses_the_imported_session(monkeypatch: pytest.MonkeyPatch) -> None:
+    """A found session cookie is handed to login_with_session."""
+    client = NicoNico()
+    monkeypatch.setattr(
+        NicoNico,
+        "_load_browser_cookies",
+        staticmethod(lambda _browser: [DummyCookie("user_session", "user_session_sample")]),
+    )
+    used: list[str] = []
+    monkeypatch.setattr(NicoNico, "login_with_session", lambda _self, session: used.append(session))
+
+    client.login_with_browser_cookies("firefox")
+
+    assert used == ["user_session_sample"]
+
+
+def test_load_browser_cookies_rejects_an_unknown_browser() -> None:
+    """An unsupported browser name is reported instead of silently ignored."""
+    with pytest.raises(LoginFailureError, match="Unsupported browser"):
+        NicoNico._load_browser_cookies("netscape")  # noqa: SLF001
+
+
+def test_find_session_cookie_skips_unreadable_browsers(monkeypatch: pytest.MonkeyPatch) -> None:
+    """An unreadable cookie store must not hide a session another browser holds."""
+    tried: list[str] = []
+
+    def loader(browser: str) -> list[DummyCookie]:
+        tried.append(browser)
+        if browser != "firefox":
+            msg = f"Could not read cookies from the browser: {browser} is locked"
+            raise LoginFailureError(message=msg)
+        return [DummyCookie("user_session", "user_session_sample")]
+
+    monkeypatch.setattr(NicoNico, "_load_browser_cookies", staticmethod(loader))
+
+    assert NicoNico._find_session_cookie(None) == "user_session_sample"  # noqa: SLF001
+    assert tried[0] == "chrome"
+    assert "firefox" in tried
+
+
+def test_find_session_cookie_propagates_errors_for_a_named_browser(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Naming a browser explicitly surfaces why it could not be read."""
+
+    def loader(browser: str) -> list[DummyCookie]:
+        msg = f"Could not read cookies from the browser: {browser} is locked"
+        raise LoginFailureError(message=msg)
+
+    monkeypatch.setattr(NicoNico, "_load_browser_cookies", staticmethod(loader))
+
+    with pytest.raises(LoginFailureError, match="is locked"):
+        NicoNico._find_session_cookie("safari")  # noqa: SLF001

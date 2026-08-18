@@ -11,7 +11,7 @@ from niconico.exceptions import CommentAPIError
 FAILED_TRY_COUNT = 5
 
 niconico_client = NicoNico()
-niconico_client.login_with_mail("sample@example.com", "password")
+niconico_client.login_with_browser_cookies()
 
 video_id = "sm43236191"
 watch_data = niconico_client.video.watch.get_watch_data(video_id)

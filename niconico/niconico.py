@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import warnings
 from logging import Logger, getLogger
+from typing import TYPE_CHECKING, cast
 from urllib.parse import urlparse
 
 import requests
@@ -12,7 +14,24 @@ from niconico.exceptions import LoginFailureError
 from niconico.user import UserClient
 from niconico.video import VideoClient
 
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
 logger = getLogger("niconico.py")
+
+SESSION_COOKIE_NAME = "user_session"
+COOKIE_DOMAIN = "nicovideo.jp"
+SUPPORTED_BROWSERS = (
+    "chrome",
+    "firefox",
+    "edge",
+    "brave",
+    "chromium",
+    "opera",
+    "vivaldi",
+    "librewolf",
+    "safari",
+)
 
 
 class NicoNico:
@@ -168,47 +187,111 @@ class NicoNico:
     def login_with_mail(self, mail: str, password: str, mfa: str | None = None) -> None:
         """Login to NicoNico with a mail and password.
 
+        .. deprecated::
+            NicoNico moved account authentication to a SPA protected by a bot
+            challenge, and the endpoint this method posted to no longer exists.
+            Use :meth:`login_with_browser_cookies` to reuse a browser you are already
+            signed in with, or :meth:`login_with_session` if you already hold a token.
+
         Args:
             mail (str): The mail to login with.
             password (str): The password to login with.
             mfa (str | None): The MFA code to login with. Defaults to None.
+
+        Raises:
+            LoginFailureError: Always, because the endpoint was removed.
         """
-        self.logined = False
-
-        res = self.session.post(
-            "https://account.nicovideo.jp/login/redirector?site=niconico&next_url=%2F",
-            data={
-                "mail_tel": mail,
-                "password": password,
-                "auth_id": "1158188129",
-            },
+        _ = mail, password, mfa
+        message = (
+            "login_with_mail is no longer supported: the login endpoint was removed and "
+            "the login form is now protected by a bot challenge that has to be solved by a "
+            "human. Use login_with_browser_cookies() to reuse a signed-in browser, or login_with_session() "
+            "with a user_session token."
         )
+        warnings.warn(message, DeprecationWarning, stacklevel=2)
+        raise LoginFailureError(message=message)
 
-        if "/login" in res.url:
-            raise LoginFailureError(message="Login failed")
+    def login_with_browser_cookies(self, browser: str | None = None) -> None:
+        """Login to NicoNico by importing the session cookie from a browser.
 
-        if "/mfa" in res.url:
-            if mfa is None:
-                raise LoginFailureError(message="MFA is required")
-            res = self.session.post(
-                res.url,
-                data={
-                    "otp": mfa,
-                    "device_name": "niconico.py",
-                },
+        Signing in through the website is the only supported way to authenticate,
+        because the login form is protected by a bot challenge. This reads the
+        ``user_session`` cookie held by a browser you are already signed in with,
+        so no credentials pass through this library.
+
+        Requires the optional ``browser`` extra::
+
+            pip install "niconico.py[browser]"
+
+        Args:
+            browser (str | None): The browser to read the cookie from, for example
+                ``"chrome"`` or ``"firefox"``. Every supported browser is tried when None.
+
+        Raises:
+            LoginFailureError: If the cookies could not be read, or no browser is
+                signed in to NicoNico.
+        """
+        session = self._find_session_cookie(browser)
+        if session is None:
+            raise LoginFailureError(
+                message=(
+                    "No NicoNico session was found in the browser. Sign in at "
+                    "https://www.nicovideo.jp/ first, then try again."
+                ),
             )
+        self.login_with_session(session)
 
-        if res.url != "https://www.nicovideo.jp/":
-            raise LoginFailureError(message="Login failed")
+    @staticmethod
+    def _find_session_cookie(browser: str | None) -> str | None:
+        """Look for the session cookie, trying every supported browser when none is named.
 
-        if res.headers.get("x-niconico-authflag") == "1":
-            self.premium = False
-        elif res.headers.get("x-niconico-authflag") == "3":
-            self.premium = True
-        else:
-            raise LoginFailureError(message="Login failed")
+        Browsers that cannot be read are skipped: an unreadable cookie store, such as the
+        one Safari keeps behind macOS privacy protection, must not hide a session another
+        browser holds.
+        """
+        if browser is not None:
+            return NicoNico._extract_session_cookie(NicoNico._load_browser_cookies(browser))
+        for name in SUPPORTED_BROWSERS:
+            try:
+                cookies = NicoNico._load_browser_cookies(name)
+            except LoginFailureError as e:
+                logger.debug("Skipping %s: %s", name, e)
+                continue
+            session = NicoNico._extract_session_cookie(cookies)
+            if session is not None:
+                logger.debug("Using the NicoNico session held by %s.", name)
+                return session
+        return None
 
-        self.logined = True
+    @staticmethod
+    def _load_browser_cookies(browser: str | None) -> Iterable[object]:
+        """Read the NicoNico cookies a browser holds."""
+        try:
+            import browser_cookie3  # noqa: PLC0415
+        except ImportError as e:  # pragma: no cover - depends on the optional extra
+            raise LoginFailureError(
+                message=(
+                    "login_with_browser_cookies requires browser-cookie3. Install it with "
+                    '`pip install "niconico.py[browser]"`.'
+                ),
+            ) from e
+        loader = browser_cookie3.load if browser is None else getattr(browser_cookie3, browser, None)
+        if loader is None or not callable(loader):
+            raise LoginFailureError(message=f"Unsupported browser: {browser}")
+        try:
+            return cast("Iterable[object]", loader(domain_name=COOKIE_DOMAIN))
+        except Exception as e:
+            raise LoginFailureError(message=f"Could not read cookies from the browser: {e}") from e
+
+    @staticmethod
+    def _extract_session_cookie(cookies: Iterable[object]) -> str | None:
+        """Pick the session cookie out of a cookie jar."""
+        for cookie in cookies:
+            value = getattr(cookie, "value", None)
+            if getattr(cookie, "name", None) == SESSION_COOKIE_NAME and value:
+                return str(value)
+        return None
+
 
     def login_with_session(self, session: str) -> None:
         """Login to NicoNico with a session.
