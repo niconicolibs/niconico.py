@@ -102,36 +102,13 @@ def test_put_sends_form_data_when_json_is_absent() -> None:
     assert kwargs["headers"]["X-Niconico-Language"] == "ja-jp"
 
 
-class DummyCookieContext:
-    """Return a scripted sequence of browser cookie jars."""
+class DummyCookie:
+    """A minimal stand-in for a cookie in a browser cookie jar."""
 
-    def __init__(self, jars: list[list[dict[str, str]]]) -> None:
-        """Initialize the scripted cookie jars."""
-        self.jars = jars
-        self.calls = 0
-
-    def cookies(self) -> list[dict[str, str]]:
-        """Return the next scripted cookie jar."""
-        jar = self.jars[min(self.calls, len(self.jars) - 1)]
-        self.calls += 1
-        return jar
-
-
-class DummyPage:
-    """Record fill calls, accepting only the selectors the page is said to have."""
-
-    def __init__(self, known: tuple[str, ...] = ()) -> None:
-        """Initialize the recorded fills and the selectors this page knows."""
-        self.fills: list[tuple[str, str]] = []
-        self.known = known
-
-    def fill(self, selector: str, value: str, timeout: float | None = None) -> None:
-        """Record a fill, or raise when the selector is not on this page."""
-        _ = timeout
-        if selector not in self.known:
-            msg = f"selector not found: {selector}"
-            raise RuntimeError(msg)
-        self.fills.append((selector, value))
+    def __init__(self, name: str, value: str) -> None:
+        """Initialize the cookie name and value."""
+        self.name = name
+        self.value = value
 
 
 def test_login_with_mail_is_deprecated_and_refuses() -> None:
@@ -144,59 +121,53 @@ def test_login_with_mail_is_deprecated_and_refuses() -> None:
     ):
         client.login_with_mail("sample@example.com", "password")
 
-    assert "login_with_browser" in str(excinfo.value)
+    assert "login_with_browser_cookies" in str(excinfo.value)
     assert client.logined is False
 
 
-def test_wait_for_session_cookie_returns_the_token() -> None:
-    """The session token is picked up once the browser sets it."""
-    context = DummyCookieContext(
-        [
-            [{"name": "nicosid", "value": "1"}],
-            [{"name": "user_session", "value": "user_session_sample"}],
-        ],
+def test_extract_session_cookie_finds_the_session() -> None:
+    """The session cookie is picked out of the jar."""
+    cookies = [
+        DummyCookie("nicosid", "1"),
+        DummyCookie("user_session", "user_session_sample"),
+    ]
+
+    assert NicoNico._extract_session_cookie(cookies) == "user_session_sample"  # noqa: SLF001
+
+
+def test_extract_session_cookie_ignores_empty_and_unrelated_cookies() -> None:
+    """An empty or missing session cookie yields None."""
+    assert NicoNico._extract_session_cookie([DummyCookie("user_session", "")]) is None  # noqa: SLF001
+    assert NicoNico._extract_session_cookie([DummyCookie("nicosid", "1")]) is None  # noqa: SLF001
+    assert NicoNico._extract_session_cookie([]) is None  # noqa: SLF001
+
+
+def test_login_with_browser_cookies_reports_a_signed_out_browser(monkeypatch: pytest.MonkeyPatch) -> None:
+    """A browser without a NicoNico session gives an actionable error."""
+    client = NicoNico()
+    monkeypatch.setattr(NicoNico, "_load_browser_cookies", staticmethod(lambda _browser: [DummyCookie("nicosid", "1")]))
+
+    with pytest.raises(LoginFailureError, match="Sign in"):
+        client.login_with_browser_cookies()
+
+
+def test_login_with_browser_cookies_uses_the_imported_session(monkeypatch: pytest.MonkeyPatch) -> None:
+    """A found session cookie is handed to login_with_session."""
+    client = NicoNico()
+    monkeypatch.setattr(
+        NicoNico,
+        "_load_browser_cookies",
+        staticmethod(lambda _browser: [DummyCookie("user_session", "user_session_sample")]),
     )
+    used: list[str] = []
+    monkeypatch.setattr(NicoNico, "login_with_session", lambda _self, session: used.append(session))
 
-    session = NicoNico._wait_for_session_cookie(context, timeout=5.0)  # type: ignore[arg-type] # noqa: SLF001
+    client.login_with_browser_cookies("firefox")
 
-    assert session == "user_session_sample"
-
-
-def test_wait_for_session_cookie_times_out() -> None:
-    """No token appears when the login is never completed."""
-    context = DummyCookieContext([[{"name": "user_session", "value": ""}]])
-
-    assert NicoNico._wait_for_session_cookie(context, timeout=0.0) is None  # type: ignore[arg-type] # noqa: SLF001
+    assert used == ["user_session_sample"]
 
 
-def test_prefill_login_form_uses_the_current_field_names() -> None:
-    """The fields the login SPA actually renders are filled."""
-    page = DummyPage(known=('input[name="mailOrTel"]', 'input[name="password"]'))
-
-    NicoNico._prefill_login_form(page, "sample@example.com", "password")  # type: ignore[arg-type] # noqa: SLF001
-
-    assert page.fills == [
-        ('input[name="mailOrTel"]', "sample@example.com"),
-        ('input[name="password"]', "password"),
-    ]
-
-
-def test_prefill_login_form_falls_back_to_generic_selectors() -> None:
-    """A renamed field is still filled through the fallback selector."""
-    page = DummyPage(known=('input[autocomplete="username"]', 'input[type="password"]'))
-
-    NicoNico._prefill_login_form(page, "sample@example.com", "password")  # type: ignore[arg-type] # noqa: SLF001
-
-    assert page.fills == [
-        ('input[autocomplete="username"]', "sample@example.com"),
-        ('input[type="password"]', "password"),
-    ]
-
-
-def test_prefill_login_form_skips_missing_values_and_survives_changes() -> None:
-    """Only supplied credentials are filled, and an unknown form is tolerated."""
-    page = DummyPage(known=('input[name="mailOrTel"]',))
-    NicoNico._prefill_login_form(page, "sample@example.com", None)  # type: ignore[arg-type] # noqa: SLF001
-    assert page.fills == [('input[name="mailOrTel"]', "sample@example.com")]
-
-    NicoNico._prefill_login_form(DummyPage(), "sample@example.com", "password")  # type: ignore[arg-type] # noqa: SLF001
+def test_load_browser_cookies_rejects_an_unknown_browser() -> None:
+    """An unsupported browser name is reported instead of silently ignored."""
+    with pytest.raises(LoginFailureError, match="Unsupported browser"):
+        NicoNico._load_browser_cookies("netscape")  # noqa: SLF001

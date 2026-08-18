@@ -2,11 +2,9 @@
 
 from __future__ import annotations
 
-import time
 import warnings
-from contextlib import contextmanager
 from logging import Logger, getLogger
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 from urllib.parse import urlparse
 
 import requests
@@ -17,16 +15,12 @@ from niconico.user import UserClient
 from niconico.video import VideoClient
 
 if TYPE_CHECKING:
-    from collections.abc import Iterator
-
-    from playwright.sync_api import BrowserContext, Page
+    from collections.abc import Iterable
 
 logger = getLogger("niconico.py")
 
-LOGIN_PAGE_URL = "https://account.nicovideo.jp/login"
 SESSION_COOKIE_NAME = "user_session"
-MAIL_SELECTORS = ('input[name="mailOrTel"]', 'input[autocomplete="username"]')
-PASSWORD_SELECTORS = ('input[name="password"]', 'input[type="password"]')
+COOKIE_DOMAIN = "nicovideo.jp"
 
 
 class NicoNico:
@@ -185,8 +179,8 @@ class NicoNico:
         .. deprecated::
             NicoNico moved account authentication to a SPA protected by a bot
             challenge, and the endpoint this method posted to no longer exists.
-            Use :meth:`login_with_browser` to sign in interactively, or
-            :meth:`login_with_session` if you already hold a session token.
+            Use :meth:`login_with_browser_cookies` to reuse a browser you are already
+            signed in with, or :meth:`login_with_session` if you already hold a token.
 
         Args:
             mail (str): The mail to login with.
@@ -200,126 +194,72 @@ class NicoNico:
         message = (
             "login_with_mail is no longer supported: the login endpoint was removed and "
             "the login form is now protected by a bot challenge that has to be solved by a "
-            "human. Use login_with_browser() to sign in interactively, or login_with_session() "
+            "human. Use login_with_browser_cookies() to reuse a signed-in browser, or login_with_session() "
             "with a user_session token."
         )
         warnings.warn(message, DeprecationWarning, stacklevel=2)
         raise LoginFailureError(message=message)
 
-    def login_with_browser(
-        self,
-        mail: str | None = None,
-        password: str | None = None,
-        *,
-        timeout: float = 300.0,
-        user_data_dir: str | None = None,
-        channel: str | None = None,
-        headless: bool = False,
-    ) -> None:
-        """Login to NicoNico by completing the login form in a real browser.
+    def login_with_browser_cookies(self, browser: str | None = None) -> None:
+        """Login to NicoNico by importing the session cookie from a browser.
 
-        Opens the NicoNico login page with Playwright and waits until you have
-        signed in, then picks up the resulting session token. When ``mail`` and
-        ``password`` are given the form is filled in for you, but you still have
-        to solve the bot challenge and submit the form yourself.
+        Signing in through the website is the only supported way to authenticate,
+        because the login form is protected by a bot challenge. This reads the
+        ``user_session`` cookie held by a browser you are already signed in with,
+        so no credentials pass through this library.
 
         Requires the optional ``browser`` extra::
 
             pip install "niconico.py[browser]"
-            playwright install chromium
 
         Args:
-            mail (str | None): The mail to prefill. Left blank when None.
-            password (str | None): The password to prefill. Left blank when None.
-            timeout (float): How long to wait for the login to complete, in seconds.
-            user_data_dir (str | None): A directory to persist the browser profile in.
-                Reusing a profile keeps you signed in and makes the bot challenge less
-                likely to fail. A throwaway profile is used when None.
-            channel (str | None): The browser channel to launch, such as "chrome" or
-                "msedge". The bundled Chromium is used when None. The bot challenge is
-                less likely to reject an installed browser.
-            headless (bool): Whether to run the browser headless. The bot challenge
-                usually fails without a visible browser, so leave this False.
+            browser (str | None): The browser to read the cookie from, for example
+                ``"chrome"`` or ``"firefox"``. Every supported browser is tried when None.
 
         Raises:
-            LoginFailureError: If the login did not complete within the timeout.
+            LoginFailureError: If the cookies could not be read, or no browser is
+                signed in to NicoNico.
         """
-        with self._browser_page(user_data_dir=user_data_dir, channel=channel, headless=headless) as (context, page):
-            page.goto(LOGIN_PAGE_URL)
-            self._prefill_login_form(page, mail, password)
-            self.logger.info("Waiting for the login to be completed in the browser.")
-            session = self._wait_for_session_cookie(context, timeout=timeout)
+        cookies = self._load_browser_cookies(browser)
+        session = self._extract_session_cookie(cookies)
         if session is None:
-            raise LoginFailureError(message="Login was not completed before the timeout expired")
-        self.login_with_session(session)
-
-    @contextmanager
-    def _browser_page(
-        self,
-        *,
-        user_data_dir: str | None,
-        channel: str | None,
-        headless: bool,
-    ) -> Iterator[tuple[BrowserContext, Page]]:
-        """Open a Playwright browser context and yield it together with a blank page."""
-        try:
-            from playwright.sync_api import sync_playwright  # noqa: PLC0415
-        except ImportError as e:  # pragma: no cover - depends on optional extra
             raise LoginFailureError(
                 message=(
-                    "login_with_browser requires Playwright. Install it with "
-                    '`pip install "niconico.py[browser]"` and `playwright install chromium`.'
+                    "No NicoNico session was found in the browser. Sign in at "
+                    "https://www.nicovideo.jp/ first, then try again."
+                ),
+            )
+        self.login_with_session(session)
+
+    @staticmethod
+    def _load_browser_cookies(browser: str | None) -> Iterable[object]:
+        """Read the NicoNico cookies a browser holds."""
+        try:
+            import browser_cookie3  # noqa: PLC0415
+        except ImportError as e:  # pragma: no cover - depends on the optional extra
+            raise LoginFailureError(
+                message=(
+                    "login_with_browser_cookies requires browser-cookie3. Install it with "
+                    '`pip install "niconico.py[browser]"`.'
                 ),
             ) from e
-        with sync_playwright() as playwright:
-            if user_data_dir is not None:
-                context = playwright.chromium.launch_persistent_context(
-                    user_data_dir,
-                    channel=channel,
-                    headless=headless,
-                )
-                page = context.pages[0] if context.pages else context.new_page()
-                try:
-                    yield context, page
-                finally:
-                    context.close()
-                return
-            browser = playwright.chromium.launch(channel=channel, headless=headless)
-            context = browser.new_context()
-            try:
-                yield context, context.new_page()
-            finally:
-                browser.close()
+        loader = browser_cookie3.load if browser is None else getattr(browser_cookie3, browser, None)
+        if loader is None or not callable(loader):
+            raise LoginFailureError(message=f"Unsupported browser: {browser}")
+        try:
+            return cast("Iterable[object]", loader(domain_name=COOKIE_DOMAIN))
+        except Exception as e:
+            raise LoginFailureError(message=f"Could not read cookies from the browser: {e}") from e
 
     @staticmethod
-    def _prefill_login_form(page: Page, mail: str | None, password: str | None) -> None:
-        """Fill the login form when credentials were supplied, ignoring layout changes."""
-        for selectors, value in ((MAIL_SELECTORS, mail), (PASSWORD_SELECTORS, password)):
-            if value is None:
-                continue
-            filled = False
-            for selector in selectors:
-                try:
-                    page.fill(selector, value, timeout=2000)
-                except Exception as e:  # noqa: BLE001 - the form is free to change
-                    logger.debug("Could not prefill %s: %s", selector, e)
-                else:
-                    filled = True
-                    break
-            if not filled:
-                logger.warning("Could not find the login field for %s; fill it in manually.", selectors[0])
-
-    @staticmethod
-    def _wait_for_session_cookie(context: BrowserContext, *, timeout: float) -> str | None:
-        """Poll the browser context until the session cookie shows up."""
-        deadline = time.monotonic() + timeout
-        while time.monotonic() < deadline:
-            for cookie in context.cookies():
-                value = cookie.get("value")
-                if cookie.get("name") == SESSION_COOKIE_NAME and value:
-                    return str(value)
-            time.sleep(1.0)
+    def _extract_session_cookie(cookies: Iterable[object]) -> str | None:
+        """Pick the session cookie out of a cookie jar."""
+        for cookie in cookies:
+            value = getattr(cookie, "value", None)
+            if getattr(cookie, "name", None) == SESSION_COOKIE_NAME and value:
+                return str(value)
         return None
+
 
     def login_with_session(self, session: str) -> None:
         """Login to NicoNico with a session.
