@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+from urllib.parse import urlencode
 
 import requests
 
@@ -14,10 +15,12 @@ from niconico.objects.nvapi import (
     LikeHistoryData,
     MylistData,
     NvAPIResponse,
+    PlaylistData,
     SeriesData,
     TagsData,
     VideosData,
 )
+from niconico.utils import add_optional_param
 from niconico.video.ranking import VideoRankingClient
 from niconico.video.search import VideoSearchClient
 from niconico.video.watch import VideoWatchClient
@@ -145,6 +148,43 @@ class VideoClient(BaseClient):
         res = self.niconico.get(f"https://nvapi.nicovideo.jp/v1/series/{series_id}?{query_str}")
         if res.status_code == requests.codes.ok:
             res_cls = NvAPIResponse[SeriesData](**res.json())
+            if res_cls.data is not None:
+                return res_cls.data
+        return None
+
+    def get_shorts_feed(
+        self,
+        video_id: str | None = None,
+        *,
+        page_size: int | None = None,
+    ) -> PlaylistData | None:
+        """Get the short video feed.
+
+        This is the playlist the short video player pulls its videos from. It works
+        without logging in, and every returned video is a short video.
+
+        Args:
+            video_id (str | None): The ID of the short video to build the feed around.
+                A generic feed is returned when None.
+            page_size (int | None): The number of videos to get. The API default is used
+                when None.
+
+        Returns:
+            PlaylistData | None: The feed if successful, None otherwise.
+        """
+        query = {
+            "recipeId": "video_short_watch_recommendation",
+            "recipeVersion": "1",
+            "site": "nicovideo",
+        }
+        if video_id is not None:
+            query["videoId"] = video_id
+            query["currentVideoId"] = video_id
+        add_optional_param(query, "pageSize", page_size)
+        query_str = urlencode(query)
+        res = self.niconico.get(f"https://nvapi.nicovideo.jp/v1/playlist/recipe-id?{query_str}")
+        if res.status_code == requests.codes.ok:
+            res_cls = NvAPIResponse[PlaylistData](**res.json())
             if res_cls.data is not None:
                 return res_cls.data
         return None

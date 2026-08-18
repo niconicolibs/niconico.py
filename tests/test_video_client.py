@@ -166,3 +166,50 @@ def test_unlike_video_uses_delete_endpoint() -> None:
     assert niconico.calls == [
         ("DELETE", "https://nvapi.nicovideo.jp/v1/users/me/likes/items?videoId=sm9"),
     ]
+
+
+def _shorts_feed_payload() -> dict[str, Any]:
+    """Return a minimal short video feed payload."""
+    return {
+        "meta": {"status": 200},
+        "data": {
+            "id": {"type": "recipe_id", "value": "video_short_watch_recommendation"},
+            "meta": {"title": "おすすめの動画", "ownerName": "niconico"},
+            "totalCount": 1,
+            "items": [{"watchId": "ss1", "content": _video_payload("ss1")}],
+            "recommendId": "recommend",
+        },
+    }
+
+
+def test_get_shorts_feed_builds_a_generic_request() -> None:
+    """The feed is fetched without a seed video by default."""
+    niconico = DummyNicoNico(_shorts_feed_payload())
+    client = VideoClient(niconico)  # type: ignore[arg-type]
+
+    feed = client.get_shorts_feed()
+
+    assert feed is not None
+    assert feed.id_.value == "video_short_watch_recommendation"
+    assert feed.total_count == 1
+    assert [item.watch_id for item in feed.items] == ["ss1"]
+    url = niconico.calls[0][1]
+    assert url.startswith("https://nvapi.nicovideo.jp/v1/playlist/recipe-id?")
+    assert "recipeId=video_short_watch_recommendation" in url
+    assert "recipeVersion=1" in url
+    assert "site=nicovideo" in url
+    assert "videoId=" not in url
+    assert "pageSize=" not in url
+
+
+def test_get_shorts_feed_seeds_and_limits() -> None:
+    """A seed video is sent as both videoId and currentVideoId."""
+    niconico = DummyNicoNico(_shorts_feed_payload())
+    client = VideoClient(niconico)  # type: ignore[arg-type]
+
+    client.get_shorts_feed("ss46649515", page_size=3)
+
+    url = niconico.calls[0][1]
+    assert "videoId=ss46649515" in url
+    assert "currentVideoId=ss46649515" in url
+    assert "pageSize=3" in url
