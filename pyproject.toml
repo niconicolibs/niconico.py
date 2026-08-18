@@ -13,6 +13,9 @@ dependencies = [
     "urllib3>=2.7.0,<3.0.0",
 ]
 
+[project.optional-dependencies]
+browser = ["playwright>=1.40,<2.0.0"]
+
 [project.urls]
 Repository = "https://github.com/niconicolibs/niconico.py"
 
@@ -21,6 +24,7 @@ niconico = "niconico.__main__:main"
 
 [dependency-groups]
 dev = [
+    "playwright>=1.40,<2.0.0",
     "pyright>=1.1.408,<2.0.0",
     "pytest>=9.0.3,<10.0.0",
     "ruff>=0.16.3,<0.17.0",

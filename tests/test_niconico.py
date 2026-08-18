@@ -4,7 +4,10 @@ from __future__ import annotations
 
 from typing import Any
 
+import pytest
+
 from niconico import NicoNico
+from niconico.exceptions import LoginFailureError
 
 
 class DummySession:
@@ -97,3 +100,79 @@ def test_put_sends_form_data_when_json_is_absent() -> None:
     assert kwargs["data"] == payload
     assert kwargs["json"] is None
     assert kwargs["headers"]["X-Niconico-Language"] == "ja-jp"
+
+
+class DummyCookieContext:
+    """Return a scripted sequence of browser cookie jars."""
+
+    def __init__(self, jars: list[list[dict[str, str]]]) -> None:
+        """Initialize the scripted cookie jars."""
+        self.jars = jars
+        self.calls = 0
+
+    def cookies(self) -> list[dict[str, str]]:
+        """Return the next scripted cookie jar."""
+        jar = self.jars[min(self.calls, len(self.jars) - 1)]
+        self.calls += 1
+        return jar
+
+
+class DummyPage:
+    """Record fill calls, optionally failing like a changed form would."""
+
+    def __init__(self, *, fails: bool = False) -> None:
+        """Initialize the recorded fills."""
+        self.fills: list[tuple[str, str]] = []
+        self.fails = fails
+
+    def fill(self, selector: str, value: str, timeout: float | None = None) -> None:
+        """Record a fill, or raise when the selector is meant to be missing."""
+        _ = timeout
+        if self.fails:
+            msg = "selector not found"
+            raise RuntimeError(msg)
+        self.fills.append((selector, value))
+
+
+def test_login_with_mail_is_deprecated_and_refuses() -> None:
+    """The removed mail login raises instead of sending credentials anywhere."""
+    client = NicoNico()
+
+    with (
+        pytest.warns(DeprecationWarning, match="no longer supported"),
+        pytest.raises(LoginFailureError) as excinfo,
+    ):
+        client.login_with_mail("sample@example.com", "password")
+
+    assert "login_with_browser" in str(excinfo.value)
+    assert client.logined is False
+
+
+def test_wait_for_session_cookie_returns_the_token() -> None:
+    """The session token is picked up once the browser sets it."""
+    context = DummyCookieContext(
+        [
+            [{"name": "nicosid", "value": "1"}],
+            [{"name": "user_session", "value": "user_session_sample"}],
+        ],
+    )
+
+    session = NicoNico._wait_for_session_cookie(context, timeout=5.0)  # type: ignore[arg-type] # noqa: SLF001
+
+    assert session == "user_session_sample"
+
+
+def test_wait_for_session_cookie_times_out() -> None:
+    """No token appears when the login is never completed."""
+    context = DummyCookieContext([[{"name": "user_session", "value": ""}]])
+
+    assert NicoNico._wait_for_session_cookie(context, timeout=0.0) is None  # type: ignore[arg-type] # noqa: SLF001
+
+
+def test_prefill_login_form_skips_missing_values_and_survives_changes() -> None:
+    """Only supplied credentials are filled, and layout changes are tolerated."""
+    page = DummyPage()
+    NicoNico._prefill_login_form(page, "sample@example.com", None)  # type: ignore[arg-type] # noqa: SLF001
+    assert page.fills == [("input#mail_tel", "sample@example.com")]
+
+    NicoNico._prefill_login_form(DummyPage(fails=True), "sample@example.com", "password")  # type: ignore[arg-type] # noqa: SLF001

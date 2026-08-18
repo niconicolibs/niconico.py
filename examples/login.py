@@ -1,14 +1,21 @@
-"""Example of login with mail address, password, and session id."""
+"""Examples of logging in to NicoNico."""
 
 from niconico import NicoNico
 
 client = NicoNico()
 
-# 1. login with mail address and password
-client.login_with_mail("mail@example.com", "password")
+# Sign in interactively. The login page opens in a browser; fill in the form,
+# solve the bot challenge and submit it, and the session is picked up for you.
+# Requires the browser extra: pip install "niconico.py[browser]"
+client.login_with_browser()
 
-# 2. login with mail address and password, using 2FA
-client.login_with_mail("mail@example.com", "password", "1234")
+# The mail and password can be prefilled, but you still submit the form yourself.
+client.login_with_browser("mail@example.com", "password")
 
-# 3. login with session id (cookie called `user_session` of nicovideo.jp)
+# Reusing a profile directory keeps you signed in between runs.
+client.login_with_browser(user_data_dir="./.niconico-profile")
+
+# If you already have a session token, use it directly.
 client.login_with_session("user_session_~~~~")
+
+print(client.get_user_session())
