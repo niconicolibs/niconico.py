@@ -32,7 +32,12 @@ from niconico.objects.video import (
     SeriesItem,
     Tag,
 )
-from niconico.objects.video.ranking import Genre
+from niconico.objects.video.playlist import PlaylistId, PlaylistItem, PlaylistMeta
+from niconico.objects.video.ranking import (
+    Genre,
+    TeibanRankingDefinition,
+    TeibanRankingFeaturedKey,
+)
 from niconico.objects.video.search import EssentialMylist, EssentialSeries, FacetItem, VideoSearchAdditionals
 
 T = TypeVar("T")
@@ -127,6 +132,43 @@ class RankingData(BaseModel):
 
     items: list[EssentialVideo]
     has_next: bool = Field(..., alias="hasNext")
+
+
+class TeibanRankingData(BaseModel):
+    """A class that represents the data of a teiban ranking response from the NvAPI.
+
+    ref: https://nvapi.nicovideo.jp/v1/ranking/teiban/<featured_key>
+    """
+
+    featured_key: str = Field(..., alias="featuredKey")
+    label: str
+    tag: str | None
+    max_item_count: int = Field(..., alias="maxItemCount")
+    has_next: bool = Field(..., alias="hasNext")
+    items: list[EssentialVideo]
+
+
+class TeibanRankingFeaturedKeysData(BaseModel):
+    """A class that represents the data of a teiban ranking featured keys response from the NvAPI.
+
+    ref: https://nvapi.nicovideo.jp/v1/ranking/teiban/featured-keys
+    """
+
+    definition: TeibanRankingDefinition
+    items: list[TeibanRankingFeaturedKey]
+
+
+class PlaylistData(BaseModel):
+    """A class that represents the data of a playlist response from the NvAPI.
+
+    ref: https://nvapi.nicovideo.jp/v1/playlist/recipe-id
+    """
+
+    id_: PlaylistId = Field(..., alias="id")
+    meta: PlaylistMeta
+    total_count: int = Field(..., alias="totalCount")
+    items: list[PlaylistItem]
+    recommend_id: str | None = Field(None, alias="recommendId")
 
 
 class VideoSearchData(BaseModel):

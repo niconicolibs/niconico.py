@@ -62,6 +62,50 @@ if result is not None:
 
 `fields` で指定したフィールドだけが応答に含まれるため、`SnapshotVideoItem` の各属性は指定しない限り `None` になります。`_context` に相当する `context` 引数には、利用するサービス名やアプリ名を指定してください。
 
+## ショート動画のフィードを取得する
+
+ショート動画プレイヤーが再生する縦型フィードを取得します。ログインは不要で、返る動画はすべてショート動画です。
+
+```python
+from niconico import NicoNico
+
+client = NicoNico()
+feed = client.video.get_shorts_feed()
+
+if feed is not None:
+    print(feed.total_count)
+    for item in feed.items:
+        print(item.watch_id, item.content.title)
+```
+
+特定のショート動画を起点にしたフィードや、件数の指定もできます。
+
+```python
+feed = client.video.get_shorts_feed("ss46649515", page_size=5)
+```
+
+## 定番ランキングを取得する
+
+ジャンル別ランキング（`get_ranking`）とは別系統の、視聴ページに表示される定番ランキングです。まず利用可能なキーを取得します。
+
+```python
+from niconico import NicoNico
+
+client = NicoNico()
+
+for key in client.video.ranking.get_teiban_ranking_featured_keys():
+    print(key.featured_key, key.label)
+
+ranking = client.video.ranking.get_teiban_ranking("e9uj2uks", "24h", page_size=25)
+
+if ranking is not None:
+    print(ranking.label, ranking.max_item_count)
+    for video in ranking.items:
+        print(video.id_, video.title)
+```
+
+`page_size` は 25 または 100 のみ指定できます。
+
 ## 動画をダウンロードする
 
 ```python

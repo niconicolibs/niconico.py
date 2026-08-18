@@ -7,10 +7,18 @@ from typing import TYPE_CHECKING, Literal
 import requests
 
 from niconico.base.client import BaseClient
-from niconico.objects.nvapi import GenresData, NvAPIResponse, PopularTagsData, RankingData
+from niconico.objects.nvapi import (
+    GenresData,
+    NvAPIResponse,
+    PopularTagsData,
+    RankingData,
+    TeibanRankingData,
+    TeibanRankingFeaturedKeysData,
+)
+from niconico.utils import add_optional_param
 
 if TYPE_CHECKING:
-    from niconico.objects.video.ranking import Genre
+    from niconico.objects.video.ranking import Genre, TeibanRankingFeaturedKey
 
 
 class VideoRankingClient(BaseClient):
@@ -121,4 +129,55 @@ class VideoRankingClient(BaseClient):
                     "hasNext": ranking["hasNext"],
                 },
             )
+        return None
+
+    def get_teiban_ranking_featured_keys(self) -> list[TeibanRankingFeaturedKey]:
+        """Get the featured keys of the teiban rankings.
+
+        The keys returned here are the ones accepted by :meth:`get_teiban_ranking`.
+
+        Returns:
+            list[TeibanRankingFeaturedKey]: A list of available featured keys.
+        """
+        res = self.niconico.get("https://nvapi.nicovideo.jp/v1/ranking/teiban/featured-keys")
+        if res.status_code == requests.codes.ok:
+            res_cls = NvAPIResponse[TeibanRankingFeaturedKeysData](**res.json())
+            if res_cls.data is not None:
+                return res_cls.data.items
+        return []
+
+    def get_teiban_ranking(
+        self,
+        featured_key: str,
+        term: Literal["hour", "24h", "week", "month", "total"],
+        *,
+        page_size: Literal[25, 100] = 100,
+        page: int = 1,
+        sensitive_contents: Literal["mask", "filter"] | None = None,
+    ) -> TeibanRankingData | None:
+        """Get a teiban ranking.
+
+        Args:
+            featured_key (str): The featured key of the ranking, as returned by
+                :meth:`get_teiban_ranking_featured_keys`.
+            term (Literal["hour", "24h", "week", "month", "total"]): The term of the ranking.
+            page_size (Literal[25, 100]): The size of the page. Defaults to 100.
+            page (int): The page number. Defaults to 1.
+            sensitive_contents (Literal["mask", "filter"] | None): The sensitive contents to get.
+
+        Returns:
+            TeibanRankingData | None: The ranking data.
+        """
+        query = {
+            "term": term,
+            "pageSize": str(page_size),
+            "page": str(page),
+        }
+        add_optional_param(query, "sensitiveContents", sensitive_contents)
+        query_str = "&".join([f"{key}={value}" for key, value in query.items()])
+        res = self.niconico.get(f"https://nvapi.nicovideo.jp/v1/ranking/teiban/{featured_key}?{query_str}")
+        if res.status_code == requests.codes.ok:
+            res_cls = NvAPIResponse[TeibanRankingData](**res.json())
+            if res_cls.data is not None:
+                return res_cls.data
         return None
