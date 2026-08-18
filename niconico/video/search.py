@@ -10,12 +10,14 @@ import requests
 from niconico.base.client import BaseClient
 from niconico.objects.nvapi import FacetData, ListSearchData, NvAPIResponse, VideoSearchData
 from niconico.objects.video.search import SnapshotSearchData
+from niconico.utils import add_optional_flag, add_optional_param
 
 if TYPE_CHECKING:
     from niconico.objects.video.search import (
         FacetItem,
         ListSearchSortKey,
         ListType,
+        SelectContentType,
         SnapshotResponseField,
         SnapshotSortKey,
         SnapshotSortOrder,
@@ -37,6 +39,7 @@ class VideoSearchClient(BaseClient):
         page_size: int = 25,
         page: int = 1,
         sensitive_content: Literal["mask", "filter"] | None = None,
+        select_content_type: SelectContentType | None = None,
         channel_video_listing_status: Literal["included"] | None = None,
         allow_future_contents: bool | None = None,
         search_by_user: bool | None = None,
@@ -53,6 +56,8 @@ class VideoSearchClient(BaseClient):
             page_size (int): The page size.
             page (int): The page.
             sensitive_content (Literal["mask", "filter"] | None): The sensitive content.
+            select_content_type (SelectContentType | None): The content type to search for.
+                "short" limits the results to short videos, "all" includes both.
             channel_video_listing_status (Literal["included"] | None): The channel video listing status.
             allow_future_contents (bool | None): The allow future contents.
             search_by_user (bool | None): The search by user.
@@ -70,20 +75,14 @@ class VideoSearchClient(BaseClient):
             "pageSize": str(page_size),
             "page": str(page),
         }
-        if sensitive_content is not None:
-            query["sensitiveContent"] = sensitive_content
-        if channel_video_listing_status is not None:
-            query["channelVideoListingStatus"] = channel_video_listing_status
-        if allow_future_contents is not None:
-            query["allowFutureContents"] = "true" if allow_future_contents else "false"
-        if search_by_user is not None:
-            query["searchByUser"] = "true" if search_by_user else "false"
-        if min_registered_at is not None:
-            query["minRegisteredAt"] = min_registered_at
-        if max_registered_at is not None:
-            query["maxRegisteredAt"] = max_registered_at
-        if max_duration is not None:
-            query["maxDuration"] = str(max_duration)
+        add_optional_param(query, "sensitiveContents", sensitive_content)
+        add_optional_param(query, "selectContentType", select_content_type)
+        add_optional_param(query, "channelVideoListingStatus", channel_video_listing_status)
+        add_optional_flag(query, "allowFutureContents", value=allow_future_contents)
+        add_optional_flag(query, "searchByUser", value=search_by_user)
+        add_optional_param(query, "minRegisteredAt", min_registered_at)
+        add_optional_param(query, "maxRegisteredAt", max_registered_at)
+        add_optional_param(query, "maxDuration", max_duration)
         query_str = "&".join([f"{key}={value}" for key, value in query.items()])
         res = self.niconico.get(f"https://nvapi.nicovideo.jp/v2/search/video?{query_str}")
         if res.status_code == requests.codes.ok:
@@ -101,6 +100,7 @@ class VideoSearchClient(BaseClient):
         page_size: int = 25,
         page: int = 1,
         sensitive_content: Literal["mask", "filter"] | None = None,
+        select_content_type: SelectContentType | None = None,
         channel_video_listing_status: Literal["included"] | None = None,
         allow_future_contents: bool | None = None,
         search_by_user: bool | None = None,
@@ -117,6 +117,8 @@ class VideoSearchClient(BaseClient):
             page_size (int): The page size.
             page (int): The page.
             sensitive_content (Literal["mask", "filter"] | None): The sensitive content.
+            select_content_type (SelectContentType | None): The content type to search for.
+                "short" limits the results to short videos, "all" includes both.
             channel_video_listing_status (Literal["included"] | None): The channel video listing status.
             allow_future_contents (bool | None): The allow future contents.
             search_by_user (bool | None): The search by user.
@@ -134,20 +136,14 @@ class VideoSearchClient(BaseClient):
             "pageSize": str(page_size),
             "page": str(page),
         }
-        if sensitive_content is not None:
-            query["sensitiveContent"] = sensitive_content
-        if channel_video_listing_status is not None:
-            query["channelVideoListingStatus"] = channel_video_listing_status
-        if allow_future_contents is not None:
-            query["allowFutureContents"] = "true" if allow_future_contents else "false"
-        if search_by_user is not None:
-            query["searchByUser"] = "true" if search_by_user else "false"
-        if min_registered_at is not None:
-            query["minRegisteredAt"] = min_registered_at
-        if max_registered_at is not None:
-            query["maxRegisteredAt"] = max_registered_at
-        if max_duration is not None:
-            query["maxDuration"] = str(max_duration)
+        add_optional_param(query, "sensitiveContents", sensitive_content)
+        add_optional_param(query, "selectContentType", select_content_type)
+        add_optional_param(query, "channelVideoListingStatus", channel_video_listing_status)
+        add_optional_flag(query, "allowFutureContents", value=allow_future_contents)
+        add_optional_flag(query, "searchByUser", value=search_by_user)
+        add_optional_param(query, "minRegisteredAt", min_registered_at)
+        add_optional_param(query, "maxRegisteredAt", max_registered_at)
+        add_optional_param(query, "maxDuration", max_duration)
         query_str = "&".join([f"{key}={value}" for key, value in query.items()])
         res = self.niconico.get(f"https://nvapi.nicovideo.jp/v2/search/video?{query_str}")
         if res.status_code == requests.codes.ok:
@@ -163,6 +159,7 @@ class VideoSearchClient(BaseClient):
         sort_key: VideoSearchSortKey = "hot",
         sort_order: VideoSearchSortOrder = "none",
         sensitive_content: Literal["mask", "filter"] | None = None,
+        select_content_type: SelectContentType | None = None,
         channel_video_listing_status: Literal["included"] | None = None,
         allow_future_contents: bool | None = None,
         search_by_user: bool | None = None,
@@ -177,6 +174,8 @@ class VideoSearchClient(BaseClient):
             sort_key (VideoSearchSortKey): The sort key.
             sort_order (VideoSearchSortOrder): The sort order.
             sensitive_content (Literal["mask", "filter"] | None): The sensitive content.
+            select_content_type (SelectContentType | None): The content type to search for.
+                "short" limits the results to short videos, "all" includes both.
             channel_video_listing_status (Literal["included"] | None): The channel video listing status.
             allow_future_contents (bool | None): The allow future contents.
             search_by_user (bool | None): The search by user.
@@ -192,20 +191,14 @@ class VideoSearchClient(BaseClient):
             "sortKey": sort_key,
             "sortOrder": sort_order,
         }
-        if sensitive_content is not None:
-            query["sensitiveContent"] = sensitive_content
-        if channel_video_listing_status is not None:
-            query["channelVideoListingStatus"] = channel_video_listing_status
-        if allow_future_contents is not None:
-            query["allowFutureContents"] = "true" if allow_future_contents else "false"
-        if search_by_user is not None:
-            query["searchByUser"] = "true" if search_by_user else "false"
-        if min_registered_at is not None:
-            query["minRegisteredAt"] = min_registered_at
-        if max_registered_at is not None:
-            query["maxRegisteredAt"] = max_registered_at
-        if max_duration is not None:
-            query["maxDuration"] = str(max_duration)
+        add_optional_param(query, "sensitiveContents", sensitive_content)
+        add_optional_param(query, "selectContentType", select_content_type)
+        add_optional_param(query, "channelVideoListingStatus", channel_video_listing_status)
+        add_optional_flag(query, "allowFutureContents", value=allow_future_contents)
+        add_optional_flag(query, "searchByUser", value=search_by_user)
+        add_optional_param(query, "minRegisteredAt", min_registered_at)
+        add_optional_param(query, "maxRegisteredAt", max_registered_at)
+        add_optional_param(query, "maxDuration", max_duration)
         query_str = "&".join([f"{key}={value}" for key, value in query.items()])
         res = self.niconico.get(f"https://nvapi.nicovideo.jp/v2/search/facet?{query_str}")
         if res.status_code == requests.codes.ok:
@@ -221,6 +214,7 @@ class VideoSearchClient(BaseClient):
         sort_key: VideoSearchSortKey = "hot",
         sort_order: VideoSearchSortOrder = "none",
         sensitive_content: Literal["mask", "filter"] | None = None,
+        select_content_type: SelectContentType | None = None,
         channel_video_listing_status: Literal["included"] | None = None,
         allow_future_contents: bool | None = None,
         search_by_user: bool | None = None,
@@ -235,6 +229,8 @@ class VideoSearchClient(BaseClient):
             sort_key (VideoSearchSortKey): The sort key.
             sort_order (VideoSearchSortOrder): The sort order.
             sensitive_content (Literal["mask", "filter"] | None): The sensitive content.
+            select_content_type (SelectContentType | None): The content type to search for.
+                "short" limits the results to short videos, "all" includes both.
             channel_video_listing_status (Literal["included"] | None): The channel video listing status.
             allow_future_contents (bool | None): The allow future contents.
             search_by_user (bool | None): The search by user.
@@ -250,20 +246,14 @@ class VideoSearchClient(BaseClient):
             "sortKey": sort_key,
             "sortOrder": sort_order,
         }
-        if sensitive_content is not None:
-            query["sensitiveContent"] = sensitive_content
-        if channel_video_listing_status is not None:
-            query["channelVideoListingStatus"] = channel_video_listing_status
-        if allow_future_contents is not None:
-            query["allowFutureContents"] = "true" if allow_future_contents else "false"
-        if search_by_user is not None:
-            query["searchByUser"] = "true" if search_by_user else "false"
-        if min_registered_at is not None:
-            query["minRegisteredAt"] = min_registered_at
-        if max_registered_at is not None:
-            query["maxRegisteredAt"] = max_registered_at
-        if max_duration is not None:
-            query["maxDuration"] = str(max_duration)
+        add_optional_param(query, "sensitiveContents", sensitive_content)
+        add_optional_param(query, "selectContentType", select_content_type)
+        add_optional_param(query, "channelVideoListingStatus", channel_video_listing_status)
+        add_optional_flag(query, "allowFutureContents", value=allow_future_contents)
+        add_optional_flag(query, "searchByUser", value=search_by_user)
+        add_optional_param(query, "minRegisteredAt", min_registered_at)
+        add_optional_param(query, "maxRegisteredAt", max_registered_at)
+        add_optional_param(query, "maxDuration", max_duration)
         query_str = "&".join([f"{key}={value}" for key, value in query.items()])
         res = self.niconico.get(f"https://nvapi.nicovideo.jp/v2/search/facet?{query_str}")
         if res.status_code == requests.codes.ok:
