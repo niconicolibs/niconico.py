@@ -23,6 +23,8 @@ VideoSearchSortKey = Literal[
 
 VideoSearchSortOrder = Literal["desc", "asc", "none"]
 
+SelectContentType = Literal["all", "long", "short"]
+
 
 class RelatedTag(BaseModel):
     """A class that represents a related tag."""
