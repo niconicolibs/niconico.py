@@ -3,17 +3,23 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Literal
+from urllib.parse import urlencode
 
 import requests
 
 from niconico.base.client import BaseClient
 from niconico.objects.nvapi import FacetData, ListSearchData, NvAPIResponse, VideoSearchData
+from niconico.objects.video.search import SnapshotSearchData
 
 if TYPE_CHECKING:
     from niconico.objects.video.search import (
         FacetItem,
         ListSearchSortKey,
         ListType,
+        SnapshotResponseField,
+        SnapshotSortKey,
+        SnapshotSortOrder,
+        SnapshotTargetField,
         VideoSearchSortKey,
         VideoSearchSortOrder,
     )
@@ -303,4 +309,68 @@ class VideoSearchClient(BaseClient):
             res_cls = NvAPIResponse[ListSearchData](**res.json())
             if res_cls.data is not None:
                 return res_cls.data
+        return None
+
+    def search_videos_by_snapshot(
+        self,
+        keyword: str,
+        targets: list[SnapshotTargetField] | None = None,
+        *,
+        sort_key: SnapshotSortKey = "viewCounter",
+        sort_order: SnapshotSortOrder = "desc",
+        fields: list[SnapshotResponseField] | None = None,
+        filters: dict[str, dict[str, str] | list[str]] | None = None,
+        json_filter: str | None = None,
+        offset: int = 0,
+        limit: int = 10,
+        context: str = "niconico.py",
+    ) -> SnapshotSearchData | None:
+        """Search videos with the snapshot search API.
+
+        Unlike the other search methods this endpoint is a public API that does not
+        require a login. See https://site.nicovideo.jp/search-api-docs/snapshot for
+        the full parameter reference.
+
+        Args:
+            keyword (str): The keyword to search.
+            targets (list[SnapshotTargetField] | None): The fields to search against.
+                Defaults to ``["title", "description", "tags"]``.
+            sort_key (SnapshotSortKey): The sort key.
+            sort_order (SnapshotSortOrder): The sort order.
+            fields (list[SnapshotResponseField] | None): The fields to include in the response.
+                If None, only ``contentId`` and ``title`` are requested.
+            filters (dict[str, dict[str, str] | list[str]] | None): The simple filters, keyed by
+                field name. A list is an exact match filter, a dict is a range filter such as
+                ``{"gte": "2024-01-01T00:00:00+09:00"}``.
+            json_filter (str | None): A JSON encoded filter, used instead of ``filters``.
+            offset (int): The offset of the first item to return.
+            limit (int): The maximum number of items to return.
+            context (str): The name of the service or application sending the request.
+
+        Returns:
+            SnapshotSearchData | None: The search result.
+        """
+        query: list[tuple[str, str]] = [
+            ("q", keyword),
+            ("targets", ",".join(targets if targets is not None else ["title", "description", "tags"])),
+            ("fields", ",".join(fields if fields is not None else ["contentId", "title"])),
+            ("_sort", f"{'-' if sort_order == 'desc' else '+'}{sort_key}"),
+            ("_offset", str(offset)),
+            ("_limit", str(limit)),
+            ("_context", context),
+        ]
+        if json_filter is not None:
+            query.append(("jsonFilter", json_filter))
+        elif filters is not None:
+            for field, condition in filters.items():
+                if isinstance(condition, dict):
+                    query.extend((f"filters[{field}][{operator}]", value) for operator, value in condition.items())
+                else:
+                    query.extend((f"filters[{field}][{index}]", value) for index, value in enumerate(condition))
+        query_str = urlencode(query)
+        res = self.niconico.get(
+            f"https://snapshot.search.nicovideo.jp/api/v2/snapshot/video/contents/search?{query_str}",
+        )
+        if res.status_code == requests.codes.ok:
+            return SnapshotSearchData(**res.json())
         return None

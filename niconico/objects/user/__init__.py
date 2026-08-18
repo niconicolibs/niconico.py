@@ -162,8 +162,10 @@ class OwnVideoItem(BaseModel):
     publish_timer_detail: str | None = Field(..., alias="publishTimerDetail")
     auto_delete_detail: str | None = Field(None, alias="autoDeleteDetail")
     is_exclude_from_upload_list: bool = Field(..., alias="isExcludeFromUploadList")
+    is_under_review: bool | None = Field(None, alias="isUnderReview")
     like_count: int = Field(..., alias="likeCount")
     gift_point: int = Field(..., alias="giftPoint")
+    thread_id: int | None = Field(None, alias="threadId")
     essential: EssentialVideo
     series: VideoItemSeries | None
 

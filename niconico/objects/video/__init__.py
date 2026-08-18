@@ -26,6 +26,7 @@ class VideoThumbnail(BaseModel):
     large_url: str | None = Field(..., alias="largeUrl")
     listing_url: str = Field(..., alias="listingUrl")
     nhd_url: str = Field(..., alias="nHdUrl")
+    short_url: str | None = Field(None, alias="shortUrl")
 
 
 class Owner(BaseModel):
@@ -50,6 +51,7 @@ class EssentialVideo(BaseModel):
 
     type_: Literal["essential"] = Field(..., alias="type")
     id_: str = Field(..., alias="id")
+    content_type: str | None = Field(None, alias="contentType")
     title: str
     registered_at: str = Field(..., alias="registeredAt")
     count: VideoCount
