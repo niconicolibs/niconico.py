@@ -171,3 +171,34 @@ def test_load_browser_cookies_rejects_an_unknown_browser() -> None:
     """An unsupported browser name is reported instead of silently ignored."""
     with pytest.raises(LoginFailureError, match="Unsupported browser"):
         NicoNico._load_browser_cookies("netscape")  # noqa: SLF001
+
+
+def test_find_session_cookie_skips_unreadable_browsers(monkeypatch: pytest.MonkeyPatch) -> None:
+    """An unreadable cookie store must not hide a session another browser holds."""
+    tried: list[str] = []
+
+    def loader(browser: str) -> list[DummyCookie]:
+        tried.append(browser)
+        if browser != "firefox":
+            msg = f"Could not read cookies from the browser: {browser} is locked"
+            raise LoginFailureError(message=msg)
+        return [DummyCookie("user_session", "user_session_sample")]
+
+    monkeypatch.setattr(NicoNico, "_load_browser_cookies", staticmethod(loader))
+
+    assert NicoNico._find_session_cookie(None) == "user_session_sample"  # noqa: SLF001
+    assert tried[0] == "chrome"
+    assert "firefox" in tried
+
+
+def test_find_session_cookie_propagates_errors_for_a_named_browser(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Naming a browser explicitly surfaces why it could not be read."""
+
+    def loader(browser: str) -> list[DummyCookie]:
+        msg = f"Could not read cookies from the browser: {browser} is locked"
+        raise LoginFailureError(message=msg)
+
+    monkeypatch.setattr(NicoNico, "_load_browser_cookies", staticmethod(loader))
+
+    with pytest.raises(LoginFailureError, match="is locked"):
+        NicoNico._find_session_cookie("safari")  # noqa: SLF001

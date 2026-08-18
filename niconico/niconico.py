@@ -21,6 +21,17 @@ logger = getLogger("niconico.py")
 
 SESSION_COOKIE_NAME = "user_session"
 COOKIE_DOMAIN = "nicovideo.jp"
+SUPPORTED_BROWSERS = (
+    "chrome",
+    "firefox",
+    "edge",
+    "brave",
+    "chromium",
+    "opera",
+    "vivaldi",
+    "librewolf",
+    "safari",
+)
 
 
 class NicoNico:
@@ -220,8 +231,7 @@ class NicoNico:
             LoginFailureError: If the cookies could not be read, or no browser is
                 signed in to NicoNico.
         """
-        cookies = self._load_browser_cookies(browser)
-        session = self._extract_session_cookie(cookies)
+        session = self._find_session_cookie(browser)
         if session is None:
             raise LoginFailureError(
                 message=(
@@ -230,6 +240,28 @@ class NicoNico:
                 ),
             )
         self.login_with_session(session)
+
+    @staticmethod
+    def _find_session_cookie(browser: str | None) -> str | None:
+        """Look for the session cookie, trying every supported browser when none is named.
+
+        Browsers that cannot be read are skipped: an unreadable cookie store, such as the
+        one Safari keeps behind macOS privacy protection, must not hide a session another
+        browser holds.
+        """
+        if browser is not None:
+            return NicoNico._extract_session_cookie(NicoNico._load_browser_cookies(browser))
+        for name in SUPPORTED_BROWSERS:
+            try:
+                cookies = NicoNico._load_browser_cookies(name)
+            except LoginFailureError as e:
+                logger.debug("Skipping %s: %s", name, e)
+                continue
+            session = NicoNico._extract_session_cookie(cookies)
+            if session is not None:
+                logger.debug("Using the NicoNico session held by %s.", name)
+                return session
+        return None
 
     @staticmethod
     def _load_browser_cookies(browser: str | None) -> Iterable[object]:
