@@ -131,3 +131,55 @@ def test_snapshot_search_returns_none_on_error() -> None:
     client = VideoSearchClient(niconico)  # type: ignore[arg-type]
 
     assert client.search_videos_by_snapshot("sample") is None
+
+
+def _video_search_payload() -> dict[str, Any]:
+    """Return a minimal video search payload."""
+    return {
+        "meta": {"status": 200},
+        "data": {
+            "searchId": "search",
+            "keyword": "sample",
+            "tag": None,
+            "genres": [],
+            "totalCount": 0,
+            "hasNext": False,
+            "items": [],
+            "additionals": {"tags": []},
+        },
+    }
+
+
+def test_keyword_search_sends_sensitive_contents_plural() -> None:
+    """The sensitive content filter uses the plural parameter the API validates."""
+    niconico = DummyNicoNico(_video_search_payload())
+    client = VideoSearchClient(niconico)  # type: ignore[arg-type]
+
+    client.search_videos_by_keyword("sample", sensitive_content="filter")
+
+    url = niconico.calls[0]
+    assert "sensitiveContents=filter" in url
+    assert "sensitiveContent=" not in url.replace("sensitiveContents=", "")
+
+
+def test_keyword_search_sends_select_content_type() -> None:
+    """Short videos can be selected through selectContentType."""
+    niconico = DummyNicoNico(_video_search_payload())
+    client = VideoSearchClient(niconico)  # type: ignore[arg-type]
+
+    client.search_videos_by_keyword("sample", select_content_type="short")
+
+    assert "selectContentType=short" in niconico.calls[0]
+
+
+def test_search_omits_unset_optional_params() -> None:
+    """Optional parameters stay absent when not provided."""
+    niconico = DummyNicoNico(_video_search_payload())
+    client = VideoSearchClient(niconico)  # type: ignore[arg-type]
+
+    client.search_videos_by_keyword("sample")
+
+    url = niconico.calls[0]
+    assert "selectContentType" not in url
+    assert "sensitiveContents" not in url
+    assert "allowFutureContents" not in url

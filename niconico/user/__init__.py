@@ -45,6 +45,7 @@ if TYPE_CHECKING:
         UserVideosSortOrder,
     )
     from niconico.objects.video import Mylist, MylistSortKey, MylistSortOrder
+    from niconico.objects.video.search import SelectContentType
 
 
 class UserClient(BaseClient):
@@ -122,6 +123,7 @@ class UserClient(BaseClient):
         page_size: int = 30,
         page: int = 1,
         sensitive_contents: Literal["mask", "filter"] | None = None,
+        select_content_type: SelectContentType | None = None,
     ) -> UserVideosData | None:
         """Get the videos of a user by its ID.
 
@@ -132,6 +134,8 @@ class UserClient(BaseClient):
             page_size (int): The number of videos to get per page.
             page (int): The page number to get the videos from.
             sensitive_contents (Literal["mask", "filter"] | None): The sensitive contents to get.
+            select_content_type (SelectContentType | None): The content type to get.
+                "short" limits the results to short videos, "all" includes both.
 
         Returns:
             UserVideosData | None: The list of videos if found, None otherwise.
@@ -144,6 +148,8 @@ class UserClient(BaseClient):
         }
         if sensitive_contents is not None:
             query["sensitiveContents"] = sensitive_contents
+        if select_content_type is not None:
+            query["selectContentType"] = select_content_type
         query_str = "&".join([f"{key}={value}" for key, value in query.items()])
         res = self.niconico.get(f"https://nvapi.nicovideo.jp/v3/users/{user_id}/videos?{query_str}")
         if res.status_code == requests.codes.ok:

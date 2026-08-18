@@ -37,6 +37,32 @@ if comments is not None:
         print(thread.id)
 ```
 
+## ショート動画を検索する
+
+`selectContentType` に対応した検索・ファセット・ユーザー投稿動画の各メソッドで、ショート動画（ID が `ss` で始まる動画）を絞り込めます。`"short"` でショートのみ、`"long"` で通常動画のみ、`"all"` で両方が対象になります。省略時は通常動画のみです。
+
+```python
+from niconico import NicoNico
+
+client = NicoNico()
+result = client.video.search.search_videos_by_keyword(
+    "音楽",
+    page_size=10,
+    select_content_type="short",
+)
+
+if result is not None:
+    for video in result.items:
+        print(video.id_, video.content_type, video.title)
+```
+
+個々の動画がショートかどうかは `content_type`（`"short"` / `"long"`）で判別できます。視聴ページの取得やダウンロードは通常動画と同じメソッドがそのまま使えます。
+
+```python
+watch_data = client.video.watch.get_watch_data("ss46649515")
+print(watch_data.video.content_type)  # short
+```
+
 ## スナップショット検索 API で検索する
 
 [スナップショット検索 API v2](https://site.nicovideo.jp/search-api-docs/snapshot) を利用した検索です。ログイン不要で、再生数などの条件で絞り込めます。

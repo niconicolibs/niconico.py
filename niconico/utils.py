@@ -24,3 +24,9 @@ def add_optional_param(query: dict[str, str], key: str, value: int | str | None)
     """Add an optional parameter to the query dict if value is not None."""
     if value is not None:
         query[key] = str(value)
+
+
+def add_optional_flag(query: dict[str, str], key: str, *, value: bool | None) -> None:
+    """Add an optional boolean parameter to the query dict as "true"/"false" if value is not None."""
+    if value is not None:
+        query[key] = "true" if value else "false"
